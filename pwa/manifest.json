@@ -1,23 +1,60 @@
 {
   "name": "Flor de Lótus - Sushi Delivery",
   "short_name": "Flor de Lótus",
-  "description": "Cardápio digital do restaurante Flor de Lótus",
-  "start_url": "/",
+  "description": "Cardápio digital e delivery do restaurante Flor de Lótus — Culinária Oriental em Cajazeiras, PB.",
+  "lang": "pt-BR",
+  "dir": "ltr",
+
+  "start_url": "./cardapio.html",
+  "scope": "./",
+
   "display": "standalone",
-  "background_color": "#F8BBD0",
+  "orientation": "portrait",
+
+  "background_color": "#000000",
   "theme_color": "#C2185B",
+
   "icons": [
     {
       "src": "icons/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
     },
     {
       "src": "icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+
+  "categories": ["food", "shopping"],
+
+  "shortcuts": [
+    {
+      "name": "Ver Cardápio",
+      "short_name": "Cardápio",
+      "description": "Abrir o cardápio completo",
+      "url": "./cardapio.html",
+      "icons": [
+        {
+          "src": "icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
     }
   ]
 }

@@ -1,132 +1,202 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>Flor de Lótus - Sushi Delivery</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="icons/icon-192.png">
-    <meta name="theme-color" content="#C2185B">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;500&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Cardápio digital da Flor de Lótus — Sushi delivery em Cajazeiras, PB. Peça agora pelo WhatsApp.">
+  <meta name="theme-color" content="#C2185B">
+
+  <title>Flor de Lótus | Cardápio</title>
+
+  <!-- CORREÇÃO: preconnect antes das fontes (performance) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;500&display=swap" rel="stylesheet">
+
+  <!-- CORREÇÃO: Font Awesome beta → versão estável 6.5.0 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <link rel="stylesheet" href="styles.css">
+  <link rel="manifest" href="manifest.json">
+
+  <!-- CORREÇÃO: apple-touch-icon com sizes declarado -->
+  <link rel="apple-touch-icon" sizes="192x192" href="icons/icon-192.png">
 </head>
 <body>
-    <header>
-        <button id="themeToggle" class="theme-toggle" aria-label="Alternar modo escuro">
-            <i class="fas fa-moon"></i>
+
+  <header>
+    <!-- CORREÇÃO: fa-lotus não existe no FA → fa-spa é o mais próximo disponível -->
+    <!-- Botões ficam no header que tem position: relative no CSS -->
+    <button id="themeToggle" class="theme-toggle" aria-label="Alternar modo escuro">
+      <i class="fas fa-moon" aria-hidden="true"></i>
+    </button>
+
+    <div class="logo">
+      <i class="fas fa-spa" style="color: #C2185B; font-size: 2rem;" aria-hidden="true"></i>
+      <h1>Flor de Lótus</h1>
+    </div>
+    <p class="slogan">Culinária Oriental</p>
+
+    <button id="musicToggle" class="music-toggle" aria-label="Tocar música ambiente">
+      <i class="fas fa-music" aria-hidden="true"></i>
+    </button>
+  </header>
+
+  <!-- Filtros de categoria -->
+  <nav class="filters" aria-label="Filtrar categorias do cardápio">
+    <button class="filter-btn active" data-section="all">Todos</button>
+    <button class="filter-btn" data-section="tradicionais">Tradicionais</button>
+    <button class="filter-btn" data-section="especiais">Especiais</button>
+    <button class="filter-btn" data-section="combinados">Combinados</button>
+  </nav>
+
+  <main>
+    <section id="tradicionais" aria-labelledby="titulo-tradicionais">
+      <h2 id="titulo-tradicionais">
+        Peças Tradicionais <i class="fas fa-fish" aria-hidden="true"></i>
+      </h2>
+      <div class="menu-grid" id="tradicionais-grid"></div>
+    </section>
+
+    <!-- CORREÇÃO: fa-lotus → fa-spa nos divisores também -->
+    <div class="lotus-divider" aria-hidden="true">
+      <i class="fas fa-spa"></i>
+    </div>
+
+    <section id="especiais" aria-labelledby="titulo-especiais">
+      <h2 id="titulo-especiais">
+        Peças Especiais <i class="fas fa-crown" aria-hidden="true"></i>
+      </h2>
+      <div class="menu-grid" id="especiais-grid"></div>
+    </section>
+
+    <div class="lotus-divider" aria-hidden="true">
+      <i class="fas fa-spa"></i>
+    </div>
+
+    <section id="combinados" aria-labelledby="titulo-combinados">
+      <h2 id="titulo-combinados">
+        Combinados <i class="fas fa-box" aria-hidden="true"></i>
+      </h2>
+      <div class="menu-grid" id="combinados-grid"></div>
+    </section>
+  </main>
+
+  <!-- =====================
+       MODAL: DETALHE DO ITEM
+  ===================== -->
+  <!-- CORREÇÃO: role="dialog" e aria-modal adicionados (estava faltando no itemModal) -->
+  <div id="itemModal" class="cart-modal" role="dialog" aria-modal="true" aria-labelledby="modalNome">
+    <div class="cart-modal-content item-detail">
+
+      <div class="cart-header">
+        <h3 id="modalNome"></h3>
+        <!-- CORREÇÃO: <i> como botão → <button> correto semanticamente e acessível -->
+        <button class="btn-close" onclick="closeItemModal()" aria-label="Fechar detalhes do item">
+          <i class="fas fa-times" aria-hidden="true"></i>
         </button>
-        <div class="logo">
-            <i class="fas fa-lotus" style="color: #C2185B; font-size: 2rem;"></i>
-            <h1>Flor de Lótus</h1>
-        </div>
-        <p class="slogan">Culinária Oriental</p>
-        <button id="musicToggle" class="music-toggle" aria-label="Tocar música ambiente">
-            <i class="fas fa-music"></i>
+      </div>
+
+      <!-- CORREÇÃO: inline style removido → classe modal-photo no CSS -->
+      <img id="modalPhoto" src="" alt="" class="modal-photo">
+
+      <p id="modalDesc" class="modal-desc"></p>
+      <p id="modalPreco" class="modal-preco"></p>
+
+      <!-- CORREÇÃO: label com for correto apontando para o select -->
+      <label for="flavorSelect">Sabor:</label>
+      <select id="flavorSelect">
+        <!-- Opções populadas dinamicamente pelo app.js a partir do menu.json -->
+      </select>
+
+      <div class="quantity">
+        <!-- CORREÇÃO: label com for correto apontando para o input de quantidade -->
+        <label for="modalQty">Quantidade:</label>
+        <button onclick="changeModalQty(-1)" aria-label="Diminuir quantidade">–</button>
+        <span id="modalQty" role="status" aria-live="polite">1</span>
+        <button onclick="changeModalQty(1)" aria-label="Aumentar quantidade">+</button>
+      </div>
+
+      <button class="btn-add btn-add-modal" onclick="addFromModal()">
+        <i class="fas fa-plus-circle" aria-hidden="true"></i> Adicionar ao Carrinho
+      </button>
+
+    </div>
+  </div>
+
+  <!-- =====================
+       MODAL: CARRINHO
+  ===================== -->
+  <div id="cartModal" class="cart-modal" role="dialog" aria-modal="true" aria-labelledby="titulo-carrinho">
+    <div class="cart-modal-content">
+
+      <div class="cart-header">
+        <h3 id="titulo-carrinho">Seu Pedido</h3>
+        <button class="btn-close" onclick="toggleCartModal()" aria-label="Fechar carrinho">
+          <i class="fas fa-times" aria-hidden="true"></i>
         </button>
+      </div>
 
-    </header>
+      <div id="cartItemsList" class="cart-items"></div>
 
-    <nav class="filters" aria-label="Navegação do cardápio">
-        <button class="filter-btn active" data-section="all">Todos</button>
-        <button class="filter-btn" data-section="tradicionais">Tradicionais</button>
-        <button class="filter-btn" data-section="especiais">Especiais</button>
-        <button class="filter-btn" data-section="combinados">Combinados</button>
-    </nav>
-
-    <main>
-        <section id="tradicionais">
-            <h2>Peças Tradicionais <i class="fas fa-fish"></i></h2>
-            <div class="menu-grid" id="tradicionais-grid"></div>
-        </section>
-        <div class="lotus-divider"><i class="fas fa-lotus"></i></div>
-
-        <section id="especiais">
-            <h2>Peças Especiais <i class="fas fa-crown"></i></h2>
-            <div class="menu-grid" id="especiais-grid"></div>
-        </section>
-        <div class="lotus-divider"><i class="fas fa-lotus"></i></div>
-
-        <section id="combinados">
-            <h2>Combinados <i class="fas fa-box"></i></h2>
-            <div class="menu-grid" id="combinados-grid"></div>
-        </section>
-    </main>
-
-    <!-- Modais -->
-    <div id="itemModal" class="cart-modal">
-        <div class="cart-modal-content item-detail">
-            <div class="cart-header">
-                <h3 id="modalNome"></h3>
-                <i class="fas fa-times" onclick="closeItemModal()"></i>
-            </div>
-            <img id="modalPhoto" src="" alt="Foto do prato" style="width:100%; height:auto; border-radius:8px;">
-            <p id="modalDesc"></p>
-            <p id="modalPreco"></p>
-            <label>Sabor:</label>
-            <select id="flavorSelect">
-                <option value="salmao">Salmão</option>
-                <option value="camarao">Camarão</option>
-                <option value="kani">Kani</option>
-            </select>
-            <div class="quantity">
-                <label>Quantidade:</label>
-                <button onclick="changeModalQty(-1)">–</button>
-                <span id="modalQty">1</span>
-                <button onclick="changeModalQty(1)">+</button>
-            </div>
-            <button class="btn-add" onclick="addFromModal()">Adicionar ao Carrinho</button>
+      <div class="cart-total">
+        <strong>Total: R$ <span id="modalTotal">0.00</span></strong>
+        <div class="agendamento">
+          <label for="agendamentoData">Data para retirada/entrega:</label>
+          <input type="datetime-local" id="agendamentoData" min="">
         </div>
+      </div>
+
+      <button class="btn-finalizar" id="finalizarBtn" onclick="finalizarPedido()">
+        <i class="fab fa-whatsapp" aria-hidden="true"></i> Finalizar via WhatsApp
+      </button>
+
     </div>
+  </div>
 
-    <div id="cartModal" class="cart-modal" role="dialog" aria-modal="true">
-        <div class="cart-modal-content">
-            <div class="cart-header">
-                <h3>Seu Pedido</h3>
-                <i class="fas fa-times" onclick="toggleCartModal()"></i>
-            </div>
-            <div id="cartItemsList" class="cart-items"></div>
-            <div class="cart-total">
-                <strong>Total: R$ <span id="modalTotal">0.00</span></strong>
-                <div class="agendamento">
-                    <label for="agendamentoData">Data para retirada/entrega:</label>
-                    <input type="datetime-local" id="agendamentoData" min="">
-                </div>
-            </div>
-            <button class="btn-finalizar" id="finalizarBtn" onclick="finalizarPedido()">
-                <i class="fab fa-whatsapp"></i> Finalizar via WhatsApp
-            </button>
-        </div>
+  <!-- =====================
+       MODAL: HISTÓRICO
+  ===================== -->
+  <div id="historyModal" class="cart-modal" role="dialog" aria-modal="true" aria-labelledby="titulo-historico">
+    <div class="cart-modal-content">
+
+      <div class="cart-header">
+        <h3 id="titulo-historico">Histórico de Pedidos</h3>
+        <button class="btn-close" onclick="toggleHistoryModal()" aria-label="Fechar histórico">
+          <i class="fas fa-times" aria-hidden="true"></i>
+        </button>
+      </div>
+
+      <div id="historyList"></div>
+
     </div>
+  </div>
 
-    <div id="historyModal" class="cart-modal" role="dialog" aria-modal="true">
-        <div class="cart-modal-content">
-            <div class="cart-header">
-                <h3>Histórico de Pedidos</h3>
-                <i class="fas fa-times" onclick="toggleHistoryModal()"></i>
-            </div>
-            <div id="historyList"></div>
-        </div>
+  <!-- Barra fixa do carrinho -->
+  <!-- CORREÇÃO: <footer> semanticamente errado para barra de carrinho → <div role="contentinfo"> -->
+  <!-- <footer> é reservado para informações do documento, não UI interativa -->
+  <div class="cart-bar" id="cartBar" role="complementary" aria-label="Resumo do carrinho">
+    <div class="cart-info" onclick="toggleCartModal()" role="button" tabindex="0"
+         aria-label="Abrir carrinho"
+         onkeydown="if(event.key==='Enter'||event.key===' ')toggleCartModal()">
+      <i class="fas fa-shopping-basket" aria-hidden="true"></i>
+      <span id="cartCount">0</span> itens | Total: R$ <span id="cartTotal">0.00</span>
+      <i class="fas fa-chevron-up" id="cartArrow" aria-hidden="true"></i>
+      <div class="pontos-info">
+        <i class="fas fa-star" aria-hidden="true"></i>
+        <span id="pontosDisplay">0</span> pontos
+      </div>
     </div>
+  </div>
 
-    <!-- Barra fixa do carrinho -->
-    <footer class="cart-bar" id="cartBar">
-        <div class="cart-info" onclick="toggleCartModal()">
-            <i class="fas fa-shopping-basket"></i>
-            <span id="cartCount">0</span> itens | Total: R$ <span id="cartTotal">0.00</span>
-            <i class="fas fa-chevron-up" id="cartArrow"></i>
-            <div class="pontos-info">
-                <i class="fas fa-star"></i> <span id="pontosDisplay">0</span> pontos
-            </div>
-        </div>
-    </footer>
+  <!-- Áudio ambiente -->
+  <audio id="ambientMusic" loop preload="none">
+    <source src="audio/happy.mp3" type="audio/mpeg">
+  </audio>
 
-    <audio id="ambientMusic" loop preload="none">
-        <source src="audio/happy.mp3" type="audio/mpeg">
-    </audio>
+  <!-- Elemento de animação (controlado via JS) -->
+  <div id="floatCartAnimation" class="float-animation" aria-hidden="true"></div>
 
-    <div id="floatCartAnimation" class="float-animation"></div>
-
-    <script src="app.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
