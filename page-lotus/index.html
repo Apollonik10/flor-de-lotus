@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Flor de Lótus — Culinária oriental artesanal com ingredientes frescos e entrega rápida em Cajazeiras, PB." />
+
+  <title>Flor de Lótus | Culinária Oriental</title>
+
+  <!-- CORREÇÃO #1: preconnect ANTES das fontes (performance) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <!-- CORREÇÃO #1: fonte duplicada removida, apenas uma declaração unificada -->
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <!-- CORREÇÃO #3: Font Awesome adicionado (ícones do footer estavam invisíveis) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/splide.min.css">
+  <link rel="stylesheet" href="css/custom.css">
+</head>
+<body>
+
+  <!-- CORREÇÃO #5: <nav> movida para dentro do <header> (semântica correta) -->
+  <header class="site-header">
+    <nav class="nav-bar" aria-label="Navegação principal">
+      <ul class="menu">
+        <li><a href="#">Home</a></li>
+        <li><a href="#">Nossa História</a></li>
+        <li><a href="#">Curiosidades</a></li>
+        <!-- CORREÇÃO #6: href="container" → href="#contact" (âncora correta para o footer) -->
+        <li><a href="#contact">Fale Conosco</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main id="root">
+
+    <!-- Hero -->
+    <section class="card2" aria-labelledby="hero-title">
+      <h1 id="hero-title">Sushi artesanal feito na hora, com ingredientes frescos e entrega rápida</h1>
+      <p>Culinária oriental inspirada na tradição, no equilíbrio e na experiência.</p>
+    </section>
+
+    <div class="button-wrapper">
+      <a href="../pwa/cardapio.html" class="btn-pedido">Fazer Pedido Agora</a>
+    </div>
+
+    <!-- Indicação de área de entrega -->
+    <p class="delivery-badge" aria-label="Área de entrega">
+      <i class="fas fa-motorcycle" aria-hidden="true"></i>
+      Entregamos para toda Cajazeiras
+    </p>
+
+    <!-- Seta de scroll — indica que há mais conteúdo abaixo -->
+    <div class="scroll-indicator" aria-hidden="true">
+      <span class="scroll-arrow"></span>
+    </div>
+
+    <article>
+      <h2 class="sr-only">Flor de Lótus – Experiência Gastronômica</h2>
+
+      <!-- Carrossel de Pratos -->
+      <section class="carousel-section" aria-label="Pratos em destaque">
+        <div class="splide" id="pratos-carousel">
+          <div class="splide__track">
+            <ul class="splide__list">
+              <!-- CORREÇÃO #15: loading="lazy" adicionado em todas as imagens abaixo do fold -->
+              <li class="splide__slide">
+                <img src="assets/images/pecas/bento.jpg" alt="Bento Oriental" loading="lazy">
+              </li>
+              <li class="splide__slide">
+                <img src="assets/images/pecas/trak-dragon.png" alt="Trak Dragon" loading="lazy">
+              </li>
+              <li class="splide__slide">
+                <img src="assets/images/pecas/kane-shake.png" alt="Kane Shake" loading="lazy">
+              </li>
+              <li class="splide__slide">
+                <img src="assets/images/pecas/supremo.png" alt="Supremo" loading="lazy">
+              </li>
+              <li class="splide__slide">
+                <img src="assets/images/pecas/carpaccio.png" alt="Carpaccio" loading="lazy">
+              </li>
+              <li class="splide__slide">
+                <img src="assets/images/pecas/temaki-hot.jpg" alt="Temaki Hot" loading="lazy">
+              </li>
+              <li class="splide__slide">
+                <img src="assets/images/pecas/ceviche.png" alt="Ceviche" loading="lazy">
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <div class="button-wrapper">
+        <a href="../pwa/index.html" class="btn-pedido">Fazer Pedido Agora</a>
+      </div>
+
+      <!-- Seção Combinados -->
+      <!-- CORREÇÃO #10: <section class="about-section"> aninhada removida; substituída por <div> sem papel semântico independente -->
+      <section class="combinados-section" aria-labelledby="combinados-title">
+
+        <div class="glass-card">
+          <h2 id="combinados-title" class="experience-title h1-style">Combinados</h2>
+          <p>Cada combinado, uma experiência.</p>
+        </div>
+
+        <div class="carousel-section">
+          <div class="splide" id="combinados-carousel">
+            <div class="splide__track">
+              <ul class="splide__list">
+                <li class="splide__slide">
+                  <img src="assets/images/combos/40variados.jpg" alt="Combinado 40 Variados" loading="lazy">
+                </li>
+                <li class="splide__slide">
+                  <img src="assets/images/combos/chef.jpg" alt="Combinado Chef" loading="lazy">
+                </li>
+                <li class="splide__slide">
+                  <img src="assets/images/combos/delicia.jpg" alt="Combinado Delícia" loading="lazy">
+                </li>
+                <li class="splide__slide">
+                  <img src="assets/images/combos/felicidade.png" alt="Combinado Felicidade" loading="lazy">
+                </li>
+                <li class="splide__slide">
+                  <img src="assets/images/combos/maravilha.png" alt="Combinado Maravilha" loading="lazy">
+                </li>
+                <!-- CORREÇÃO #8: </li> duplicado removido -->
+                <!-- CORREÇÃO: alt="Combinado maravilha" corrigido para o nome real -->
+                <li class="splide__slide">
+                  <img src="assets/images/combos/omega.jpg" alt="Combinado Ômega" loading="lazy">
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- Seção Experiência -->
+      <section class="experience-section" aria-labelledby="experience-title">
+        <div class="glass-card glass-card-wide">
+          <h2 id="experience-title" class="experience-title h1-style">
+            Uma Experiência Além do Prato
+          </h2>
+          <div class="experience-content">
+            <p class="experience-text">
+              Cada detalhe da Flor de Lótus é pensado para criar uma experiência
+              sensorial completa. Da escolha dos ingredientes à apresentação,
+              tradição e sofisticação caminham juntas em cada prato servido.
+            </p>
+            <div class="experience-video">
+              <iframe
+                src="https://www.youtube.com/embed/CrONernzbiQ"
+                title="Experiência Flor de Lótus"
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowfullscreen
+              ></iframe>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CTA WhatsApp — substituiu o 3º botão genérico sem nexo -->
+      <div class="whatsapp-cta-block">
+        <p class="whatsapp-cta-text">Prefere pedir direto pelo WhatsApp?</p>
+        <a
+          href="https://wa.me/5583999700469?text=Olá!%20Gostaria%20de%20fazer%20um%20pedido%20%F0%9F%8D%A3"
+          class="btn-whatsapp-cta"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Fazer pedido pelo WhatsApp"
+        >
+          <i class="fab fa-whatsapp" aria-hidden="true"></i>
+          Chamar no WhatsApp
+        </a>
+      </div>
+
+      <!-- Seção Sobre -->
+      <section class="about-section" aria-labelledby="about-title">
+        <div class="glass-card glass-card-wide">
+          <h2 id="about-title" class="h1-style">Sobre o Sushi Man &amp; Proprietário</h2>
+
+          <!-- CORREÇÃO #9: about-image movida para DENTRO do about-container (grid de 2 colunas funcionando) -->
+          <div class="about-container">
+            <div class="about-text">
+              <p>
+                Minha história na cozinha começou há mais de 15 anos, movida pela paixão
+                pela gastronomia e pelo respeito aos ingredientes. Há 10 anos atuo como
+                sushi man, aperfeiçoando técnicas, sabores e a apresentação de cada prato.
+              </p>
+              <p>
+                Há 5 anos fundei o <strong>Flor de Lótus Culinária Oriental</strong>, onde
+                assumi também o papel de proprietário. Desde então, desenvolvi cardápios,
+                participei da inauguração de outras casas e restaurantes, e treinei
+                profissionais que hoje atuam como sushi mans.
+              </p>
+              <p>
+                Atualmente, meu foco é a excelência: qualidade acima de tudo, atenção
+                absoluta aos detalhes e a entrega de uma experiência que vai além do prato.
+              </p>
+            </div>
+            <div class="about-image">
+              <img src="assets/images/minha-foto.jpg" alt="Sushi Man e Proprietário Flor de Lótus" loading="lazy">
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+    </article>
+  </main>
+
+  <!-- =====================
+       SEÇÃO: AVALIAÇÕES
+       (textos de exemplo — substituir pelos reais do Instagram/WhatsApp)
+  ===================== -->
+  <section class="reviews-section" aria-labelledby="reviews-title">
+    <div class="container">
+
+      <div class="reviews-header">
+        <h2 id="reviews-title" class="h1-style">O que nossos clientes dizem</h2>
+        <p class="reviews-subtitle">Avaliações reais de quem já pediu e aprovou</p>
+      </div>
+
+      <div class="reviews-grid">
+
+        <article class="review-card" aria-label="Avaliação de cliente">
+          <div class="review-stars" aria-label="5 estrelas">
+            <i class="fas fa-star" aria-hidden="true"></i>
+            <i class="fas fa-star" aria-hidden="true"></i>
+            <i class="fas fa-star" aria-hidden="true"></i>
+            <i class="fas fa-star" aria-hidden="true"></i>
+            <i class="fas fa-star" aria-hidden="true"></i>
+          </div>
+          <blockquote class="review-text">
+            "Melhor sushi de Cajazeiras, sem dúvida. Os ingredientes são fresquíssimos e a apresentação é impecável. Já virei cliente fiel!"
+          </blockquote>
+          <footer class="review-author">
+            <div class="review-avatar" aria-hidden="true">M</div>
+            <div>
+              <strong class="review-name">Mariana S.</strong>
+              <span class="review-source"><i class="fab fa-instagram" aria-hidden="true"></i> Instagram</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" aria-label="Avaliação de cliente">
+          <div class="review-stars" aria-label="5 estrelas">
+            <i class="fas fa-star" aria-hidden="true"></i>
+            <i class="fas fa-star" aria-hidden="true"></i>
+            <i class="fas fa-star" aria-hidden="true"></i>
+            <i class="fas fa-star" aria-hidden="true"></i>
+            <i class="fas fa-star" aria-hidden="true"></i>
+          </div>
+          <blockquote class="review-text">
+            "Pedi o combinado chef e me surpreendi com o tamanho e a qualidade. Entrega rápida, embalagem caprichada e ainda veio quentinho. 10/10!"
+          </blockquote>
+          <footer class="review-author">
+            <div class="review-avatar" aria-hidden="true">R</div>
+            <div>
+              <strong class="review-name">Rafael L.</strong>
+              <span class="review-source"><i class="fab fa-whatsapp" aria-hidden="true"></i> WhatsApp</span>
+            </div>
+          </footer>
+        </article>
+
+        <article class="review-card" aria-label="Avaliação de cliente">
+          <div class="review-stars" aria-label="5 estrelas">
+            <i class="fas fa-star" aria-hidden="true"></i>
+            <i class="fas fa-star" aria-hidden="true"></i>
+            <i class="fas fa-star" aria-hidden="true"></i>
+            <i class="fas fa-star" aria-hidden="true"></i>
+            <i class="fas fa-star" aria-hidden="true"></i>
+          </div>
+          <blockquote class="review-text">
+            "Finalmente um sushi de verdade aqui em Cajazeiras. Cada peça é uma obra de arte. A família toda amou e já está pedindo de novo essa semana!"
+          </blockquote>
+          <footer class="review-author">
+            <div class="review-avatar" aria-hidden="true">A</div>
+            <div>
+              <strong class="review-name">Ana Paula C.</strong>
+              <span class="review-source"><i class="fab fa-instagram" aria-hidden="true"></i> Instagram</span>
+            </div>
+          </footer>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer id="contact">
+    <div class="container">
+      <div class="footer-content">
+
+        <div class="footer-about">
+          <div class="footer-logo">Flor de <span>Lótus</span></div>
+          <!-- CORREÇÃO: typo "cúlinaria" → "culinária" -->
+          <p>O melhor da culinária oriental no conforto da sua casa. Qualidade, sabor e tradição.</p>
+        </div>
+
+        <!-- CORREÇÃO: <div> de links semântico, aria-label adicionado -->
+        <nav class="footer-links" aria-label="Links rápidos do rodapé">
+          <h3 class="footer-heading">Links Rápidos</h3>
+          <ul>
+            <li><a href="#favorites">Cardápio Completo</a></li>
+            <li><a href="#">Área de Entrega</a></li>
+            <li><a href="#">Política de Privacidade</a></li>
+            <li><a href="#tradition">Sobre Nós</a></li>
+          </ul>
+        </nav>
+
+        <!-- CORREÇÃO: <address> é o elemento semântico correto para informações de contato -->
+        <address class="contact-info">
+          <h3 class="footer-heading">Contato</h3>
+          <!-- CORREÇÃO #3: ícones Font Awesome agora visíveis + aria-hidden para leitores de tela -->
+          <p><i class="fas fa-phone-alt" aria-hidden="true"></i> (83) 99970-0469</p>
+          <!-- CORREÇÃO: e-mail obfuscado pelo Cloudflare substituído por href limpo -->
+          <p><i class="fas fa-envelope" aria-hidden="true"></i>
+            <a href="mailto:contato@flordelotus.com.br">contato@flordelotus.com.br</a>
+          </p>
+          <p><i class="fas fa-map-marker-alt" aria-hidden="true"></i> Cajazeiras, PB</p>
+        </address>
+
+        <div class="opening-hours">
+          <h3 class="footer-heading">Horário de Funcionamento</h3>
+          <p><strong>Terça a Sexta:</strong> 17:30 – 22:00</p>
+          <p><strong>Sábado e Domingo:</strong> 17:30 – 22:30</p>
+        </div>
+
+      </div>
+
+      <div class="copyright">
+        <p>&copy; Flor de Lótus Culinária Oriental. Todos os direitos reservados.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- CORREÇÃO #4: Splide JS adicionado (carrosséis estavam estáticos sem o script) -->
+  <script src="js/splide.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+      // Carrossel de pratos individuais
+      new Splide('#pratos-carousel', {
+        type       : 'loop',
+        perPage    : 3,
+        gap        : '1.5rem',
+        autoplay   : true,
+        interval   : 3000,
+        pauseOnHover: true,
+        breakpoints: {
+          900: { perPage: 2 },
+          600: { perPage: 1 }
+        }
+      }).mount();
+
+      // Carrossel de combinados
+      new Splide('#combinados-carousel', {
+        type       : 'loop',
+        perPage    : 3,
+        gap        : '1.5rem',
+        autoplay   : true,
+        interval   : 3500,
+        pauseOnHover: true,
+        breakpoints: {
+          900: { perPage: 2 },
+          600: { perPage: 1 }
+        }
+      }).mount();
+
+    });
+  </script>
+  <!-- Botão Flutuante WhatsApp -->
+  <a
+    href="https://wa.me/5583999700469?text=Olá!%20Gostaria%20de%20fazer%20um%20pedido%20%F0%9F%8D%A3"
+    class="whatsapp-float"
+    target="_blank"
+    rel="noopener noreferrer"
+    aria-label="Falar no WhatsApp"
+  >
+    <i class="fab fa-whatsapp" aria-hidden="true"></i>
+    <span class="whatsapp-float-tooltip">Fazer Pedido</span>
+  </a>
+
+</body>
+</html>

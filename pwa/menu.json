@@ -1,0 +1,48 @@
+{
+  "tradicionais": [
+    {"id":1,"nome":"Uramaki","descricao":"5 unidades","preco":10.00,"imagem":"images/tradicionais/uramaki.jpg","flavors":["Salmão","Camarão","Kani"],"tags":["vegano","sem gluten"]},
+    {"id":2,"nome":"Hossomaki","descricao":"5 unidades","preco":10.00,"imagem":"images/tradicionais/hossomaki.jpg","flavors":["Salmão","Camarão","Kani"],"tags":["vegano","sem gluten"]},
+    {"id":3,"nome":"Arco Íris","descricao":"5 unidades","preco":10.00,"imagem":"images/tradicionais/arco-iris.jpg","flavors":["Salmão","Camarão","Kani"],"tags":["salmão"]},
+    {"id":4,"nome":"Canapé","descricao":"5 unidades","preco":10.00,"imagem":"images/tradicionais/canape.jpg","flavors":["Salmão","Camarão","Kani"],"tags":["salmão"]},
+    {"id":5,"nome":"Hot Roll","descricao":"5 unidades","preco":10.00,"imagem":"images/tradicionais/hot-roll.jpg","flavors":["Salmão","Camarão","Kani"],"tags":["salmão"]},
+    {"id":6,"nome":"Kani Queijo","descricao":"5 unidades","preco":15.00,"imagem":"images/tradicionais/kani-queijo.jpg","flavors":["Salmão","Camarão","Kani"],"tags":["salmão"]},
+    {"id":7,"nome":"Joy Joy","descricao":"1 unidade","preco":3.00,"imagem":"images/tradicionais/joy-joy.jpg","flavors":["Salmão","Camarão","Kani"],"tags":["salmão"]},
+    {"id":8,"nome":"Eby Joy","descricao":"1 unidade","preco":3.00,"imagem":"images/tradicionais/eby-joy.jpg","flavors":["Salmão","Camarão","Kani"],"tags":["salmão"]},
+    {"id":9,"nome":"Dragon","descricao":"1 unidade","preco":3.00,"imagem":"images/tradicionais/dragon.jpg","flavors":["Salmão","Camarão","Kani"],"tags":["salmão"]},
+    {"id":10,"nome":"Nigiri","descricao":"1 unidade","preco":3.00,"imagem":"images/tradicionais/nigiri.jpg","flavors":["Salmão","Camarão","Kani"],"tags":["salmão","sem gluten"]},
+    {"id":11,"nome":"Mini Temaki","descricao":"1 unidade","preco":3.00,"imagem":"images/tradicionais/mini-temaki.jpg","flavors":["Salmão","Camarão","Kani"],"tags":["salmão"]},
+    {"id":12,"nome":"Nigiri de Camarão Kroc","descricao":"1 unidade","preco":3.00,"imagem":"images/tradicionais/nigiri-camarao-kroc.jpg","flavors":["Salmão","Camarão","Kani"],"tags":["camarão"]},
+    {"id":13,"nome":"Arco Íris Zaga","descricao":"5 unidades","preco":15.00,"imagem":"images/tradicionais/arco-iris-zaga.jpg","flavors":["Salmão","Camarão","Kani"],"tags":["salmão"]},
+    {"id":14,"nome":"Kani Shake","descricao":"5 unidades","preco":15.00,"imagem":"images/tradicionais/kani-shake.jpg","flavors":["Salmão","Camarão","Kani"],"tags":["salmão"]},
+    {"id":15,"nome":"Sashimis","descricao":"5 unidades","preco":30.00,"imagem":"images/tradicionais/sashimi.jpg","flavors":["Salmão","Camarão","Kani"],"tags":["salmão","sem gluten"]},
+    {"id":16,"nome":"Carpaccio","descricao":"10 unidades","preco":30.00,"imagem":"images/tradicionais/carpaccio.jpg","flavors":["Salmão","Camarão","Kani"],"tags":["salmão"]},
+    {"id":17,"nome":"Temaki","descricao":"1 unidade","preco":25.00,"imagem":"images/tradicionais/temaki.jpg","flavors":["Salmão","Camarão","Kani"],"tags":["salmão"]},
+    {"id":18,"nome":"Temaki Haromaki","descricao":"1 unidade","preco":25.00,"imagem":"images/tradicionais/temaki-haromaki.jpg","flavors":["Salmão","Camarão","Kani"],"tags":["salmão"]},
+    {"id":19,"nome":"Bento","descricao":"Prato completo","preco":35.00,"imagem":"images/tradicionais/bento.jpg","flavors":["Salmão","Camarão","Kani"],"tags":["salmão","sem gluten"]},
+    {"id":20,"nome":"Ceviche","descricao":"Porção","preco":15.00,"imagem":"images/tradicionais/ceviche.jpg","flavors":["Salmão","Camarão","Kani"],"tags":["camarão"]},
+    {"id":21,"nome":"Sunomono","descricao":"Porção","preco":15.00,"imagem":"images/tradicionais/sunomono.jpg","flavors":["Salmão","Camarão","Kani"],"tags":["vegano","sem gluten"]},
+    {"id":22,"nome":"Hot Dog Roll","descricao":"1 unidade","preco":28.00,"imagem":"images/tradicionais/hot-dog-roll.jpg","flavors":["Salmão","Camarão","Kani"],"tags":["salmão"]},
+    {"id":23,"nome":"Sushi Burger","descricao":"1 unidade","preco":30.00,"imagem":"images/tradicionais/sushi-burger.jpg","flavors":["Salmão","Camarão","Kani"],"tags":["salmão"]},
+    {"id":24,"nome":"Kani Queijo na Haromaki","descricao":"5 unidades","preco":15.00,"imagem":"images/tradicionais/kani-haromaki.jpg","flavors":["Salmão","Camarão","Kani"],"tags":["salmão"]},
+    {"id":25,"nome":"Bolinhas de Salmão","descricao":"5 unidades","preco":15.00,"imagem":"images/tradicionais/bolinhas-salmao.jpg","flavors":["Salmão","Camarão","Kani"],"tags":["salmão"]},
+    {"id":26,"nome":"Rolinho Haromaki","descricao":"4 unidades","preco":15.00,"imagem":"images/tradicionais/rolinho-haromaki.jpg","flavors":["Salmão","Camarão","Kani"],"tags":["salmão"]},
+    {"id":27,"nome":"Canudos de Camarão","descricao":"4 unidades","preco":18.00,"imagem":"images/tradicionais/canudos-camarao.jpg","flavors":["Salmão","Camarão","Kani"],"tags":["camarão"]}
+  ],
+  "especiais": [
+    {"id":28,"nome":"Lótus Supremo","descricao":"Peça especial premium","preco":100.00,"imagem":"images/especiais/lotus-supremo.jpg","flavors":["Salmão","Camarão","Kani"],"tags":["salmão"]},
+    {"id":29,"nome":"Temaki Lótus","descricao":"Temaki especial da casa","preco":50.00,"imagem":"images/especiais/temaki-lotus.jpg","flavors":["Salmão","Camarão","Kani"],"tags":["salmão"]},
+    {"id":30,"nome":"Trak Dragon","descricao":"Peça especial crocante","preco":40.00,"imagem":"images/especiais/trak-dragon.jpg","flavors":["Salmão","Camarão","Kani"],"tags":["salmão"]},
+    {"id":31,"nome":"Roll Supremo","descricao":"7 unidades especiais","preco":40.00,"imagem":"images/especiais/roll-supremo.jpg","flavors":["Salmão","Camarão","Kani"],"tags":["salmão"]},
+    {"id":32,"nome":"Sunomono Especial","descricao":"Porção especial","preco":40.00,"imagem":"images/especiais/sunomono-especial.jpg","flavors":["Salmão","Camarão","Kani"],"tags":["vegano","sem gluten"]},
+    {"id":33,"nome":"Pizza de Sushi","descricao":"Porção especial da casa","preco":35.00,"imagem":"images/especiais/pizza-sushi.jpg","flavors":["Salmão","Camarão","Kani"],"tags":["salmão"]}
+  ],
+  "combinados": [
+    {"id":34,"nome":"40 Variados","descricao":"Um combinado com 40 peças tradicionais da culinária japonesa onde o frescor e a qualidade de um bom arroz são realçados. Peças inclusas: 6 Uramaki, 7 Hossomaki, 6 Arco Íris, 7 Canapé, 14 Hot Holl. 40 peças.","preco":50.00,"imagem":"images/combinados/40-variados.jpg","flavors":[],"tags":[]},
+    {"id":35,"nome":"Combo Crocante","descricao":"São 40 peças empanadas em uma deliciosa massa e na farinha panko que traz toda a crocância da fritura. Peças inclusas: 28 Hot Holl tradicionais, 12 Canapés Hot Holls. 40 peças.","preco":50.00,"imagem":"images/combinados/combo-crocante.jpg","flavors":[],"tags":[]},
+    {"id":36,"nome":"Combo Reserva","descricao":"Uma ótima opção para comer a dois, com uma boa variação de peças e tudo bem fresquinho. Peças inclusas: 12 Uramaki, 7 Hossomaki, 12 Arco Íris, 5 Joy Joy, 7 Kane Queijo, 14 Hot Holl. 58 peças.","preco":90.00,"imagem":"images/combinados/combo-reserva.jpg","flavors":[],"tags":[]},
+    {"id":37,"nome":"Combo Felicidade","descricao":"Um combinado com peças únicas de salmão, para realçar o maravilhoso sabor desse incrível peixe. Peças inclusas: 6 Gramaki, 4 Nigiri, 4 Joy Joy, 3 Sashimi, 14 Hot Holl, 1 Temaki. 31 peças e 1 Temaki.","preco":80.00,"imagem":"images/combinados/combo-felicidade.jpg","flavors":[],"tags":[]},
+    {"id":38,"nome":"Combo do Cheff","descricao":"Um combinado elaborado pelo sushiman Felipe Garcia com o que há de melhor no Zaga Sushi. Peças inclusas: 6 Uramaki, 6 Arco Íris, 4 Nigiri Crok de Camarão, 2 Joy Zaga, 1 Rolinho, 8 Hot Holl Especial. 26 peças e 1 Rolinho.","preco":50.00,"imagem":"images/combinados/combo-cheff.jpg","flavors":[],"tags":[]},
+    {"id":39,"nome":"Combo Maravilha","descricao":"Um maravilhoso combo com delícias cremosas e crocantes que irão conquistar o seu paladar. Peças inclusas: 10 Aramaki, 6 Arco Íris, 12 Kane Queijo, 6 Kane Queijo na Haromaki, 12 Hot Haromaki, 5 Canapé. 51 peças.","preco":80.00,"imagem":"images/combinados/combo-maravilha.jpg","flavors":[],"tags":[]},
+    {"id":40,"nome":"Lótus Delícia","descricao":"Um combo que reverência uma peça icônica do sushi, o nigiri maçaricado ou natural ele cai bem a qualquer hora. Peças inclusas: 6 Aramaki, 6 Arco Íris, 12 Nigiri, 14 Hot Holl. 38 peças.","preco":60.00,"imagem":"images/combinados/sotus-delicia.jpg","flavors":[],"tags":[]}
+  ]
+}

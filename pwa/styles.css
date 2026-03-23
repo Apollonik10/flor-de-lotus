@@ -1,0 +1,462 @@
+/* Paleta de cores */
+:root {
+    --preto: #000000;
+    --rosa-escuro: #C2185B;
+    --rosa-claro: #F8BBD0;
+    --vermelho-oriental: #D32F2F;
+    --branco: #FFFFFF;
+    --cinza-claro: #f5f5f5;
+     --bg-color: #f5f5f5;
+    --text-color: #000000;
+    --card-bg: #ffffff;
+    /* mantenha as outras variáveis */
+}
+.dark-theme {
+    --bg-color: #121212;
+    --text-color: #ffffff;
+    --card-bg: #1e1e1e;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Roboto, sans-serif;
+}
+
+body {
+    background-color: var(--cinza-claro);
+    color: var(--preto);
+    padding-bottom: 70px; /* espaço para a barra fixa do carrinho */
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    transition: background-color 0.3s, color 0.3s;
+}
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('icons/fundo1.png');
+    background-repeat: repeat;
+    pointer-events: none;
+    z-index: -1;
+}
+
+header {
+    background-color: var(--preto);
+    color: var(--branco);
+    padding: 1.5rem 1rem;
+    text-align: center;
+    border-bottom: 4px solid var(--rosa-escuro);
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.8rem;
+}
+
+.logo h1 {
+    font-size: 3rem;
+    font-weight: 300;
+    letter-spacing: 2px;
+}
+
+.slogan {
+    color: var(--rosa-claro);
+    font-style: italic;
+    margin-top: 2rem;
+    font-size: 0.9rem;
+}
+
+main {
+    padding: 1rem;
+}
+h1, h2 {
+    font-family: 'Noto Serif JP', serif;
+}
+
+section {
+    margin-bottom: 2.5rem;
+}
+
+section h2 {
+    color: var(--rosa-escuro);
+    border-left: 6px solid var(--vermelho-oriental);
+    padding-left: 0.8rem;
+    margin-bottom: 1.2rem;
+    font-weight: 400;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.menu-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 1rem;
+}
+
+/* Cartão de cada item */
+.menu-item {
+    background: var(--branco);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    transition: transform 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--rosa-claro);
+    background: var(--card-bg);
+    /* outros ajustes de borda etc. */
+}
+
+.menu-item:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(194, 24, 91, 0.15);
+}
+    
+ .item-image { background-color: transparent; height: 80px; } /* menor */
+.menu-item { 
+  background: rgba(255,255,255,0.2); 
+  backdrop-filter: blur(10px); 
+  border: 1px solid rgba(255,255,255,0.3); 
+  min-width: 140px; /* menor */
+}
+.item-detail { padding: 1rem; text-align: center; }
+.quantity { display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin: 1rem 0; }
+}
+
+.item-info {
+    padding: 0.8rem;
+    flex: 1;
+}
+
+.item-info h3 {
+    font-size: 1.1rem;
+    margin-bottom: 0.3rem;
+    color: var(--preto);
+}
+
+.item-info .descricao {
+    font-size: 0.8rem;
+    color: #666;
+    margin-bottom: 0.5rem;
+    line-height: 1.2;
+}
+
+.item-info .preco {
+    font-weight: bold;
+    color: var(--vermelho-oriental);
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+}
+
+.btn-add {
+    background-color: var(--rosa-escuro);
+    color: white;
+    border: none;
+    padding: 0.5rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
+    transition: background 0.2s;
+    width: 100%;
+    margin-top: 0.3rem;
+}
+
+.btn-add:hover {
+    background-color: var(--vermelho-oriental);
+}
+
+/* Barra fixa do carrinho */
+.cart-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: var(--preto);
+    color: var(--branco);
+    padding: 0.8rem 1.2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 1000;
+    border-top: 2px solid var(--rosa-escuro);
+    cursor: pointer;
+}
+
+.cart-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 1rem;
+    width: 100%;
+    justify-content: center;
+}
+
+.cart-info i {
+    color: var(--rosa-claro);
+}
+
+/* Modal do carrinho */
+.cart-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.7);
+    z-index: 2000;
+    align-items: flex-end;
+}
+
+.cart-modal.show {
+    display: flex;
+}
+
+.cart-modal-content {
+    background-color: var(--branco);
+    width: 100%;
+    max-height: 80vh;
+    border-top-left-radius: 24px;
+    border-top-right-radius: 24px;
+    padding: 1.5rem 1rem;
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+}
+
+.cart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    color: var(--rosa-escuro);
+}
+
+.cart-header i {
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+.cart-items {
+    max-height: 50vh;
+    overflow-y: auto;
+    margin-bottom: 1rem;
+}
+
+.cart-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.8rem 0;
+    border-bottom: 1px solid var(--rosa-claro);
+}
+
+.cart-item-info {
+    flex: 2;
+}
+
+.cart-item-name {
+    font-weight: 600;
+}
+
+.cart-item-price {
+    color: var(--vermelho-oriental);
+    font-size: 0.9rem;
+}
+
+.cart-item-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.cart-item-actions button {
+    background: none;
+    border: 1px solid var(--rosa-escuro);
+    color: var(--rosa-escuro);
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.cart-item-actions button:hover {
+    background: var(--rosa-escuro);
+    color: white;
+}
+
+.cart-total {
+    text-align: right;
+    font-size: 1.3rem;
+    margin: 1rem 0;
+    color: var(--preto);
+}
+
+.btn-finalizar {
+    background-color: #25D366; /* WhatsApp green */
+    color: white;
+    border: none;
+    padding: 1rem;
+    border-radius: 30px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    width: 100%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: opacity 0.2s;
+}
+
+.btn-finalizar:hover {
+    opacity: 0.9;
+}
+/* botao modo dark */
+.theme-toggle {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: 1px solid var(--rosa-claro);
+    color: var(--branco);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+.theme-toggle:hover {
+    background-color: var(--rosa-escuro);
+    border-color: var(--rosa-escuro);
+}
+.filters {
+    display: flex;
+    overflow-x: auto;
+    gap: 0.5rem;
+    padding: 1rem;
+    background-color: var(--card-bg);
+    white-space: nowrap;
+    border-bottom: 1px solid var(--rosa-claro);
+}
+.filter-btn {
+    background: none;
+    border: 1px solid var(--rosa-escuro);
+    color: var(--rosa-escuro);
+    padding: 0.5rem 1rem;
+    border-radius: 30px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.filter-btn.active {
+    background-color: var(--rosa-escuro);
+    color: white;
+}
+.float-animation {
+    position: fixed;
+    width: 40px;
+    height: 40px;
+    background-color: var(--rosa-escuro);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.5rem;
+    pointer-events: none;
+    z-index: 3000;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+.favorite-icon {
+    float: right;
+    color: var(--rosa-escuro);
+    cursor: pointer;
+    font-size: 1.2rem;
+}
+.favorite-icon.fas {
+    color: var(--vermelho-oriental);
+}
+.agendamento {
+    margin: 1rem 0;
+    padding: 0.5rem;
+    border-top: 1px solid var(--rosa-claro);
+}
+.agendamento input {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid var(--rosa-claro);
+    border-radius: 8px;
+}
+.lotus-divider {
+    text-align: center;
+    color: var(--rosa-claro);
+    margin: 1rem 0;
+    font-size: 1.5rem;
+}
+.music-toggle {
+    position: absolute;
+    top: 1rem;
+    right: 4rem; /* ao lado do botão de tema */
+    background: none;
+    border: 1px solid var(--rosa-claro);
+    color: var(--branco);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+/* Transições suaves gerais */
+body, section, .menu-grid, .menu-item {
+    transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+/* Ao esconder/mostrar seções */
+section {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+section[style*="display: none"] {
+    opacity: 0;
+    transform: translateY(20px);
+    pointer-events: none;
+}
+
+/* Itens do menu ao carregar/filtrar */
+.menu-item {
+    opacity: 0;
+    transform: scale(0.95);
+    animation: fadeInUp 0.5s forwards;
+}
+
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Delay escalonado nos itens */
+.menu-grid .menu-item:nth-child(1) { animation-delay: 0.1s; }
+.menu-grid .menu-item:nth-child(2) { animation-delay: 0.2s; }
+.menu-grid .menu-item:nth-child(3) { animation-delay: 0.3s; }
+.menu-grid .menu-item:nth-child(4) { animation-delay: 0.4s; }
+/* continue se precisar de mais */
