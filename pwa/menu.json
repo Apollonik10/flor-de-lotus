@@ -12,7 +12,7 @@
           "porcao": "5 unidades",
           "descricao": "O clássico arroz por fora, enrolado com maestria. Combinação perfeita de sabor e textura com recheio fresco à escolha.",
           "preco": 10.00,
-          "imagem": "images/tradicionais/uramaki.jpg",
+          "imagem": "../page-lotus/assets/images/uramaki.jpg",
           "sabores": ["Salmão", "Camarão", "Kani"],
           "tags": ["vegano", "sem gluten"],
           "destaque": false

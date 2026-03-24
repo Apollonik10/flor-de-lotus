@@ -230,7 +230,7 @@ function renderCard(item, catNome) {
 
       <div class="item-card-img">
         <img src="${item.imagem}" alt="${item.nome}" loading="lazy"
-             onerror="this.src='images/placeholder.jpg'">
+             onerror="this.src='../pages-lotus/assets/images/placeholder.jpg'">
       </div>
 
       <div class="item-card-body">
@@ -334,7 +334,7 @@ function buildModalHTML(item) {
 
     <div class="modal-img">
       <img src="${item.imagem}" alt="${item.nome}" loading="lazy"
-           onerror="this.src='images/placeholder.jpg'">
+           onerror="this.src='../pages-lotus/assets/images/placeholder.jpg'">
     </div>
 
     <div class="modal-body">
