@@ -69,7 +69,7 @@ function persistData() {
 /* ── Fetch menu.json ── */
 async function fetchMenu() {
   try {
-    const res = await fetch('./menu.json');
+    const res = await fetch('menu.json');
     if (!res.ok) throw new Error('Falha ao carregar cardápio');
     const data = await res.json();
     state.menu = data.categorias || [];
@@ -230,7 +230,7 @@ function renderCard(item, catNome) {
 
       <div class="item-card-img">
         <img src="${item.imagem}" alt="${item.nome}" loading="lazy"
-             onerror="this.src='../pages-lotus/assets/images/placeholder.jpg'">
+             onerror="this.src='images/placeholder.jpg'">
       </div>
 
       <div class="item-card-body">
@@ -334,7 +334,7 @@ function buildModalHTML(item) {
 
     <div class="modal-img">
       <img src="${item.imagem}" alt="${item.nome}" loading="lazy"
-           onerror="this.src='../pages-lotus/assets/images/placeholder.jpg'">
+           onerror="this.src='images/placeholder.jpg'">
     </div>
 
     <div class="modal-body">
@@ -529,15 +529,27 @@ function sendOrderWhatsApp() {
     return `• ${c.qty}x ${c.nome}${sabor} — R$ ${formatPrice(c.preco * c.qty)}`;
   });
 
-  const msg = [
-    '🌸 *Flor de Lótus — Novo Pedido*',
-    '',
-    ...lines,
-    '',
-    `*Total: R$ ${formatPrice(total)}*`,
-    '',
-    '📍 Informe seu endereço de entrega, por favor!'
-  ].join('\n');
+  const user    = window.FL_USER;
+   const nomeCliente = user?.name ? `*Cliente:* ${user.name}` : '';
+   const enderecoWA  = user?.address ? `*Endereço:* ${user.address}` : '';
+   const alergiaWA   = user?.allergies?.length
+     ? `⚠️ *Alergias:* ${user.allergies.join(', ')}`
+     : '';
+   const notasWA = user?.notes ? `📝 *Obs:* ${user.notes}` : '';
+
+   const msg = [
+     '🌸 *Flor de Lótus — Novo Pedido*',
+     nomeCliente,
+     '',
+     ...lines,
+     '',
+     `*Total: R$ ${formatPrice(total)}*`,
+     '',
+     enderecoWA,
+     alergiaWA,
+     notasWA,
+     '📍 Confirme o endereço de entrega, por favor!',
+   ].filter(Boolean).join('\n');
 
   const url = `https://wa.me/5583999700469?text=${encodeURIComponent(msg)}`;
   window.open(url, '_blank', 'noopener,noreferrer');

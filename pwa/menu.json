@@ -23,7 +23,7 @@
           "porcao": "5 unidades",
           "descricao": "Rolinho fino envolto em alga nori crocante com recheio simples e delicado. Equilíbrio perfeito entre arroz e sabor.",
           "preco": 10.00,
-          "imagem": "images/tradicionais/hossomaki.jpg",
+          "imagem": "../page-lotus/assets/images/hossomaki.jpg",
           "sabores": ["Salmão", "Camarão", "Kani"],
           "tags": ["vegano", "sem gluten"],
           "destaque": false
@@ -34,7 +34,7 @@
           "porcao": "5 unidades",
           "descricao": "Uramaki coberto com fatias coloridas de diferentes peixes, criando um visual impressionante e sabor marcante.",
           "preco": 10.00,
-          "imagem": "images/tradicionais/arco-iris.jpg",
+          "imagem": "../page-lotus/assets/images/arco-iris.jpg",
           "sabores": ["Salmão", "Camarão", "Kani"],
           "tags": ["salmão"],
           "destaque": true
@@ -45,7 +45,7 @@
           "porcao": "5 unidades",
           "descricao": "Base crocante de arroz frito coroada com peixe fresco e finalização especial. Uma explosão de texturas a cada mordida.",
           "preco": 10.00,
-          "imagem": "images/tradicionais/canape.jpg",
+          "imagem": "../page-lotus/assets/images/canape.jpg",
           "sabores": ["Salmão", "Camarão", "Kani"],
           "tags": ["salmão"],
           "destaque": false
@@ -56,7 +56,7 @@
           "porcao": "5 unidades",
           "descricao": "Uramaki empanado na farinha panko e frito até dourar. Crocante por fora, cremoso por dentro — irresistível.",
           "preco": 10.00,
-          "imagem": "images/tradicionais/hot-roll.jpg",
+          "imagem": "../page-lotus/assets/images/hot.jpg",
           "sabores": ["Salmão", "Camarão", "Kani"],
           "tags": ["salmão"],
           "destaque": true
@@ -67,7 +67,7 @@
           "porcao": "5 unidades",
           "descricao": "Combinação clássica de kani com cream cheese gratinado. Cremoso, suave e absolutamente viciante.",
           "preco": 15.00,
-          "imagem": "images/tradicionais/kani-queijo.jpg",
+          "imagem": "../page-lotus/assets/images/kane-keijo.jpg",
           "sabores": ["Salmão", "Camarão", "Kani"],
           "tags": ["salmão"],
           "destaque": false
@@ -78,18 +78,7 @@
           "porcao": "1 unidade",
           "descricao": "Peça individual recheada e finalizada com toque especial da casa. Pequena mas com muito sabor.",
           "preco": 3.00,
-          "imagem": "images/tradicionais/joy-joy.jpg",
-          "sabores": ["Salmão", "Camarão", "Kani"],
-          "tags": ["salmão"],
-          "destaque": false
-        },
-        {
-          "id": "trad-08",
-          "nome": "Eby Joy",
-          "porcao": "1 unidade",
-          "descricao": "Peça especial com camarão crocante encapado, finalizada com molho e gergelim torrado.",
-          "preco": 3.00,
-          "imagem": "images/tradicionais/eby-joy.jpg",
+          "imagem": "../page-lotus/assets/images/joy.jpg",
           "sabores": ["Salmão", "Camarão", "Kani"],
           "tags": ["salmão"],
           "destaque": false
@@ -100,7 +89,7 @@
           "porcao": "1 unidade",
           "descricao": "Peça inspirada no dragão oriental — recheio potente coberto com fatia de abacate e finalização flamejada.",
           "preco": 3.00,
-          "imagem": "images/tradicionais/dragon.jpg",
+          "imagem": "../page-lotus/assets/images/dragon.jpg",
           "sabores": ["Salmão", "Camarão", "Kani"],
           "tags": ["salmão"],
           "destaque": false
@@ -111,7 +100,7 @@
           "porcao": "1 unidade",
           "descricao": "Base oval de arroz temperado coroada com fatia generosa de peixe fresco. Simplicidade que encanta.",
           "preco": 3.00,
-          "imagem": "images/tradicionais/nigiri.jpg",
+          "imagem": "../page-lotus/assets/images/nigiri.jpg",
           "sabores": ["Salmão", "Camarão", "Kani"],
           "tags": ["salmão", "sem gluten"],
           "destaque": false
@@ -122,7 +111,7 @@
           "porcao": "1 unidade",
           "descricao": "Cone de alga nori em versão mini, recheado com arroz e ingrediente à escolha. Prático e delicioso.",
           "preco": 3.00,
-          "imagem": "images/tradicionais/mini-temaki.jpg",
+          "imagem": "../page-lotus/assets/images/mini-temaki.jpg",
           "sabores": ["Salmão", "Camarão", "Kani"],
           "tags": ["salmão"],
           "destaque": false
@@ -133,7 +122,7 @@
           "porcao": "1 unidade",
           "descricao": "Nigiri diferenciado com camarão empanado e maçaricado. Textura crocante com sabor adocicado do camarão fresco.",
           "preco": 3.00,
-          "imagem": "images/tradicionais/nigiri-camarao-kroc.jpg",
+          "imagem": "../page-lotus/assets/images/nigiri-krok.png",
           "sabores": ["Camarão"],
           "tags": ["camarão"],
           "destaque": true
@@ -144,7 +133,7 @@
           "porcao": "5 unidades",
           "descricao": "Versão premium do Arco Íris com ingredientes selecionados e apresentação ainda mais elaborada.",
           "preco": 15.00,
-          "imagem": "images/tradicionais/arco-iris-zaga.jpg",
+          "imagem": "../page-lotus/assets/images/arco-iris-zaga.jpg",
           "sabores": ["Salmão", "Camarão", "Kani"],
           "tags": ["salmão"],
           "destaque": false
@@ -166,7 +155,7 @@
           "porcao": "5 unidades",
           "descricao": "Fatias finas de peixe fresco servidas sem arroz. Pureza máxima de sabor — elegância japonesa em sua essência.",
           "preco": 30.00,
-          "imagem": "images/tradicionais/sashimi.jpg",
+          "imagem": "../page-lotus/assets/images/sashimi.jpg",
           "sabores": ["Salmão", "Camarão"],
           "tags": ["salmão", "sem gluten"],
           "destaque": true
@@ -177,7 +166,7 @@
           "porcao": "10 unidades",
           "descricao": "Finas fatias de salmão sobre base crocante, finalizadas com azeite, alcaparras e limão siciliano.",
           "preco": 30.00,
-          "imagem": "../page-lotus/assets/images/pecas/carpaccio.png",
+          "imagem": "../page-lotus/assets/images/carpaccio.png",
           "sabores": ["Salmão", "Camarão", "Kani"],
           "tags": ["salmão"],
           "destaque": false
@@ -188,7 +177,7 @@
           "porcao": "1 unidade",
           "descricao": "Cone de alga nori crocante recheado generosamente com arroz, peixe fresco e cream cheese.",
           "preco": 25.00,
-          "imagem": "images/tradicionais/temaki.jpg",
+          "imagem": "../page-lotus/assets/images/temaki.jpg",
           "sabores": ["Salmão", "Camarão", "Kani"],
           "tags": ["salmão"],
           "destaque": false
@@ -199,7 +188,7 @@
           "porcao": "1 unidade",
           "descricao": "Temaki diferenciado com camada adicional de massa haromaki, que traz crocância extra a cada mordida.",
           "preco": 25.00,
-          "imagem": "images/tradicionais/temaki-haromaki.jpg",
+          "imagem": "../page-lotus/assets/images/temaki-haromaki.jpg",
           "sabores": ["Salmão", "Camarão", "Kani"],
           "tags": ["salmão"],
           "destaque": false
@@ -210,7 +199,7 @@
           "porcao": "Prato completo",
           "descricao": "Caixa completa com variedade de peças tradicionais. Ideal para uma refeição completa e satisfatória.",
           "preco": 35.00,
-          "imagem": "../page-lotus/assets/images/pecas/bento.jpg",
+          "imagem": "../page-lotus/assets/images/bento.jpg",
           "sabores": ["Salmão", "Camarão", "Kani"],
           "tags": ["salmão", "sem gluten"],
           "destaque": true
@@ -221,7 +210,7 @@
           "porcao": "Porção",
           "descricao": "Peixe fresco marinado no limão, pimenta dedo-de-moça, coentro e cebola roxa. Refrescante e aromático.",
           "preco": 15.00,
-          "imagem": "../page-lotus/assets/images/pecas/ceviche.png",
+          "imagem": "../page-lotus/assets/images/ceviche.png",
           "sabores": ["Camarão"],
           "tags": ["camarão"],
           "destaque": false
@@ -232,7 +221,7 @@
           "porcao": "Porção",
           "descricao": "Salada japonesa de pepino em conserva com molho agridoce. Acompanhamento perfeito e refrescante.",
           "preco": 15.00,
-          "imagem": "images/tradicionais/sunomono.jpg",
+          "imagem": "../page-lotus/assets/images/sunomono.png",
           "sabores": ["Salmão", "Camarão", "Kani"],
           "tags": ["sem gluten"],
           "destaque": false
@@ -243,7 +232,7 @@
           "porcao": "1 unidade",
           "descricao": "Fusão criativa entre o hot dog e o sushi. Recheio generoso dentro de um cone crocante e irresistível.",
           "preco": 28.00,
-          "imagem": "images/tradicionais/hot-dog-roll.jpg",
+          "imagem": "../page-lotus/assets/images/hot-dog.jpg",
           "sabores": ["Salmão", "Camarão", "Kani"],
           "tags": ["salmão"],
           "destaque": false
@@ -254,7 +243,7 @@
           "porcao": "1 unidade",
           "descricao": "Hambúrguer japonês — dois discos de arroz prensado fazem o pão, com recheio especial entre eles.",
           "preco": 30.00,
-          "imagem": "images/tradicionais/sushi-burger.jpg",
+          "imagem": "../page-lotus/assets/images/burger.jpg",
           "sabores": ["Salmão", "Camarão", "Kani"],
           "tags": ["salmão"],
           "destaque": true
@@ -265,7 +254,7 @@
           "porcao": "5 unidades",
           "descricao": "Kani com cream cheese envolvido na crocante massa haromaki. A versão elevada de um clássico amado.",
           "preco": 15.00,
-          "imagem": "images/tradicionais/kani-haromaki.jpg",
+          "imagem": "../page-lotus/assets/images/haromaki-kani-keijo.jpg",
           "sabores": ["Salmão", "Camarão", "Kani"],
           "tags": ["salmão"],
           "destaque": false
@@ -276,7 +265,7 @@
           "porcao": "5 unidades",
           "descricao": "Bolas de arroz com recheio de salmão temperado, envoltas em gergelim e finalização maçaricada.",
           "preco": 15.00,
-          "imagem": "images/tradicionais/bolinhas-salmao.jpg",
+          "imagem": "../page-lotus/assets/images/bolinho.jpg",
           "sabores": ["Salmão"],
           "tags": ["salmão"],
           "destaque": false
@@ -287,7 +276,7 @@
           "porcao": "4 unidades",
           "descricao": "Rolinhos crocantes de massa haromaki recheados generosamente. Crocância incomparável com sabor marcante.",
           "preco": 15.00,
-          "imagem": "images/tradicionais/rolinho-haromaki.jpg",
+          "imagem": "../page-lotus/assets/images/rolinho-haromaki.jpg",
           "sabores": ["Salmão", "Camarão", "Kani"],
           "tags": ["salmão"],
           "destaque": false
@@ -298,7 +287,7 @@
           "porcao": "4 unidades",
           "descricao": "Canudos de massa crocante recheados com camarão temperado e cream cheese. Entrada perfeita para o pedido.",
           "preco": 18.00,
-          "imagem": "images/tradicionais/canudos-camarao.jpg",
+          "imagem": "../page-lotus/assets/images/canudo.png",
           "sabores": ["Camarão"],
           "tags": ["camarão"],
           "destaque": false
@@ -318,7 +307,7 @@
           "porcao": "Peça especial",
           "descricao": "A peça mais icônica da casa. Elaborada com ingredientes premium e montagem artesanal pelo Sushi Man. Uma experiência única.",
           "preco": 100.00,
-          "imagem": "../page-lotus/assets/images/pecas/supremo.png",
+          "imagem": "../page-lotus/assets/images/supremo.png",
           "sabores": ["Salmão", "Camarão", "Kani"],
           "tags": ["salmão"],
           "destaque": true
@@ -329,7 +318,7 @@
           "porcao": "1 unidade",
           "descricao": "O temaki assinado da casa. Cone generoso com ingredientes exclusivos e finalização especial que surpreende a cada mordida.",
           "preco": 50.00,
-          "imagem": "../page-lotus/assets/images/pecas/temaki-hot.jpg",
+          "imagem": "../page-lotus/assets/images/temaki-lotus.jpg",
           "sabores": ["Salmão", "Camarão", "Kani"],
           "tags": ["salmão"],
           "destaque": true
@@ -340,7 +329,7 @@
           "porcao": "Peça especial",
           "descricao": "Uramaki com camarão empanado, cream cheese e cobertura de abacate. Visual dramático e sabor marcante — um clássico da casa.",
           "preco": 40.00,
-          "imagem": "../page-lotus/assets/images/pecas/trak-dragon.png",
+          "imagem": "../page-lotus/assets/images/trak-dragon.png",
           "sabores": ["Salmão", "Camarão", "Kani"],
           "tags": ["salmão"],
           "destaque": true
@@ -351,7 +340,7 @@
           "porcao": "7 unidades",
           "descricao": "Sete peças especiais cuidadosamente montadas com ingredientes selecionados. O melhor que o cardápio especial pode oferecer.",
           "preco": 40.00,
-          "imagem": "images/especiais/roll-supremo.jpg",
+          "imagem": "../page-lotus/assets/images/holl-supremo.png",
           "sabores": ["Salmão", "Camarão", "Kani"],
           "tags": ["salmão"],
           "destaque": false
@@ -362,7 +351,7 @@
           "porcao": "Porção especial",
           "descricao": "Versão premium do sunomono clássico, com ingredientes adicionais e apresentação que eleva a experiência.",
           "preco": 40.00,
-          "imagem": "images/especiais/sunomono-especial.jpg",
+          "imagem": "../page-lotus/assets/images/sunomono-especial.jpg",
           "sabores": ["Salmão", "Camarão", "Kani"],
           "tags": ["sem gluten"],
           "destaque": false
@@ -373,7 +362,7 @@
           "porcao": "Porção especial",
           "descricao": "Criação exclusiva: base de arroz crocante no formato de pizza, coberta com peixe fresco, cream cheese e finalizações especiais.",
           "preco": 35.00,
-          "imagem": "images/especiais/pizza-sushi.jpg",
+          "imagem": "../page-lotus/assets/images/pecas/pizza.jpg",
           "sabores": ["Salmão", "Camarão", "Kani"],
           "tags": ["salmão"],
           "destaque": true
@@ -404,7 +393,7 @@
           "porcao": "40 peças",
           "descricao": "40 peças empanadas em farinha panko que traz toda a crocância da fritura. Inclui: 28 Hot Roll tradicionais e 12 Canapés Hot Roll.",
           "preco": 50.00,
-          "imagem": "images/combinados/combo-crocante.jpg",
+          "imagem": "../page-lotus/assets/images/combos/combo-crocante.jpg",
           "sabores": [],
           "tags": [],
           "destaque": false
@@ -415,7 +404,7 @@
           "porcao": "58 peças",
           "descricao": "Ótima opção para comer a dois, com boa variação de peças fresquinhas. Inclui: 12 Uramaki, 7 Hossomaki, 12 Arco Íris, 5 Joy Joy, 7 Kani Queijo e 14 Hot Roll.",
           "preco": 90.00,
-          "imagem": "images/combinados/combo-reserva.jpg",
+          "imagem": "../page-lotus/assets/images/combos/combo-reserva.jpg",
           "sabores": [],
           "tags": [],
           "destaque": true
@@ -459,7 +448,7 @@
           "porcao": "38 peças",
           "descricao": "Um combo que reverencia o nigiri — maçaricado ou natural, cai bem a qualquer hora. Inclui: 6 Aramaki, 6 Arco Íris, 12 Nigiri e 14 Hot Roll.",
           "preco": 60.00,
-          "imagem": "../page-lotus/assets/images/combos/lotus-delicia.jpg",
+          "imagem": "../page-lotus/assets/images/combos/delicia.jpg",
           "sabores": [],
           "tags": [],
           "destaque": false

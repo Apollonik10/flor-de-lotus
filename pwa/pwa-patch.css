@@ -1,0 +1,140 @@
+/* ══════════════════════════════════════════════════════
+   FLOR DE LÓTUS — pwa-patch.css  v1.1
+   Adicione em cardapio.html:
+   <link rel="stylesheet" href="./pwa-patch.css">
+
+   Fixes críticos:
+   1. FAB invisível com gesture nav Android
+   2. font-size 16px no input (evita zoom iOS)
+   3. Touch targets mínimo 44 px
+   4. Safe-area em modais e drawer
+   5. Cart qty layout
+   6. Focus visible — acessibilidade
+══════════════════════════════════════════════════════ */
+
+/* ─────────────────────────────────────────────
+   FIX 1 — FAB: gesture bar Android esconde botão
+───────────────────────────────────────────── */
+.fab-cart {
+  bottom: max(24px, calc(16px + env(safe-area-inset-bottom))) !important;
+  right:  max(24px, calc(16px + env(safe-area-inset-right)))  !important;
+}
+
+/* ─────────────────────────────────────────────
+   FIX 2 — Toast: z-index acima do FAB (300)
+───────────────────────────────────────────── */
+.toast {
+  bottom: max(96px, calc(80px + env(safe-area-inset-bottom))) !important;
+  z-index: 900 !important;
+}
+
+/* ─────────────────────────────────────────────
+   FIX 3 — Search input: 16px evita zoom iOS
+───────────────────────────────────────────── */
+.search-input {
+  font-size: 16px !important;   /* nunca < 16px em inputs */
+  min-height: 40px !important;
+}
+
+/* ─────────────────────────────────────────────
+   FIX 4 — Touch targets mínimo 44 × 44 px (WCAG)
+───────────────────────────────────────────── */
+.filter-pill {
+  min-height: 42px !important;
+  padding: 10px 18px !important;
+}
+
+.btn-add {
+  min-height: 40px !important;
+  padding: 10px 16px !important;
+}
+
+.btn-fav {
+  width: 38px !important;
+  height: 38px !important;
+}
+
+.qty-btn {
+  min-width: 36px !important;
+  min-height: 36px !important;
+}
+
+/* ─────────────────────────────────────────────
+   FIX 5 — Safe-area: drawer, modal, footer
+───────────────────────────────────────────── */
+.cart-summary {
+  padding-bottom: max(1rem, calc(0.75rem + env(safe-area-inset-bottom))) !important;
+}
+
+.item-modal .modal-body {
+  padding-bottom: max(1.5rem, calc(1rem + env(safe-area-inset-bottom))) !important;
+}
+
+/* ─────────────────────────────────────────────
+   FIX 6 — Cart item qty: melhor layout mobile
+   Coloca + qty - em linha (era coluna)
+───────────────────────────────────────────── */
+.cart-item-qty {
+  flex-direction: row-reverse !important;  /* - qty + */
+  align-items: center !important;
+  gap: 6px !important;
+  align-self: center;
+}
+
+.cart-item-qty .qty-btn {
+  width:  30px !important;
+  height: 30px !important;
+  font-size: 1rem !important;
+}
+
+.cart-item-qty .qty-value {
+  min-width: 28px !important;
+  text-align: center !important;
+  font-size: 1rem !important;
+}
+
+/* ─────────────────────────────────────────────
+   FIX 7 — Focus visible acessibilidade
+───────────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--lotus-pink-dark, #d98f7a) !important;
+  outline-offset: 3px !important;
+  border-radius: 4px;
+}
+
+/* ─────────────────────────────────────────────
+   TREND 2025 — UX improvements
+───────────────────────────────────────────── */
+
+/* Scroll com snap natural no filter bar */
+.filter-bar {
+  scroll-padding-inline: 1rem;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Smooth scroll no conteúdo principal */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Animações: respeitar preferência do usuário */
+@media (prefers-reduced-motion: reduce) {
+  .item-card,
+  .item-modal,
+  .cart-drawer,
+  .fab-cart {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* ─────────────────────────────────────────────
+   MOBILE EXTREMO — telas < 360px
+───────────────────────────────────────────── */
+@media (max-width: 360px) {
+  .brand-sub       { display: none; }
+  .search-wrap     { max-width: 140px !important; }
+  .item-price      { font-size: 1.2rem !important; }
+  .btn-add         { padding: 8px 12px !important; font-size: 0.68rem !important; }
+}

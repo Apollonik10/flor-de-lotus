@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#d98f7a" />
+  <meta name="description" content="Cadastre-se para pedidos mais rápidos — Flor de Lótus" />
+  <title>Bem-vindo — Flor de Lótus</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <style>
+    /* ── Tokens ── */
+    :root {
+      --black:       #0b0b0b;
+      --pink-light:  #f3d7cf;
+      --pink:        #e8b4a2;
+      --pink-dark:   #d98f7a;
+      --white:       #f5f5f5;
+      --red:         #c73a32;
+      --green-wa:    #25D366;
+      --glass-bg:    rgba(14,14,14,.75);
+      --glass-bd:    rgba(243,215,207,.18);
+      --text-dim:    rgba(245,245,245,.65);
+      --easing:      cubic-bezier(.25,.46,.45,.94);
+      --font-d:      'Cormorant Garamond', Georgia, serif;
+      --font-b:      'Outfit', system-ui, sans-serif;
+    }
+
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior:smooth; -webkit-tap-highlight-color:transparent; }
+
+    body {
+      min-height: 100dvh;
+      background:
+        linear-gradient(rgba(0,0,0,.75), rgba(0,0,0,.75)),
+        url('../page-lotus/assets/images/fundo1.png') center/cover fixed;
+      font-family: var(--font-b);
+      font-weight: 300;
+      color: var(--white);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem 1rem max(1.5rem, env(safe-area-inset-bottom));
+    }
+
+    /* ── Card principal ── */
+    .card {
+      width: 100%; max-width: 440px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-bd);
+      border-radius: 24px;
+      box-shadow: 0 24px 72px rgba(0,0,0,.6);
+      padding: clamp(1.8rem,5vw,2.8rem) clamp(1.4rem,5vw,2.4rem);
+      animation: slideUp .6s var(--easing) both;
+      position: relative;
+      overflow: hidden;
+    }
+    /* Brilho interno */
+    .card::before {
+      content:''; position:absolute; inset:0;
+      border-radius: inherit;
+      border: 1px solid rgba(255,255,255,.05);
+      pointer-events: none;
+    }
+
+    /* ── Logo / Header ── */
+    .logo {
+      font-family: var(--font-d);
+      font-size: 1.9rem; font-weight: 400;
+      letter-spacing: .06em; text-align: center;
+      margin-bottom: .3rem;
+    }
+    .logo em { color: var(--pink-dark); font-style: normal; }
+
+    .tag {
+      display: flex; align-items: center; justify-content: center; gap: .45rem;
+      font-size: .65rem; font-weight: 500;
+      letter-spacing: .22em; text-transform: uppercase;
+      color: var(--pink-dark); margin-bottom: 1.8rem;
+    }
+    .tag::before, .tag::after {
+      content:''; flex:1; max-width:32px;
+      height:1px; background:var(--pink-dark);
+    }
+
+    /* ── Steps ── */
+    .steps {
+      display: flex; justify-content: center; gap: .5rem;
+      margin-bottom: 1.8rem;
+    }
+    .step-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: rgba(255,255,255,.15);
+      transition: all .3s;
+    }
+    .step-dot.active {
+      background: var(--pink-dark);
+      width: 24px; border-radius: 4px;
+    }
+    .step-dot.done { background: rgba(217,143,122,.4); }
+
+    /* ── Telas ── */
+    .screen { display: none; }
+    .screen.active { display: block; animation: fadeIn .35s var(--easing) both; }
+
+    .screen-title {
+      font-family: var(--font-d);
+      font-size: clamp(1.4rem, 5vw, 1.8rem);
+      font-weight: 300; line-height: 1.15;
+      margin-bottom: .5rem;
+    }
+    .screen-title em { color: var(--pink); font-style: italic; }
+    .screen-desc {
+      font-size: .92rem; color: var(--text-dim);
+      line-height: 1.65; margin-bottom: 1.4rem;
+    }
+
+    /* ── Campos ── */
+    .field { margin-bottom: 1rem; }
+    .field label {
+      display: block; font-size: .7rem;
+      font-weight: 500; letter-spacing: .14em;
+      text-transform: uppercase; color: var(--pink-dark);
+      margin-bottom: .45rem;
+    }
+    .field input,
+    .field textarea,
+    .field select {
+      width: 100%; padding: 12px 14px;
+      font-family: var(--font-b); font-size: 1rem; /* 16px — evita zoom iOS */
+      color: var(--white);
+      background: rgba(255,255,255,.07);
+      border: 1px solid var(--glass-bd); border-radius: 10px;
+      outline: none;
+      transition: border-color .25s, background .25s;
+      -webkit-appearance: none;
+    }
+    .field input::placeholder,
+    .field textarea::placeholder { color: rgba(245,245,245,.35); }
+    .field input:focus,
+    .field textarea:focus,
+    .field select:focus {
+      border-color: var(--pink-dark);
+      background: rgba(255,255,255,.1);
+    }
+    .field textarea { resize: none; height: 88px; }
+    .field select option { background: #1a1a1a; color: var(--white); }
+
+    /* ── Checkboxes de alergia ── */
+    .allergy-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: .5rem; margin-bottom: 1rem;
+    }
+    .allergy-item {
+      display: flex; align-items: center; gap: .5rem;
+      padding: 10px 12px;
+      background: rgba(255,255,255,.05);
+      border: 1px solid var(--glass-bd); border-radius: 10px;
+      cursor: pointer;
+      transition: all .25s;
+      font-size: .85rem; color: var(--text-dim);
+      user-select: none;
+    }
+    .allergy-item:has(input:checked) {
+      border-color: var(--red);
+      background: rgba(199,58,50,.12);
+      color: var(--white);
+    }
+    .allergy-item input { display: none; }
+    .allergy-item i { font-size: .9rem; color: inherit; }
+
+    /* ── Botões ── */
+    .btn-primary {
+      width: 100%; min-height: 50px;
+      display: flex; align-items: center; justify-content: center; gap: .5rem;
+      font-family: var(--font-b); font-size: .82rem;
+      font-weight: 600; letter-spacing: .14em; text-transform: uppercase;
+      color: #fff; background: var(--red); border: none; border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(199,58,50,.35);
+      transition: transform .2s, box-shadow .2s;
+    }
+    .btn-primary:active { transform: scale(.97); }
+
+    .btn-skip {
+      display: block; text-align: center;
+      margin-top: .9rem; font-size: .78rem;
+      color: var(--text-dim); cursor: pointer;
+      background: none; border: none; width: 100%;
+      padding: .4rem; letter-spacing: .05em;
+      transition: color .2s;
+    }
+    .btn-skip:hover { color: var(--pink); }
+
+    /* ── Screen 3: Sucesso ── */
+    .success-icon {
+      width: 72px; height: 72px; border-radius: 50%;
+      background: rgba(37,211,102,.15);
+      border: 1px solid rgba(37,211,102,.3);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 1.4rem; font-size: 1.8rem; color: var(--green-wa);
+    }
+    .countdown {
+      font-size: .78rem; color: var(--text-dim);
+      text-align: center; margin-top: .8rem;
+    }
+    .countdown strong { color: var(--pink); }
+
+    /* ── Nota sobre backend ── */
+    .info-note {
+      display: flex; gap: .6rem; align-items: flex-start;
+      padding: .9rem 1rem;
+      background: rgba(232,180,162,.07);
+      border: 1px solid rgba(232,180,162,.2);
+      border-radius: 10px; margin-top: 1.4rem;
+      font-size: .8rem; color: var(--text-dim); line-height: 1.6;
+    }
+    .info-note i { color: var(--pink-dark); margin-top: .1rem; flex-shrink:0; }
+
+    /* ── Animações ── */
+    @keyframes slideUp {
+      from { opacity:0; transform:translateY(24px); }
+      to   { opacity:1; transform:none; }
+    }
+    @keyframes fadeIn {
+      from { opacity:0; transform:translateY(10px); }
+      to   { opacity:1; transform:none; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+
+    <!-- Logo -->
+    <p class="logo">Flor de <em>Lótus</em></p>
+    <p class="tag">Bem-vindo</p>
+
+    <!-- Progress dots -->
+    <div class="steps" aria-hidden="true">
+      <div class="step-dot active" id="dot0"></div>
+      <div class="step-dot"        id="dot1"></div>
+      <div class="step-dot"        id="dot2"></div>
+    </div>
+
+    <!-- ── Screen 0: Dados básicos ── -->
+    <div class="screen active" id="screen-0">
+      <h1 class="screen-title">Seus <em>dados</em></h1>
+      <p class="screen-desc">
+        Salvo só no seu celular. Usamos para agilizar seus pedidos — sem conta, sem senha.
+      </p>
+
+      <div class="field">
+        <label for="inp-name">Seu nome</label>
+        <input id="inp-name" type="text" placeholder="Ex: João Silva"
+               autocomplete="given-name" maxlength="60" />
+      </div>
+
+      <div class="field">
+        <label for="inp-phone">WhatsApp (opcional)</label>
+        <input id="inp-phone" type="tel" placeholder="(83) 99999-9999"
+               autocomplete="tel" inputmode="tel" maxlength="20" />
+      </div>
+
+      <div class="field">
+        <label for="inp-addr">Endereço de entrega (opcional)</label>
+        <input id="inp-addr" type="text"
+               placeholder="Rua, número, bairro — Cajazeiras, PB"
+               autocomplete="street-address" maxlength="120" />
+      </div>
+
+      <button class="btn-primary" id="btn-next-0" type="button">
+        <i class="fas fa-arrow-right" aria-hidden="true"></i> Continuar
+      </button>
+      <button class="btn-skip" id="btn-skip-0" type="button">Pular e ir direto ao cardápio</button>
+    </div>
+
+    <!-- ── Screen 1: Alergias ── -->
+    <div class="screen" id="screen-1">
+      <h2 class="screen-title">Alguma <em>alergia</em>?</h2>
+      <p class="screen-desc">
+        Marcamos no seu pedido do WhatsApp para o Sushi Man ficar ciente. 100% opcional.
+      </p>
+
+      <div class="allergy-grid">
+        <label class="allergy-item">
+          <input type="checkbox" name="allergy" value="Frutos do Mar">
+          <i class="fas fa-shrimp"></i> Frutos do Mar
+        </label>
+        <label class="allergy-item">
+          <input type="checkbox" name="allergy" value="Glúten">
+          <i class="fas fa-wheat-awn"></i> Glúten
+        </label>
+        <label class="allergy-item">
+          <input type="checkbox" name="allergy" value="Lactose">
+          <i class="fas fa-droplet"></i> Lactose
+        </label>
+        <label class="allergy-item">
+          <input type="checkbox" name="allergy" value="Amendoim">
+          <i class="fas fa-circle-dot"></i> Amendoim
+        </label>
+        <label class="allergy-item">
+          <input type="checkbox" name="allergy" value="Soja">
+          <i class="fas fa-leaf"></i> Soja
+        </label>
+        <label class="allergy-item">
+          <input type="checkbox" name="allergy" value="Gergelim">
+          <i class="fas fa-seedling"></i> Gergelim
+        </label>
+      </div>
+
+      <div class="field">
+        <label for="inp-notes">Outras observações (opcional)</label>
+        <textarea id="inp-notes" placeholder="Ex: sem molho shoyu, pouca pimenta..."></textarea>
+      </div>
+
+      <button class="btn-primary" id="btn-next-1" type="button">
+        <i class="fas fa-check" aria-hidden="true"></i> Salvar e continuar
+      </button>
+      <button class="btn-skip" id="btn-back-1" type="button">← Voltar</button>
+    </div>
+
+    <!-- ── Screen 2: Sucesso ── -->
+    <div class="screen" id="screen-2">
+      <div class="success-icon" aria-hidden="true">
+        <i class="fab fa-whatsapp"></i>
+      </div>
+      <h2 class="screen-title" style="text-align:center">Tudo <em>pronto</em>!</h2>
+      <p class="screen-desc" style="text-align:center">
+        Seus dados foram salvos no celular. Os pedidos via WhatsApp já virão com nome e endereço preenchidos.
+      </p>
+
+      <button class="btn-primary" id="btn-go" type="button">
+        <i class="fas fa-utensils" aria-hidden="true"></i> Ver o cardápio
+      </button>
+
+      <p class="countdown">
+        Indo automaticamente em <strong id="countdown-num">3</strong>s...
+      </p>
+
+      <div class="info-note">
+        <i class="fas fa-info-circle"></i>
+        <span>
+          Estes dados ficam <strong>só no seu celular</strong> — não enviamos para nenhum servidor.
+          Para histórico de pedidos e conta sincronizada entre dispositivos, é necessário um
+          backend (Node.js + banco de dados).
+        </span>
+      </div>
+    </div>
+
+  </div><!-- /card -->
+
+  <script>
+    'use strict';
+
+    const STORAGE_KEY = 'fl_user';
+    const VISITED_KEY = 'fl_visited';
+    const CARDAPIO    = '/pwa/cardapio.html'; /* ajuste ao caminho real */
+
+    /* ── Se já cadastrado, vai direto ── */
+    if (localStorage.getItem(STORAGE_KEY)) {
+      localStorage.setItem(VISITED_KEY, '1');
+      window.location.replace(CARDAPIO);
+    }
+
+    /* ── Dados em memória durante o cadastro ── */
+    let userData = { name: '', phone: '', address: '', allergies: [], notes: '' };
+
+    /* ── Helpers DOM ── */
+    const $ = id => document.getElementById(id);
+    const screens  = document.querySelectorAll('.screen');
+    const dots     = document.querySelectorAll('.step-dot');
+    let   current  = 0;
+
+    function goTo(n) {
+      screens[current].classList.remove('active');
+      dots[current].classList.remove('active');
+      dots[current].classList.add('done');
+      current = n;
+      screens[current].classList.add('active');
+      dots[current].classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* ── Screen 0 → 1 ── */
+    $('btn-next-0').addEventListener('click', () => {
+      const name = $('inp-name').value.trim();
+      if (!name) {
+        $('inp-name').focus();
+        $('inp-name').style.borderColor = 'var(--red)';
+        setTimeout(() => $('inp-name').style.borderColor = '', 2000);
+        return;
+      }
+      userData.name    = name;
+      userData.phone   = $('inp-phone').value.trim();
+      userData.address = $('inp-addr').value.trim();
+      goTo(1);
+    });
+
+    $('btn-skip-0').addEventListener('click', () => {
+      localStorage.setItem(VISITED_KEY, '1');
+      window.location.href = CARDAPIO;
+    });
+
+    /* ── Screen 1 → 2 ── */
+    $('btn-next-1').addEventListener('click', () => {
+      userData.allergies = [...document.querySelectorAll('input[name="allergy"]:checked')]
+        .map(el => el.value);
+      userData.notes = $('inp-notes').value.trim();
+
+      /* Salva no localStorage */
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        ...userData,
+        createdAt: new Date().toISOString()
+      }));
+      localStorage.setItem(VISITED_KEY, '1');
+
+      goTo(2);
+      startCountdown();
+    });
+
+    $('btn-back-1').addEventListener('click', () => {
+      screens[current].classList.remove('active');
+      dots[current].classList.remove('active');
+      dots[current].classList.remove('done');
+      current = 0;
+      screens[0].classList.add('active');
+      dots[0].classList.remove('done');
+      dots[0].classList.add('active');
+    });
+
+    /* ── Screen 2: ir ao cardápio ── */
+    $('btn-go').addEventListener('click', () => {
+      window.location.href = CARDAPIO;
+    });
+
+    /* ── Contagem regressiva ── */
+    function startCountdown() {
+      let n = 3;
+      const el = $('countdown-num');
+      const t = setInterval(() => {
+        n--;
+        el.textContent = n;
+        if (n <= 0) { clearInterval(t); window.location.href = CARDAPIO; }
+      }, 1000);
+    }
+
+    /* ── Service Worker ── */
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker
+        .register('/service-worker.js', { scope: '/' })
+        .catch(() => {});
+    }
+  </script>
+
+</body>
+</html>

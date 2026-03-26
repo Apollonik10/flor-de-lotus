@@ -1,0 +1,217 @@
+/* ══════════════════════════════════════════════════════
+   FLOR DE LÓTUS — landing-patch.css  v1.1
+   Adicione APÓS o bloco <style> em index-v2.html:
+   <link rel="stylesheet" href="/landing-patch.css">
+
+   Fixes:
+   1. Hero — H1/parágrafo sobrepostos
+   2. Tipografia — mínimo 1rem em todo body text
+   3. Safe-area — botão WA sumindo na gesture nav
+   4. Touch targets — 44 px mínimo
+   5. Focus visible — acessibilidade 2025
+   6. Micro-melhorias UX tendência 2025
+══════════════════════════════════════════════════════ */
+
+/* ─────────────────────────────────────────────
+   FIX 1 — Hero: remover sobreposição H1 / texto
+   Problema: height fixo + conteúdo absoluto
+   Solução: min-height + flex no pai, posição
+            relativa no conteúdo
+───────────────────────────────────────────── */
+.site-header {
+  height: auto !important;
+  min-height: clamp(380px, 62vh, 640px);
+  display: flex !important;
+  flex-direction: column;
+  justify-content: flex-end;   /* empurra conteúdo para baixo */
+  overflow: hidden;
+}
+
+/* O ::after (overlay escuro) precisa ficar absolutamente posicionado */
+.site-header::after {
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: 0 !important;
+  /* Gradiente mais suave e elegante — tendência 2025 */
+  background: linear-gradient(
+    160deg,
+    rgba(0, 0, 0, 0.50) 0%,
+    rgba(0, 0, 0, 0.12) 38%,
+    rgba(0, 0, 0, 0.72) 70%,
+    rgba(0, 0, 0, 0.93) 100%
+  ) !important;
+  pointer-events: none;
+}
+
+.hero-content {
+  position: relative !important;   /* sai do flow absoluto */
+  inset: unset !important;
+  z-index: 1;
+  width: 100%;
+  display: flex !important;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: clamp(1.5rem, 5vw, 4rem) clamp(1rem, 5vw, 4rem) clamp(2.2rem, 5vw, 4rem);
+  gap: clamp(0.75rem, 2vw, 1.2rem);
+}
+
+/* ─────────────────────────────────────────────
+   FIX 2 — Tipografia: mínimo 1rem (16 px)
+   Google recomienda mínimo 16 px para body text
+───────────────────────────────────────────── */
+.hero-sub {
+  font-size: clamp(1rem, 2.2vw, 1.1rem) !important;
+  line-height: 1.78 !important;
+  max-width: 48ch;
+}
+
+.story-body {
+  font-size: clamp(1rem, 1.8vw, 1.12rem) !important;
+  line-height: 1.9 !important;
+}
+
+.about-body {
+  font-size: clamp(1rem, 1.6vw, 1.1rem) !important;
+  line-height: 1.9 !important;
+}
+
+.combos-desc {
+  font-size: clamp(1rem, 1.5vw, 1.05rem) !important;
+  margin-top: 0.6rem;
+}
+
+.reviews-sub {
+  font-size: 1rem !important;
+  letter-spacing: 0.03em !important;
+}
+
+blockquote.review-text {
+  font-size: clamp(1.02rem, 1.9vw, 1.18rem) !important;
+  line-height: 1.76 !important;
+}
+
+/* Footer — todos os textos de conteúdo */
+.footer-tagline,
+.footer-list a,
+.footer-contact-item,
+.footer-hours p {
+  font-size: 0.96rem !important;
+  line-height: 1.75 !important;
+}
+
+.footer-copy {
+  font-size: 0.8rem !important;
+}
+
+/* Nav: fica small por ser navigation, OK — mas adiciona espaço */
+.menu a {
+  padding: 10px 14px !important;
+}
+
+/* ─────────────────────────────────────────────
+   FIX 3 — Safe-area: botão WA e footer
+   Problema: gesture bar Android/iOS esconde UI
+───────────────────────────────────────────── */
+.wa-float {
+  bottom: max(24px, calc(16px + env(safe-area-inset-bottom))) !important;
+  right:  max(24px, calc(16px + env(safe-area-inset-right)))  !important;
+}
+
+footer {
+  padding-bottom: max(
+    clamp(1.5rem, 4vw, 2.5rem),
+    calc(clamp(0.8rem, 2vw, 1.2rem) + env(safe-area-inset-bottom))
+  ) !important;
+}
+
+/* ─────────────────────────────────────────────
+   FIX 4 — Touch targets mínimo 44 × 44 px (WCAG)
+───────────────────────────────────────────── */
+.btn-primary,
+.btn-whatsapp {
+  min-height: 48px !important;
+  padding: 13px 32px !important;
+}
+
+/* ─────────────────────────────────────────────
+   FIX 5 — Focus visible (acessibilidade 2025)
+───────────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--lotus-pink-dark, #d98f7a) !important;
+  outline-offset: 3px !important;
+  border-radius: 4px;
+}
+
+/* ─────────────────────────────────────────────
+   TREND 2025 — Micro-melhorias UX
+───────────────────────────────────────────── */
+
+/* Scroll suave nativo no root */
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: calc(var(--nav-h, 64px) + 1rem);
+}
+
+/* Review cards: swipe com snap mais natural */
+.reviews-track {
+  scroll-padding-inline: clamp(1rem, 5vw, 4rem);
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Noise texture sutil no hero (sensação premium) */
+.site-header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 200px;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+}
+
+/* Animações: respeitar preferência do usuário */
+@media (prefers-reduced-motion: reduce) {
+  .reveal, .reveal-left, .reveal-right {
+    transition: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .wa-float::before { animation: none !important; }
+}
+
+/* ─────────────────────────────────────────────
+   RESPONSIVO — breakpoints críticos
+───────────────────────────────────────────── */
+@media (max-width: 480px) {
+  h1.hero-title {
+    font-size: clamp(2rem, 9vw, 2.8rem) !important;
+    max-width: 14ch;
+  }
+
+  .hero-sub {
+    font-size: 0.96rem !important;
+    max-width: 36ch;
+  }
+
+  .hero-actions {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.8rem;
+  }
+
+  .hero-content {
+    gap: 0.65rem !important;
+    padding-bottom: max(2rem, env(safe-area-inset-bottom)) !important;
+  }
+
+  .site-header {
+    min-height: clamp(340px, 68vh, 520px) !important;
+  }
+}
+
+@media (max-width: 360px) {
+  .menu a { font-size: 0.54rem !important; }
+  .nav-brand { font-size: 1rem !important; }
+}
