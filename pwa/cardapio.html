@@ -8,8 +8,8 @@
 
   <title>Cardápio — Flor de Lótus</title>
 
-  <!-- PWA -->
-  <link rel="manifest" href="./manifest.json" />
+  <!-- PWA — apenas 1 manifest -->
+  <link rel="manifest" href="/manifest.json" />
   <link rel="apple-touch-icon" href="images/icons/icon-192.png" />
 
   <!-- Fonts -->
@@ -22,8 +22,7 @@
 
   <!-- Styles -->
   <link rel="stylesheet" href="./styles.css">
-  <link rel="manifest" href="/manifest.json">
-<link rel="stylesheet" href="./pwa-patch.css">
+  <link rel="stylesheet" href="./pwa-patch.css">
 </head>
 <body>
 
@@ -32,7 +31,19 @@
   ═══════════════════════════════ -->
   <header class="top-bar" role="banner">
 
-    <a href="../page-lotus/index.html" class="top-bar-brand" aria-label="Ir para página inicial">
+    <!-- Botão Perfil (esquerda) -->
+    <button class="btn-icon" id="btnProfile"
+            aria-label="Abrir perfil e fidelidade"
+            aria-expanded="false">
+      <i class="fas fa-user-circle" aria-hidden="true"></i>
+      <span class="badge" id="loyaltyBadge"
+            aria-label="Status do cartão fidelidade"
+            role="status"></span>
+    </button>
+
+    <a href="../page-lotus/index-v2.html"
+       class="top-bar-brand"
+       aria-label="Ir para página inicial">
       <span class="brand-name">Flor de <em>Lótus</em></span>
       <span class="brand-sub" aria-hidden="true">Cardápio</span>
     </a>
@@ -54,15 +65,23 @@
     <div class="top-bar-actions" role="toolbar" aria-label="Ações do cardápio">
 
       <!-- Favoritos -->
-      <button class="btn-icon" id="btnFav" aria-label="Ver favoritos" aria-pressed="false">
+      <button class="btn-icon" id="btnFav"
+              aria-label="Ver favoritos"
+              aria-pressed="false">
         <i class="far fa-heart" aria-hidden="true"></i>
-        <span class="badge" id="favCount" aria-label="Favoritos" role="status"></span>
+        <span class="badge" id="favCount"
+              aria-label="Favoritos"
+              role="status"></span>
       </button>
 
       <!-- Carrinho -->
-      <button class="btn-icon" id="btnCart" aria-label="Abrir carrinho" aria-expanded="false">
+      <button class="btn-icon" id="btnCart"
+              aria-label="Abrir carrinho"
+              aria-expanded="false">
         <i class="fas fa-bag-shopping" aria-hidden="true"></i>
-        <span class="badge" id="cartCount" aria-label="Itens no carrinho" role="status"></span>
+        <span class="badge" id="cartCount"
+              aria-label="Itens no carrinho"
+              role="status"></span>
       </button>
 
     </div>
@@ -71,27 +90,36 @@
   <!-- ═══════════════════════════════
        FILTROS DE CATEGORIA — sticky
   ═══════════════════════════════ -->
-  <nav id="filterBar" class="filter-bar" aria-label="Filtrar por categoria" role="navigation">
-    <!-- preenchido por app.js -->
+  <nav id="filterBar"
+       class="filter-bar"
+       aria-label="Filtrar por categoria"
+       role="navigation">
+    <!-- preenchido por render.js -->
   </nav>
 
   <!-- ═══════════════════════════════
        CONTEÚDO PRINCIPAL
   ═══════════════════════════════ -->
-  <main id="mainContent" class="main-content" aria-label="Itens do cardápio">
-    <!-- preenchido por app.js -->
+  <main id="mainContent"
+        class="main-content"
+        aria-label="Itens do cardápio">
+    <!-- preenchido por render.js -->
   </main>
 
   <!-- Estado vazio (sem resultados de busca) -->
-  <div class="empty-state" id="emptyState" role="status" aria-live="polite">
+  <div class="empty-state" id="emptyState"
+       role="status" aria-live="polite">
     <i class="fas fa-bowl-rice" aria-hidden="true"></i>
     <p>Nenhum item encontrado.<br>Tente outra busca.</p>
   </div>
 
   <!-- ═══════════════════════════════
-       OVERLAY (modal + drawer)
+       OVERLAY (modal + drawers)
   ═══════════════════════════════ -->
-  <div class="modal-overlay" id="modalOverlay" role="presentation" aria-hidden="true"></div>
+  <div class="modal-overlay"
+       id="modalOverlay"
+       role="presentation"
+       aria-hidden="true"></div>
 
   <!-- ═══════════════════════════════
        MODAL DE DETALHE (bottom sheet)
@@ -103,11 +131,24 @@
     aria-modal="true"
     aria-label="Detalhes do item"
   >
-    <!-- preenchido dinamicamente por app.js -->
+    <!-- preenchido dinamicamente por modal.js -->
   </article>
 
   <!-- ═══════════════════════════════
-       DRAWER DO CARRINHO
+       PROFILE DRAWER — abre pela esquerda
+  ═══════════════════════════════ -->
+  <aside
+    class="profile-drawer"
+    id="profileDrawer"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Seu perfil e fidelidade"
+  >
+    <!-- preenchido por profile.js -->
+  </aside>
+
+  <!-- ═══════════════════════════════
+       DRAWER DO CARRINHO — abre pela direita
   ═══════════════════════════════ -->
   <aside
     class="cart-drawer"
@@ -118,13 +159,16 @@
   >
     <header class="cart-header">
       <h2 class="cart-title">Seu <em>pedido</em></h2>
-      <button class="btn-icon" onclick="document.getElementById('cartDrawer').classList.remove('open');document.getElementById('modalOverlay').classList.remove('open');document.body.style.overflow=''" aria-label="Fechar carrinho">
+      <button class="btn-icon"
+              id="btnCloseCart"
+              aria-label="Fechar carrinho">
         <i class="fas fa-times" aria-hidden="true"></i>
       </button>
     </header>
 
     <!-- Itens do carrinho -->
-    <div class="cart-items" id="cartItems" role="list" aria-label="Itens adicionados"></div>
+    <div class="cart-items" id="cartItems"
+         role="list" aria-label="Itens adicionados"></div>
 
     <!-- Estado vazio do carrinho -->
     <div class="cart-empty" id="cartEmpty" role="status">
@@ -138,7 +182,8 @@
         <span class="cart-total-label">Total do pedido</span>
         <span class="cart-total-value" id="cartTotalValue">R$ 0,00</span>
       </div>
-      <button class="btn-order-wa" id="btnOrderWa" aria-label="Enviar pedido pelo WhatsApp">
+      <button class="btn-order-wa" id="btnOrderWa"
+              aria-label="Enviar pedido pelo WhatsApp">
         <i class="fab fa-whatsapp" aria-hidden="true"></i>
         Enviar pedido pelo WhatsApp
       </button>
@@ -154,18 +199,17 @@
   </button>
 
   <!-- Toast de feedback -->
-  <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+  <div class="toast" id="toast"
+       role="status" aria-live="polite" aria-atomic="true"></div>
 
-  <!-- ═══════════════════════════════
-       SR-ONLY
-  ═══════════════════════════════ -->
-  <span class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)">
+  <!-- SR-ONLY legenda acessível -->
+  <span class="sr-only">
     Cardápio digital da Flor de Lótus Culinária Oriental — Cajazeiras, PB
   </span>
 
-  <!-- App -->
+  <!-- Scripts — pwa-patch antes do module para expor FL_USER -->
   <script src="./pwa-patch.js"></script>
-  <script src="./app.js"></script>
+  <script type="module" src="./app.js"></script>
 
 </body>
 </html>

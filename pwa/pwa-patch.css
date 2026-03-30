@@ -137,4 +137,323 @@ html {
   .search-wrap     { max-width: 140px !important; }
   .item-price      { font-size: 1.2rem !important; }
   .btn-add         { padding: 8px 12px !important; font-size: 0.68rem !important; }
+}/* ══════════════════════════════════════════════════════
+   pwa-patch-additions.css
+   ADICIONE no final do pwa-patch.css existente
+
+   Novos componentes:
+   1. Profile Drawer (abre pela esquerda)
+   2. Cartão Fidelidade (barra de progresso)
+   3. Gift Cards
+   4. Badge do botão de perfil
+══════════════════════════════════════════════════════ */
+
+/* ─────────────────────────────────────────────
+   1. BOTÃO DE PERFIL NA TOP-BAR
+   Badge: verde = gift card disponível
+          cinza  = progresso
+───────────────────────────────────────────── */
+#btnProfile {
+  position: relative;
+}
+
+#loyaltyBadge {
+  position: absolute; top: 2px; right: 2px;
+  min-width: 17px; height: 17px;
+  padding: 0 3px;
+  border-radius: 999px;
+  background: var(--lotus-pink-dark, #d98f7a);
+  color: #000;
+  font-size: .58rem; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; transform: scale(.6);
+  transition: opacity .25s, transform .25s;
+}
+#loyaltyBadge.visible  { opacity: 1; transform: scale(1); }
+#loyaltyBadge.gift-ready {
+  background: #25D366;  /* verde = presente disponível */
+  color: #fff;
+  animation: giftPulse 2s ease-in-out infinite;
+}
+@keyframes giftPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(37,211,102,.5); }
+  50%       { box-shadow: 0 0 0 5px rgba(37,211,102,0); }
+}
+
+/* ─────────────────────────────────────────────
+   2. PROFILE DRAWER — espelha cart-drawer
+      mas abre pela ESQUERDA
+───────────────────────────────────────────── */
+.profile-drawer {
+  position: fixed;
+  top: 0; left: 0; bottom: 0; z-index: 600;
+  width: min(100vw, 400px);
+  display: flex; flex-direction: column;
+
+  background: rgba(8, 8, 8, .94);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-right: 1px solid var(--glass-border, rgba(243,215,207,.16));
+  box-shadow: 16px 0 64px rgba(0, 0, 0, .7);
+
+  transform: translateX(-100%);
+  transition: transform .4s cubic-bezier(.25,.46,.45,.94);
+  overflow-y: auto;
+}
+.profile-drawer.open { transform: translateX(0); }
+
+/* ─────────────────────────────────────────────
+   3. CORPO DO PERFIL
+───────────────────────────────────────────── */
+.profile-body {
+  flex: 1;
+  padding: .5rem 0 max(1.5rem, calc(1rem + env(safe-area-inset-bottom)));
+  overflow-y: auto;
+}
+
+.profile-section {
+  padding: 1.2rem 1rem;
+  border-bottom: 1px solid rgba(243,215,207,.06);
+}
+
+.profile-section-title {
+  font-size: .65rem; font-weight: 600;
+  letter-spacing: .2em; text-transform: uppercase;
+  color: var(--lotus-pink-dark, #d98f7a);
+  margin-bottom: 1rem;
+  display: flex; align-items: center; gap: .5rem;
+}
+
+/* Campo individual */
+.profile-field {
+  padding: .65rem 0;
+  border-bottom: 1px solid rgba(255,255,255,.04);
+}
+.profile-field:last-child { border-bottom: none; }
+
+.profile-label {
+  display: block;
+  font-size: .62rem; font-weight: 500;
+  letter-spacing: .16em; text-transform: uppercase;
+  color: rgba(245,245,245,.4);
+  margin-bottom: .3rem;
+}
+
+.profile-value-row {
+  display: flex; align-items: flex-start;
+  justify-content: space-between; gap: .6rem;
+}
+
+.profile-value {
+  font-size: .88rem; color: var(--white-soft, #f5f5f5);
+  line-height: 1.5; flex: 1;
+  word-break: break-word;
+}
+
+/* Botão de editar (lápis) */
+.btn-edit {
+  flex-shrink: 0;
+  width: 28px; height: 28px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .72rem;
+  color: rgba(245,245,245,.4);
+  background: rgba(255,255,255,.05);
+  border: 1px solid transparent;
+  transition: all .2s;
+  cursor: pointer;
+}
+.btn-edit:hover {
+  color: var(--lotus-pink, #e8b4a2);
+  border-color: var(--glass-border, rgba(243,215,207,.16));
+  background: rgba(232,180,162,.1);
+}
+
+/* Input de edição inline */
+.profile-edit-input {
+  width: 100%;
+  padding: 9px 12px;
+  font-size: 1rem; /* evita zoom iOS */
+  color: var(--white-soft, #f5f5f5);
+  background: rgba(255,255,255,.07);
+  border: 1px solid var(--lotus-pink-dark, #d98f7a);
+  border-radius: 8px;
+  outline: none;
+  margin-bottom: .4rem;
+  transition: background .2s;
+}
+.profile-edit-input:focus { background: rgba(255,255,255,.1); }
+
+.edit-actions {
+  display: flex; gap: .4rem;
+}
+
+.btn-save-edit {
+  flex: 1; min-height: 36px;
+  display: flex; align-items: center; justify-content: center; gap: .4rem;
+  font-size: .75rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase;
+  color: #000; background: var(--lotus-pink-dark, #d98f7a);
+  border-radius: 6px; cursor: pointer;
+  transition: opacity .2s;
+}
+.btn-save-edit:active { opacity: .8; }
+
+.btn-cancel-edit {
+  width: 36px; min-height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  color: rgba(245,245,245,.5);
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(243,215,207,.12);
+  border-radius: 6px; cursor: pointer;
+  transition: all .2s;
+}
+.btn-cancel-edit:hover { color: var(--white-soft, #f5f5f5); }
+
+/* ─────────────────────────────────────────────
+   4. GRID DE ALERGIAS (edição)
+───────────────────────────────────────────── */
+.allergy-edit-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: .4rem; margin-bottom: .6rem;
+}
+
+.allergy-edit-item {
+  display: flex; align-items: center; gap: .45rem;
+  padding: 9px 10px;
+  font-size: .8rem; color: rgba(245,245,245,.65);
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(243,215,207,.12); border-radius: 8px;
+  cursor: pointer;
+  transition: all .2s;
+  user-select: none;
+}
+.allergy-edit-item.checked,
+.allergy-edit-item:has(input:checked) {
+  border-color: #c73a32;
+  background: rgba(199,58,50,.12);
+  color: var(--white-soft, #f5f5f5);
+}
+.allergy-edit-item input { display: none; }
+
+/* ─────────────────────────────────────────────
+   5. ESTADO VAZIO — sem cadastro
+───────────────────────────────────────────── */
+.profile-no-user {
+  display: flex; flex-direction: column;
+  align-items: center; text-align: center; gap: .8rem;
+  padding: 2rem 1.5rem;
+}
+.profile-no-user i { font-size: 2.6rem; color: rgba(245,245,245,.2); }
+.profile-no-user p { font-size: .9rem; color: rgba(245,245,245,.55); }
+
+.btn-go-register {
+  display: inline-flex; align-items: center; gap: .5rem;
+  padding: 12px 24px; margin-top: .4rem;
+  font-size: .78rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase;
+  color: #000; background: var(--lotus-pink-dark, #d98f7a);
+  text-decoration: none; border-radius: 6px;
+  transition: opacity .2s;
+}
+.btn-go-register:active { opacity: .8; }
+
+/* ─────────────────────────────────────────────
+   6. BARRA DE PROGRESSO — fidelidade
+───────────────────────────────────────────── */
+.loyalty-section { }
+
+.loyalty-wrap { margin-top: .2rem; }
+
+.loyalty-counts {
+  display: flex; align-items: baseline; gap: .2rem;
+  margin-bottom: .5rem;
+}
+.loyalty-num {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 2rem; font-weight: 400;
+  color: var(--lotus-pink, #e8b4a2);
+  line-height: 1;
+}
+.loyalty-sep {
+  font-size: 1.1rem; color: rgba(245,245,245,.3);
+}
+.loyalty-total {
+  font-size: 1.1rem; color: rgba(245,245,245,.4);
+}
+.loyalty-label-text {
+  font-size: .72rem; letter-spacing: .1em; text-transform: uppercase;
+  color: rgba(245,245,245,.35); margin-left: .3rem;
+}
+
+.loyalty-bar-track {
+  height: 4px; border-radius: 999px;
+  background: rgba(255,255,255,.08);
+  overflow: hidden; margin-bottom: .7rem;
+}
+.loyalty-bar-fill {
+  height: 100%; border-radius: 999px;
+  background: linear-gradient(90deg, var(--lotus-pink-dark, #d98f7a), var(--lotus-pink, #e8b4a2));
+  transition: width .6s cubic-bezier(.25,.46,.45,.94);
+}
+
+.loyalty-desc {
+  font-size: .8rem; color: rgba(245,245,245,.55);
+  line-height: 1.65;
+}
+.loyalty-desc strong { color: var(--white-soft, #f5f5f5); }
+.loyalty-desc small  { font-size: .72rem; color: rgba(245,245,245,.35); }
+
+/* ─────────────────────────────────────────────
+   7. GIFT CARDS
+───────────────────────────────────────────── */
+.gift-list { margin-top: .4rem; }
+
+.gift-card-item {
+  display: flex; align-items: center; justify-content: space-between; gap: .8rem;
+  padding: .9rem;
+  background: rgba(37,211,102,.07);
+  border: 1px solid rgba(37,211,102,.2);
+  border-radius: 10px; margin-bottom: .6rem;
+}
+
+.gift-card-code {
+  font-family: 'Courier New', monospace;
+  font-size: .85rem; font-weight: 700;
+  color: #25D366; letter-spacing: .08em;
+}
+.gift-card-valor {
+  font-size: .75rem; color: rgba(245,245,245,.55);
+  margin-top: .15rem;
+}
+
+.btn-copy-gift {
+  display: inline-flex; align-items: center; gap: .35rem;
+  padding: 8px 14px; flex-shrink: 0;
+  font-size: .7rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase;
+  color: #25D366;
+  background: rgba(37,211,102,.1);
+  border: 1px solid rgba(37,211,102,.25);
+  border-radius: 6px; cursor: pointer;
+  transition: all .2s;
+}
+.btn-copy-gift:active { background: rgba(37,211,102,.2); }
+/* ══════════════════════════════════════════════════════
+
+/* ═══════════════════════════════════════════════════════════
+   FIX — Visibilidade dos cards após troca de filtro
+   Correção: seletor #mainContent (era #main-content, estava errado)
+═══════════════════════════════════════════════════════════ */
+#mainContent .item-card {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: translateY(0) !important;
+}
+
+#mainContent .category-section,
+#mainContent .items-grid {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+#mainContent {
+  visibility: visible !important;
+  opacity: 1 !important;
 }
