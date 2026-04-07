@@ -5,12 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="Cardápio digital da Flor de Lótus — Culinária Oriental artesanal em Cajazeiras, PB." />
   <meta name="theme-color" content="#d98f7a" />
-
   <title>Cardápio — Flor de Lótus</title>
 
-  <!-- PWA — apenas 1 manifest -->
-  <link rel="manifest" href="/manifest.json" />
-  <link rel="apple-touch-icon" href="images/icons/icon-192.png" />
+  <!-- PWA -->
+  <link rel="manifest" href="./manifest.json" />
+  <link rel="apple-touch-icon" href="./images/icons/icon-192.png" />
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -20,30 +19,17 @@
   <!-- Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-  <!-- Styles -->
+  <!-- Estilos unificados (pwa-patch.css já integrado aqui) -->
   <link rel="stylesheet" href="./styles.css">
-  <link rel="stylesheet" href="./pwa-patch.css">
 </head>
 <body>
 
-  <!-- ═══════════════════════════════
-       BARRA DE TOPO — fixa
-  ═══════════════════════════════ -->
+  <!-- ══════════════════════════════
+       TOPO — fixo
+  ══════════════════════════════ -->
   <header class="top-bar" role="banner">
 
-    <!-- Botão Perfil (esquerda) -->
-    <button class="btn-icon" id="btnProfile"
-            aria-label="Abrir perfil e fidelidade"
-            aria-expanded="false">
-      <i class="fas fa-user-circle" aria-hidden="true"></i>
-      <span class="badge" id="loyaltyBadge"
-            aria-label="Status do cartão fidelidade"
-            role="status"></span>
-    </button>
-
-    <a href="../page-lotus/index-v2.html"
-       class="top-bar-brand"
-       aria-label="Ir para página inicial">
+    <a href="../page-lotus/index-v2.html" class="top-bar-brand" aria-label="Ir para página inicial">
       <span class="brand-name">Flor de <em>Lótus</em></span>
       <span class="brand-sub" aria-hidden="true">Cardápio</span>
     </a>
@@ -64,66 +50,52 @@
 
     <div class="top-bar-actions" role="toolbar" aria-label="Ações do cardápio">
 
-      <!-- Favoritos -->
-      <button class="btn-icon" id="btnFav"
-              aria-label="Ver favoritos"
-              aria-pressed="false">
-        <i class="far fa-heart" aria-hidden="true"></i>
-        <span class="badge" id="favCount"
-              aria-label="Favoritos"
-              role="status"></span>
+      <button class="btn-icon" id="btnProfile" aria-label="Abrir perfil" aria-expanded="false">
+        <i class="far fa-user-circle" aria-hidden="true"></i>
+        <span class="badge" id="loyaltyBadge" aria-label="Progresso fidelidade" role="status"></span>
       </button>
 
-      <!-- Carrinho -->
-      <button class="btn-icon" id="btnCart"
-              aria-label="Abrir carrinho"
-              aria-expanded="false">
+      <button class="btn-icon" id="btnFav" aria-label="Ver favoritos" aria-pressed="false">
+        <i class="far fa-heart" aria-hidden="true"></i>
+        <span class="badge" id="favCount" aria-label="Favoritos" role="status"></span>
+      </button>
+
+      <button class="btn-icon" id="btnCart" aria-label="Abrir carrinho" aria-expanded="false">
         <i class="fas fa-bag-shopping" aria-hidden="true"></i>
-        <span class="badge" id="cartCount"
-              aria-label="Itens no carrinho"
-              role="status"></span>
+        <span class="badge" id="cartCount" aria-label="Itens no carrinho" role="status"></span>
       </button>
 
     </div>
   </header>
 
-  <!-- ═══════════════════════════════
-       FILTROS DE CATEGORIA — sticky
-  ═══════════════════════════════ -->
-  <nav id="filterBar"
-       class="filter-bar"
-       aria-label="Filtrar por categoria"
-       role="navigation">
+  <!-- ══════════════════════════════
+       FILTROS — sticky
+  ══════════════════════════════ -->
+  <nav id="filterBar" class="filter-bar" aria-label="Filtrar por categoria" role="navigation">
     <!-- preenchido por render.js -->
   </nav>
 
-  <!-- ═══════════════════════════════
+  <!-- ══════════════════════════════
        CONTEÚDO PRINCIPAL
-  ═══════════════════════════════ -->
-  <main id="mainContent"
-        class="main-content"
-        aria-label="Itens do cardápio">
+  ══════════════════════════════ -->
+  <main id="mainContent" class="main-content" aria-label="Itens do cardápio">
     <!-- preenchido por render.js -->
   </main>
 
-  <!-- Estado vazio (sem resultados de busca) -->
-  <div class="empty-state" id="emptyState"
-       role="status" aria-live="polite">
+  <!-- Estado vazio -->
+  <div class="empty-state" id="emptyState" role="status" aria-live="polite">
     <i class="fas fa-bowl-rice" aria-hidden="true"></i>
     <p>Nenhum item encontrado.<br>Tente outra busca.</p>
   </div>
 
-  <!-- ═══════════════════════════════
-       OVERLAY (modal + drawers)
-  ═══════════════════════════════ -->
-  <div class="modal-overlay"
-       id="modalOverlay"
-       role="presentation"
-       aria-hidden="true"></div>
+  <!-- ══════════════════════════════
+       OVERLAY
+  ══════════════════════════════ -->
+  <div class="modal-overlay" id="modalOverlay" role="presentation" aria-hidden="true"></div>
 
-  <!-- ═══════════════════════════════
+  <!-- ══════════════════════════════
        MODAL DE DETALHE (bottom sheet)
-  ═══════════════════════════════ -->
+  ══════════════════════════════ -->
   <article
     class="item-modal"
     id="itemModal"
@@ -131,25 +103,25 @@
     aria-modal="true"
     aria-label="Detalhes do item"
   >
-    <!-- preenchido dinamicamente por modal.js -->
+    <!-- preenchido por modal.js -->
   </article>
 
-  <!-- ═══════════════════════════════
-       PROFILE DRAWER — abre pela esquerda
-  ═══════════════════════════════ -->
+  <!-- ══════════════════════════════
+       DRAWER DO PERFIL (esquerda)
+  ══════════════════════════════ -->
   <aside
     class="profile-drawer"
     id="profileDrawer"
     role="dialog"
     aria-modal="true"
-    aria-label="Seu perfil e fidelidade"
+    aria-label="Seu perfil"
   >
     <!-- preenchido por profile.js -->
   </aside>
 
-  <!-- ═══════════════════════════════
-       DRAWER DO CARRINHO — abre pela direita
-  ═══════════════════════════════ -->
+  <!-- ══════════════════════════════
+       DRAWER DO CARRINHO (direita)
+  ══════════════════════════════ -->
   <aside
     class="cart-drawer"
     id="cartDrawer"
@@ -159,56 +131,42 @@
   >
     <header class="cart-header">
       <h2 class="cart-title">Seu <em>pedido</em></h2>
-      <button class="btn-icon"
-              id="btnCloseCart"
-              aria-label="Fechar carrinho">
+      <button class="btn-icon" id="btnCloseCart" aria-label="Fechar carrinho">
         <i class="fas fa-times" aria-hidden="true"></i>
       </button>
     </header>
 
-    <!-- Itens do carrinho -->
-    <div class="cart-items" id="cartItems"
-         role="list" aria-label="Itens adicionados"></div>
+    <div class="cart-items" id="cartItems" role="list" aria-label="Itens adicionados"></div>
 
-    <!-- Estado vazio do carrinho -->
     <div class="cart-empty" id="cartEmpty" role="status">
       <i class="fas fa-bag-shopping" aria-hidden="true"></i>
       <p>Seu carrinho está vazio.<br>Adicione itens do cardápio.</p>
     </div>
 
-    <!-- Resumo e botão de pedido -->
     <div class="cart-summary" id="cartSummary" style="display:none">
       <div class="cart-total-row">
         <span class="cart-total-label">Total do pedido</span>
         <span class="cart-total-value" id="cartTotalValue">R$ 0,00</span>
       </div>
-      <button class="btn-order-wa" id="btnOrderWa"
-              aria-label="Enviar pedido pelo WhatsApp">
+      <button class="btn-order-wa" id="btnOrderWa" aria-label="Enviar pedido pelo WhatsApp">
         <i class="fab fa-whatsapp" aria-hidden="true"></i>
         Enviar pedido pelo WhatsApp
       </button>
     </div>
   </aside>
 
-  <!-- ═══════════════════════════════
+  <!-- ══════════════════════════════
        FAB CARRINHO (flutuante)
-  ═══════════════════════════════ -->
+  ══════════════════════════════ -->
   <button class="fab-cart" id="fabCart" aria-label="Abrir carrinho">
     <i class="fas fa-bag-shopping" aria-hidden="true"></i>
     <span class="fab-cart-count" id="fabCartCount">0 itens</span>
   </button>
 
-  <!-- Toast de feedback -->
-  <div class="toast" id="toast"
-       role="status" aria-live="polite" aria-atomic="true"></div>
+  <!-- Toast -->
+  <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
 
-  <!-- SR-ONLY legenda acessível -->
-  <span class="sr-only">
-    Cardápio digital da Flor de Lótus Culinária Oriental — Cajazeiras, PB
-  </span>
-
-  <!-- Scripts — pwa-patch antes do module para expor FL_USER -->
-  <script src="./pwa-patch.js"></script>
+  <!-- Único script de entrada -->
   <script type="module" src="./app.js"></script>
 
 </body>

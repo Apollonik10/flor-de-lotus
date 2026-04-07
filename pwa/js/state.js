@@ -2,22 +2,20 @@
 
 /* ═══════════════════════════════════════════════════
    state.js — Estado global + DOM refs + Persistência
-   Quando vier Firebase: só loadPersistedData e
-   persistData precisam mudar — nada mais.
+   Absorve: lógica de fl_user do antigo pwa-patch.js
 ═══════════════════════════════════════════════════ */
 
 export const state = {
-  menu:         [],         // dados do menu.json (futuro: Firestore)
-  cart:         [],         // { key, id, nome, preco, imagem, sabor, qty }
-  favorites:    new Set(),  // ids favoritados
+  menu:         [],
+  cart:         [],
+  favorites:    new Set(),
   search:       '',
-  activeFilter: 'todos',    // 'todos' | 'favoritos' | id da categoria
+  activeFilter: 'todos',
   modalItem:    null,
   modalQty:     1,
   modalSabor:   null,
 };
 
-/* ── Referências DOM (lazy — só buscam quando chamadas) ── */
 export const dom = {
   filterBar:      () => document.getElementById('filterBar'),
   mainContent:    () => document.getElementById('mainContent'),
@@ -35,11 +33,10 @@ export const dom = {
   cartTotalValue: () => document.getElementById('cartTotalValue'),
   toast:          () => document.getElementById('toast'),
   emptyState:     () => document.getElementById('emptyState'),
+  profileDrawer:  () => document.getElementById('profileDrawer'),
 };
 
-/* ── Persistência localStorage ──
-   Fase Firebase: trocar por Firestore read/write aqui
-─────────────────────────────────────────────────── */
+/* ── Persistência localStorage ── */
 export function loadPersistedData() {
   try {
     const favs = JSON.parse(localStorage.getItem('fl_favorites') || '[]');
@@ -48,6 +45,14 @@ export function loadPersistedData() {
     const cart = JSON.parse(localStorage.getItem('fl_cart') || '[]');
     state.cart = cart;
   } catch (_) { /* silencia erros de parse */ }
+
+  try {
+    window.FL_USER = JSON.parse(localStorage.getItem('fl_user') || 'null');
+  } catch (_) {
+    window.FL_USER = null;
+  }
+
+  localStorage.setItem('fl_visited', '1');
 }
 
 export function persistData() {
