@@ -1,0 +1,25 @@
+# dependências
+node_modules/
+
+# build
+dist/
+build/
+
+# ambiente (backend futuro)
+.env
+.env.*
+
+# logs
+*.log
+
+# sistema
+.DS_Store
+Thumbs.db
+
+# cache
+.cache/
+.tmp/
+
+# editor
+.vscode/
+.idea/
