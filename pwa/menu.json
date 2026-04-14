@@ -111,7 +111,7 @@
           "porcao": "1 unidade",
           "descricao": "Cone de alga nori em versão mini, recheado com arroz e ingrediente à escolha. Prático e delicioso.",
           "preco": 3.00,
-          "imagem": "../page-lotus/assets/images/mini-temaki.jpg",
+          "imagem": "../page-lotus/assets/images/minitemaki.jpg",
           "sabores": ["Salmão", "Camarão", "Kani"],
           "tags": ["salmão"],
           "destaque": false
@@ -133,7 +133,7 @@
           "porcao": "5 unidades",
           "descricao": "Versão premium do Arco Íris com ingredientes selecionados e apresentação ainda mais elaborada.",
           "preco": 15.00,
-          "imagem": "../page-lotus/assets/images/arco-iris-zaga.jpg",
+          "imagem": "../page-lotus/assets/images/arco-iris-especial.jpg",
           "sabores": ["Salmão", "Camarão", "Kani"],
           "tags": ["salmão"],
           "destaque": false
@@ -144,7 +144,7 @@
           "porcao": "5 unidades",
           "descricao": "A dupla perfeita: kani e salmão em uramaki cremoso com cream cheese e cebolinha.",
           "preco": 15.00,
-          "imagem": "../page-lotus/assets/images/pecas/kane-shake.png",
+          "imagem": "../page-lotus/assets/images/kane-shake.png",
           "sabores": ["Salmão", "Camarão", "Kani"],
           "tags": ["salmão"],
           "destaque": false
@@ -188,7 +188,7 @@
           "porcao": "1 unidade",
           "descricao": "Temaki diferenciado com camada adicional de massa haromaki, que traz crocância extra a cada mordida.",
           "preco": 25.00,
-          "imagem": "../page-lotus/assets/images/temaki-haromaki.jpg",
+          "imagem": "../page-lotus/assets/images/temaki-haro.jpg",
           "sabores": ["Salmão", "Camarão", "Kani"],
           "tags": ["salmão"],
           "destaque": false
@@ -254,7 +254,7 @@
           "porcao": "5 unidades",
           "descricao": "Kani com cream cheese envolvido na crocante massa haromaki. A versão elevada de um clássico amado.",
           "preco": 15.00,
-          "imagem": "../page-lotus/assets/images/haromaki-kani-keijo.jpg",
+          "imagem": "../page-lotus/assets/images/kane-haro.jpg",
           "sabores": ["Salmão", "Camarão", "Kani"],
           "tags": ["salmão"],
           "destaque": false
@@ -276,7 +276,7 @@
           "porcao": "4 unidades",
           "descricao": "Rolinhos crocantes de massa haromaki recheados generosamente. Crocância incomparável com sabor marcante.",
           "preco": 15.00,
-          "imagem": "../page-lotus/assets/images/rolinho-haromaki.jpg",
+          "imagem": "../page-lotus/assets/images/rolinho.jpg",
           "sabores": ["Salmão", "Camarão", "Kani"],
           "tags": ["salmão"],
           "destaque": false
@@ -362,7 +362,7 @@
           "porcao": "Porção especial",
           "descricao": "Criação exclusiva: base de arroz crocante no formato de pizza, coberta com peixe fresco, cream cheese e finalizações especiais.",
           "preco": 35.00,
-          "imagem": "../page-lotus/assets/images/pecas/pizza.jpg",
+          "imagem": "../page-lotus/assets/images/pizza.jpg",
           "sabores": ["Salmão", "Camarão", "Kani"],
           "tags": ["salmão"],
           "destaque": true
@@ -393,7 +393,7 @@
           "porcao": "40 peças",
           "descricao": "40 peças empanadas em farinha panko que traz toda a crocância da fritura. Inclui: 28 Hot Roll tradicionais e 12 Canapés Hot Roll.",
           "preco": 50.00,
-          "imagem": "../page-lotus/assets/images/combos/combo-crocante.jpg",
+          "imagem": "../page-lotus/assets/images/combos/crocante.jpg",
           "sabores": [],
           "tags": [],
           "destaque": false
@@ -404,7 +404,7 @@
           "porcao": "58 peças",
           "descricao": "Ótima opção para comer a dois, com boa variação de peças fresquinhas. Inclui: 12 Uramaki, 7 Hossomaki, 12 Arco Íris, 5 Joy Joy, 7 Kani Queijo e 14 Hot Roll.",
           "preco": 90.00,
-          "imagem": "../page-lotus/assets/images/combos/combo-reserva.jpg",
+          "imagem": "../page-lotus/assets/images/combos/reserva.jpg",
           "sabores": [],
           "tags": [],
           "destaque": true

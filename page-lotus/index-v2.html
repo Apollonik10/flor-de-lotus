@@ -4,6 +4,15 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="Flor de Lótus — Culinária oriental artesanal com ingredientes frescos e entrega rápida em Cajazeiras, PB." />
+  <meta http-equiv="Content-Security-Policy" content="
+default-src * data: blob: 'unsafe-inline' 'unsafe-eval';
+img-src * data: blob:;
+script-src * 'unsafe-inline' 'unsafe-eval';
+style-src * 'unsafe-inline';
+font-src * data:;
+connect-src *;
+">
+  
   <title>Flor de Lótus | Culinária Oriental</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -501,13 +510,13 @@
       <div class="splide" id="pratos-carousel" aria-label="Pratos em destaque">
         <div class="splide__track">
           <ul class="splide__list">
-            <li class="splide__slide"><img src="assets/images/pecas/bento.jpg"       alt="Bento Oriental"  loading="lazy"></li>
-            <li class="splide__slide"><img src="assets/images/pecas/trak-dragon.png" alt="Trak Dragon"     loading="lazy"></li>
-            <li class="splide__slide"><img src="assets/images/pecas/kane-shake.png"  alt="Kane Shake"      loading="lazy"></li>
-            <li class="splide__slide"><img src="assets/images/pecas/supremo.png"     alt="Supremo"         loading="lazy"></li>
-            <li class="splide__slide"><img src="assets/images/pecas/carpaccio.png"   alt="Carpaccio"       loading="lazy"></li>
-            <li class="splide__slide"><img src="assets/images/pecas/temaki-hot.jpg"  alt="Temaki Hot"      loading="lazy"></li>
-            <li class="splide__slide"><img src="assets/images/pecas/ceviche.png"     alt="Ceviche"         loading="lazy"></li>
+            <li class="splide__slide"><img src="assets/images/bento.jpg"       alt="Bento Oriental"  loading="lazy"></li>
+            <li class="splide__slide"><img src="assets/images/trak-dragon.png" alt="Trak Dragon"     loading="lazy"></li>
+            <li class="splide__slide"><img src="assets/images/kane-shake.png"  alt="Kane Shake"      loading="lazy"></li>
+            <li class="splide__slide"><img src="assets/images/supremo.png"     alt="Supremo"         loading="lazy"></li>
+            <li class="splide__slide"><img src="assets/images/carpaccio.png"   alt="Carpaccio"       loading="lazy"></li>
+            <li class="splide__slide"><img src="assets/images/temaki-hot.jpg"  alt="Temaki Hot"      loading="lazy"></li>
+            <li class="splide__slide"><img src="assets/images/ceviche.png"     alt="Ceviche"         loading="lazy"></li>
           </ul>
         </div>
       </div>

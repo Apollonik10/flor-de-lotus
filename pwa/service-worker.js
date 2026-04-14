@@ -1,31 +1,17 @@
 'use strict';
 
-/* ═══════════════════════════════════════════════════════
-   FLOR DE LÓTUS — service-worker.js (RAIZ)
-   Coloque na RAIZ do projeto: /service-worker.js
-   Escopo: controla TODA a aplicação (landing + PWA)
-
-   Estratégias:
-   · HTML/JSON  → Stale-While-Revalidate  (rápido + fresco)
-   · CSS/JS     → Cache First             (assets estáticos)
-   · Fontes/CDN → Cache First             (muito estáveis)
-   · Imagens    → Cache First + fallback  (placeholder off)
-═══════════════════════════════════════════════════════ */
-
-const VER          = 'v3';
+const VER          = 'v4';
 const CACHE_STATIC = `fl-static-${VER}`;
 const CACHE_DYN    = `fl-dynamic-${VER}`;
 
-/* Arquivos pré-cacheados no install */
+/* Arquivos pré-cacheados */
 const PRECACHE = [
-  /* Landing */
   '/',
   '/index.html',
   '/page-lotus/index-v2.html',
   '/landing-patch.css',
   '/landing-patch.js',
 
-  /* PWA */
   '/pwa/cardapio.html',
   '/pwa/styles.css',
   '/pwa/pwa-patch.css',
@@ -33,113 +19,105 @@ const PRECACHE = [
   '/pwa/menu.json',
   '/pwa/register.html',
 
-  /* Raiz */
   '/manifest.json',
+
+  /* fallback imagem */
+  '/page-lotus/assets/images/uramaki.jpg',
 ];
 
-/* ── Install: pré-cacheia assets essenciais ── */
+/* INSTALL */
 self.addEventListener('install', e => {
   e.waitUntil(
     caches.open(CACHE_STATIC)
-      .then(cache => {
-        return Promise.allSettled(
-          PRECACHE.map(url =>
-            cache.add(url).catch(err =>
-              console.warn(`[SW] Não cacheou ${url}:`, err.message)
-            )
-          )
-        );
-      })
+      .then(cache => cache.addAll(PRECACHE))
       .then(() => self.skipWaiting())
   );
 });
 
-/* ── Activate: limpa caches antigos ── */
+/* ACTIVATE */
 self.addEventListener('activate', e => {
   e.waitUntil(
-    caches.keys()
-      .then(keys => Promise.all(
+    caches.keys().then(keys =>
+      Promise.all(
         keys
           .filter(k => k !== CACHE_STATIC && k !== CACHE_DYN)
-          .map(k => {
-            console.log('[SW] 🗑 Deletando cache antigo:', k);
-            return caches.delete(k);
-          })
-      ))
-      .then(() => self.clients.claim())
+          .map(k => caches.delete(k))
+      )
+    ).then(() => self.clients.claim())
   );
 });
 
-/* ── Fetch: roteador de estratégias ── */
+/* FETCH */
 self.addEventListener('fetch', e => {
   const req = e.request;
   if (req.method !== 'GET') return;
 
-  const url    = new URL(req.url);
-  const origin = location.origin;
+  const url = new URL(req.url);
 
-  /* 1. Fontes Google / CDN externo → Cache First */
-  const isExtFont = url.hostname.includes('fonts.googleapis.com')
+  /* CDN (fonts/icons) */
+  const isExt = url.hostname.includes('fonts.googleapis.com')
     || url.hostname.includes('fonts.gstatic.com')
     || url.hostname.includes('cdnjs.cloudflare.com');
 
-  if (isExtFont) {
+  if (isExt) {
     e.respondWith(cacheFirst(req, CACHE_DYN));
     return;
   }
 
-  /* 2. Ignora outros cross-origin */
-  if (url.origin !== origin) return;
-
-  /* 3. HTML e JSON → Stale-While-Revalidate */
-  const isHTML = req.destination === 'document' || url.pathname.endsWith('.html');
-  const isJSON = url.pathname.endsWith('.json');
-
-  if (isHTML || isJSON) {
+  /* HTML / JSON */
+  if (
+    req.destination === 'document' ||
+    url.pathname.endsWith('.html') ||
+    url.pathname.endsWith('.json')
+  ) {
     e.respondWith(staleWhileRevalidate(req));
     return;
   }
 
-  /* 4. Imagens → Cache First + fallback placeholder */
+  /* IMAGENS */
   if (req.destination === 'image') {
     e.respondWith(
-      cacheFirst(req, CACHE_DYN).catch(() =>
-        caches.match('/pwa/images/placeholder.jpg')
-      )
+      cacheFirst(req, CACHE_DYN)
+        .then(res => res || caches.match('/page-lotus/assets/images/uramaki.jpg'))
+        .catch(() => caches.match('/page-lotus/assets/images/uramaki.jpg'))
     );
     return;
   }
 
-  /* 5. CSS, JS, outros assets → Cache First */
+  /* CSS / JS / outros */
   e.respondWith(cacheFirst(req, CACHE_DYN));
 });
 
-/* ═══════════════════════════════════════════
-   HELPERS DE ESTRATÉGIA
-═══════════════════════════════════════════ */
-
-/** Cache First: retorna cache; se não existir, busca na rede e cacheia */
+/* CACHE FIRST (seguro) */
 async function cacheFirst(req, cacheName) {
-  const cache  = await caches.open(cacheName);
+  const cache = await caches.open(cacheName);
   const cached = await cache.match(req);
   if (cached) return cached;
 
-  const fresh = await fetch(req);
-  if (fresh.ok) cache.put(req, fresh.clone());
-  return fresh;
+  try {
+    const fresh = await fetch(req);
+    if (fresh && fresh.ok) {
+      cache.put(req, fresh.clone());
+      return fresh;
+    }
+  } catch (err) {}
+
+  return cached || new Response('Offline', { status: 503 });
 }
 
-/** Stale-While-Revalidate: retorna cache imediatamente, atualiza em background */
+/* STALE WHILE REVALIDATE */
 async function staleWhileRevalidate(req) {
-  const cache  = await caches.open(CACHE_STATIC);
+  const cache = await caches.open(CACHE_STATIC);
   const cached = await cache.match(req);
 
   const fetchPromise = fetch(req)
-    .then(fresh => {
-      if (fresh.ok) cache.put(req, fresh.clone());
-      return fresh;
+    .then(res => {
+      if (res && res.ok) {
+        cache.put(req, res.clone());
+      }
+      return res;
     })
-    .catch(() => cached); /* offline fallback */
+    .catch(() => cached);
 
   return cached || fetchPromise;
 }
