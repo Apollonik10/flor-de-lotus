@@ -9,7 +9,7 @@ export function registerSW() {
   if (!('serviceWorker' in navigator)) return;
 
   navigator.serviceWorker
-    .register('/service-worker.js', { scope: '/' })
+    .register('/pwa/service-worker.js', { scope: '/' })
     .then(reg => {
       reg.addEventListener('updatefound', () => {
         reg.installing?.addEventListener('statechange', function () {

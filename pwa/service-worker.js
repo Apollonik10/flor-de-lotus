@@ -8,18 +8,15 @@ const CACHE_DYN    = `fl-dynamic-${VER}`;
 const PRECACHE = [
   '/',
   '/index.html',
-  '/page-lotus/index-v2.html',
-  '/landing-patch.css',
-  '/landing-patch.js',
+  '/page-lotus/index.html',
 
   '/pwa/cardapio.html',
   '/pwa/styles.css',
-  '/pwa/pwa-patch.css',
   '/pwa/app.js',
   '/pwa/menu.json',
   '/pwa/register.html',
 
-  '/manifest.json',
+  '/pwa/manifest.json',
 
   /* fallback imagem */
   '/page-lotus/assets/images/uramaki.jpg',
