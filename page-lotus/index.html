@@ -21,7 +21,6 @@ connect-src *;
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css">
   <link rel="manifest" href="/manifest.json">
-  <link rel="stylesheet" href="/landing-patch.css">
 
   <style>
 
@@ -134,8 +133,7 @@ connect-src *;
       /* Compensação da nav fixa */
       margin-top: var(--nav-h);
       position: relative;
-      /* ← MENOR: altura compacta, não 100svh */
-      height: clamp(340px, 52vh, 560px);
+      height: clamp(560px, 88vh, 820px);
       background: url("assets/images/capa.png") center / cover no-repeat;
       isolation: isolate;
       overflow: hidden;
@@ -144,9 +142,10 @@ connect-src *;
       content:''; position:absolute; inset:0; z-index:0;
       background: linear-gradient(
         to bottom,
-        rgba(0,0,0,.60) 0%,
-        rgba(0,0,0,.20) 40%,
-        rgba(0,0,0,.85) 100%
+        rgba(0,0,0,.45) 0%,
+        rgba(0,0,0,.10) 40%,
+        rgba(0,0,0,.90) 75%,
+        rgba(0,0,0,.95) 100%
       );
     }
 
@@ -154,7 +153,7 @@ connect-src *;
       position: absolute; inset: 0; z-index: 1;
       display: flex; flex-direction: column;
       justify-content: flex-end; align-items: flex-start;
-      padding: clamp(1.5rem,5vw,4rem) clamp(1rem,5vw,4rem) clamp(2rem,5vw,3.5rem);
+      padding: clamp(1.5rem,5vw,4rem) clamp(1rem,5vw,4rem) clamp(3.5rem,8vw,5rem);
       gap: clamp(.6rem,2vw,1.2rem);
     }
 
@@ -616,12 +615,16 @@ connect-src *;
             <i class="fas fa-star" aria-hidden="true"></i><i class="fas fa-star" aria-hidden="true"></i>
             <i class="fas fa-star" aria-hidden="true"></i>
           </div>
-          <blockquote class="review-text">"Melhor sushi de Cajazeiras, sem dúvida. Os ingredientes são fresquíssimos e a apresentação é impecável. Já virei cliente fiel!"</blockquote>
+          <blockquote class="review-text">  Sou muito tradicionalista nas minhas escolhas, a pessoa pede comida com medo em outros locais e acaba às vezes surpreso negativamente.
+Mas o sushi e o temaki da flor de lótus não deixa a desenhar em nada aos tradicionais restaurantes de João Pessoa
+Estou encantando pelo sabor e pelo cuidado como pedido
+Muito obrigado por tudo
+Estão de parabéns</blockquote>
           <footer class="review-author">
             <div class="review-avatar" aria-hidden="true">M</div>
             <div>
-              <strong class="review-name">Mariana S.</strong>
-              <span class="review-source"><i class="fab fa-instagram" aria-hidden="true"></i> Instagram</span>
+              <strong class="review-name">Ed</strong>
+              <span class="review-source"><i class="fab fa-whatsapp" aria-hidden="true"></i> WhatsApp</span>
             </div>
           </footer>
         </article>
@@ -632,11 +635,11 @@ connect-src *;
             <i class="fas fa-star" aria-hidden="true"></i><i class="fas fa-star" aria-hidden="true"></i>
             <i class="fas fa-star" aria-hidden="true"></i>
           </div>
-          <blockquote class="review-text">"Pedi o combinado chef e me surpreendi com o tamanho e a qualidade. Entrega rápida, embalagem caprichada. 10/10!"</blockquote>
+          <blockquote class="review-text">Neste final de ano eu quero parabenizar a vocês que formam essa equipe que faz a alegria da minha casa com refeições de qualidade, o sushi de vocês é sem igual, fico muito feliz em ver meu filho autista se alimentando tão bem quando tem o sushi da Flor de Lotus.</blockquote>
           <footer class="review-author">
             <div class="review-avatar" aria-hidden="true">R</div>
             <div>
-              <strong class="review-name">Rafael L.</strong>
+              <strong class="review-name">Amanda Moura</strong>
               <span class="review-source"><i class="fab fa-whatsapp" aria-hidden="true"></i> WhatsApp</span>
             </div>
           </footer>
@@ -648,11 +651,30 @@ connect-src *;
             <i class="fas fa-star" aria-hidden="true"></i><i class="fas fa-star" aria-hidden="true"></i>
             <i class="fas fa-star" aria-hidden="true"></i>
           </div>
-          <blockquote class="review-text">"Finalmente um sushi de verdade aqui em Cajazeiras. Cada peça é uma obra de arte. A família toda amou e já está pedindo de novo!"</blockquote>
+          <blockquote class="review-text">Oi passando pra deixar meu feedback.
+O sushi estava muito bom, bem apresentado, organizado e muito saboroso.
+Nós amamos, vcs ganharam novos clientes.</blockquote>
           <footer class="review-author">
             <div class="review-avatar" aria-hidden="true">A</div>
             <div>
-              <strong class="review-name">Ana Paula C.</strong>
+              <strong class="review-name">Larissa</strong>
+              <span class="review-source"><i class="fab fa-instagram" aria-hidden="true"></i> Instagram</span>
+            </div>
+          </footer>
+        </article>
+        
+         <article class="review-card reveal d3" role="listitem" aria-label="Avaliação de Ana Paula C.">
+          <div class="review-stars" aria-label="5 estrelas">
+            <i class="fas fa-star" aria-hidden="true"></i><i class="fas fa-star" aria-hidden="true"></i>
+            <i class="fas fa-star" aria-hidden="true"></i><i class="fas fa-star" aria-hidden="true"></i>
+            <i class="fas fa-star" aria-hidden="true"></i>
+          </div>
+          <blockquote class="review-text">Bom dia, parabéns pelo trabalho de vcs, tudo uma delícia delícia mesmo parabéns e mais sucesso...
+          Amamos!!!</blockquote>
+          <footer class="review-author">
+            <div class="review-avatar" aria-hidden="true">A</div>
+            <div>
+              <strong class="review-name">Central motos</strong>
               <span class="review-source"><i class="fab fa-instagram" aria-hidden="true"></i> Instagram</span>
             </div>
           </footer>
@@ -683,7 +705,7 @@ connect-src *;
         <address>
           <h3 class="footer-col-title">Contato</h3>
           <p class="footer-contact-item"><i class="fas fa-phone-alt" aria-hidden="true"></i>(83) 99970-0469</p>
-          <p class="footer-contact-item"><i class="fas fa-envelope" aria-hidden="true"></i><a href="mailto:flordelotus@email.com">flordelotus@email.com</a></p>
+          <p class="footer-contact-item"><i class="fas fa-envelope" aria-hidden="true"></i><a href="mailto:flordelotus@email.com">florlotusoriental@email.com</a></p>
           <p class="footer-contact-item"><i class="fas fa-map-marker-alt" aria-hidden="true"></i>Cajazeiras, PB</p>
         </address>
         <div class="footer-hours">
@@ -705,7 +727,6 @@ connect-src *;
     <i class="fab fa-whatsapp" aria-hidden="true"></i>
     <span class="wa-tooltip">Pedir agora</span>
   </a>
-  <script src="/landing-patch.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
   <script>
     'use strict';
