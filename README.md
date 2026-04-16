@@ -108,7 +108,9 @@ Um app web que funciona como:
 - Melhorar performance do render  
 - Refinar UI/UX mobile  
 - Integrar backend (Firebase ou API real)  
-- Adicionar pagamento (Stripe/Mercado Pago)  
+- Adicionar pagamento (Stripe/Mercado Pago)
+- integrar deshbord própria
+- integração com n8n
 
 ---
 
@@ -118,4 +120,4 @@ Projeto focado em:
 - Organização de código  
 - Arquitetura limpa  
 - Experiência mobile  
-- Evolução para app real
+- Evolução para SaaS
