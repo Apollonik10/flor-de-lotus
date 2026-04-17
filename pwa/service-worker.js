@@ -10,7 +10,7 @@ const PRECACHE = [
   '/index.html',
   '/page-lotus/index.html',
 
-  '/pwa/cardapio.html',
+  '/pwa/index.html',
   '/pwa/styles.css',
   '/pwa/app.js',
   '/pwa/menu.json',
