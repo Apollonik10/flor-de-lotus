@@ -14,6 +14,17 @@ connect-src *;
 ">
   
   <title>Flor de Lótus | Culinária Oriental</title>
+  
+  <script>
+  // Usuário já registrado ou visitou o PWA → vai direto para o cardápio
+  (function () {
+    var visited = localStorage.getItem('fl_visited');
+    var user    = localStorage.getItem('fl_user');
+    if (visited || user) {
+      window.location.replace('/pwa/cardapio.html');
+    }
+  })();
+</script>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

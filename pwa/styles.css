@@ -858,3 +858,29 @@ body {
 ::-webkit-scrollbar       { width:4px; }
 ::-webkit-scrollbar-track { background:transparent; }
 ::-webkit-scrollbar-thumb { background:rgba(255,255,255,.1); border-radius:4px; }
+
+/* ═══════════════════════════════════════════
+   16. BOTÃO INSTALAR PWA
+═══════════════════════════════════════════ */
+#btnInstall {
+  display: none; /* controlado por install.js */
+  align-items: center; gap: .4rem;
+  padding: 7px 14px;
+  font-size: .68rem; font-weight: 600;
+  letter-spacing: .1em; text-transform: uppercase;
+  color: var(--black-absolute);
+  background: var(--lotus-pink-dark);
+  border: none; border-radius: 999px;
+  box-shadow: 0 4px 14px rgba(217,143,122,.35);
+  cursor: pointer; white-space: nowrap;
+  transition: transform .2s, box-shadow .2s;
+  flex-shrink: 0;
+}
+#btnInstall:active { transform: scale(.97); }
+#btnInstall i { font-size: .85rem; }
+
+/* Mobile: esconde texto, mantém ícone */
+@media (max-width: 480px) {
+  #btnInstall .install-label { display: none; }
+  #btnInstall { padding: 7px 10px; }
+}
