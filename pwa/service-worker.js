@@ -6,17 +6,20 @@ const CACHE_DYN    = `fl-dynamic-${VER}`;
 
 /* Arquivos pré-cacheados */
 const PRECACHE = [
-  '/',
-  '/index.html',
-  '/page-lotus/index.html',
+  '/flor-de-lotus/',
+  '/flor-de-lotus/index.html',
+  '/flor-de-lotus/page-lotus/index-v2.html',
+  '/flor-de-lotus/landing-patch.css',
+  '/flor-de-lotus/landing-patch.js',
 
-  '/pwa/index.html',
-  '/pwa/styles.css',
-  '/pwa/app.js',
-  '/pwa/menu.json',
-  '/pwa/register.html',
+  '/flor-de-lotus/pwa/index.html',
+  '/flor-de-lotus/pwa/styles.css',
+  '/flor-de-lotus/pwa/pwa-patch.css',
+  '/flor-de-lotus/pwa/app.js',
+  '/flor-de-lotus/pwa/menu.json',
+  '/flor-de-lotus/pwa/register.html',
 
-  '/pwa/manifest.json',
+  '/flor-de-lotus/manifest.json',
 
   /* fallback imagem */
   '/page-lotus/assets/images/uramaki.jpg',
