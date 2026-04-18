@@ -7,13 +7,13 @@ const usuarioRegistrado = localStorage.getItem('usuarioRegistrado');
 // se já registrou → nunca mais vê landing/register
 if (usuarioRegistrado === 'true') {
   if (path.includes('index.html') || path.includes('register.html')) {
-    window.location.href = './cardapio.html';
+    window.location.href = './index.html';
   }
 }
 
 // se NÃO registrou → não pode acessar cardápio direto
 if (!usuarioRegistrado) {
-  if (path.includes('cardapio.html')) {
+  if (path.includes('index.html')) {
     window.location.href = './index.html';
   }
 }

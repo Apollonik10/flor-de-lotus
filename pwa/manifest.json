@@ -3,9 +3,9 @@
   "short_name": "Flor de Lótus",
   "description": "Cardápio digital da Flor de Lótus Culinária Oriental — Cajazeiras, PB",
 
-  "start_url": "./flor-de-lotus/index.html?utm_source=pwa",
-  "scope": "/flor-de-lotus",
-  "id": "/flor-de-lotus/pwa/index.html",
+  "scope": "/flor-de-lotus/",
+"start_url": "/flor-de-lotus/pwa/index.html?utm_source=pwa",
+"id": "/flor-de-lotus/pwa/index.html"
 
   "display": "standalone",
   "display_override": ["standalone", "minimal-ui", "browser"],
@@ -20,19 +20,19 @@
 
   "icons": [
     {
-      "src": "/pwa/icons/icon-192.png",
+      "src": "/flor-de-lotus/pwa/icons/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/pwa/icons/icon-512.png",
+      "src": "/flor-de-lotus/pwa/icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/pwa/icons/icon-maskable.png",
+      "src": "/flor-de-lotus/pwa/icons/icon-maskable.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
@@ -44,15 +44,15 @@
       "name": "Ver Cardápio",
       "short_name": "Cardápio",
       "description": "Abrir o cardápio digital completo",
-      "url": "/pwa/index.html",
-      "icons": [{ "src": "/pwa/images/icons/icon-192.png", "sizes": "192x192" }]
+      "url": "/flor-de-lotus/pwa/index.html",
+      "icons": [{ "src": "/flor-de-lotus/pwa/icons/icon-192.png", "sizes": "192x192" }]
     },
     {
       "name": "Pedir pelo WhatsApp",
       "short_name": "WhatsApp",
       "description": "Fazer pedido direto via WhatsApp",
       "url": "https://wa.me/5583999700469?text=Olá!%20Gostaria%20de%20fazer%20um%20pedido%20🍣",
-      "icons": [{ "src": "/pwa/images/icons/icon-192.png", "sizes": "192x192" }]
+      "icons": [{ "src": "/flor-de-lotus/pwa/icons/icon-192.png", "sizes": "192x192" }]
     }
   ],
 
