@@ -1,14 +1,12 @@
 'use strict';
-// app.js (COLOCA NO TOPO, antes de qualquer init)
+// Guard de acesso — roda antes dos imports
+const _path  = window.location.pathname;
+const _user  = localStorage.getItem('fl_user');
+const _visit = localStorage.getItem('fl_visited');
 
-const path = window.location.pathname;
-const usuarioRegistrado = localStorage.getItem('usuarioRegistrado');
-
-// se já registrou → nunca mais vê landing/register
-if (usuarioRegistrado === 'true') {
-  if (path.includes('index.html') || path.includes('register.html')) {
-    window.location.href = './index.html';
-  }
+if (!_user && !_visit) {
+  const noMenu = _path.includes('/pwa/index') || /\/pwa\/?$/.test(_path);
+  if (noMenu) window.location.replace('/flor-de-lotus/pwa/register.html');
 }
 
 // se NÃO registrou → não pode acessar cardápio direto

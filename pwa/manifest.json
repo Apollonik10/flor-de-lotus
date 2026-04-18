@@ -5,7 +5,7 @@
 
  "scope": "/flor-de-lotus/pwa/",
 "start_url": "/flor-de-lotus/pwa/index.html?utm_source=pwa",
-"id": "/flor-de-lotus/pwa/index.html"
+"id": "/flor-de-lotus/pwa/index.html",
 
   "display": "standalone",
   "display_override": ["standalone", "minimal-ui", "browser"],

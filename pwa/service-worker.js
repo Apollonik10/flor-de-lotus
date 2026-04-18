@@ -6,19 +6,11 @@ const CACHE_DYN    = `fl-dynamic-${VER}`;
 
 /* Arquivos pré-cacheados */
 const PRECACHE = [
-  '/flor-de-lotus/',
-  '/flor-de-lotus/index.html',
-  '/flor-de-lotus/page-lotus/index-v2.html',
-  '/flor-de-lotus/landing-patch.css',
-  '/flor-de-lotus/landing-patch.js',
-
   '/flor-de-lotus/pwa/index.html',
   '/flor-de-lotus/pwa/styles.css',
-  '/flor-de-lotus/pwa/pwa-patch.css',
   '/flor-de-lotus/pwa/app.js',
   '/flor-de-lotus/pwa/menu.json',
   '/flor-de-lotus/pwa/register.html',
-
   '/flor-de-lotus/manifest.json',
 
   /* fallback imagem */
