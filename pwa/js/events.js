@@ -1,47 +1,54 @@
 'use strict';
 
-import { state, dom }                                          from './state.js';
-import { renderFilterBar, renderContent }                     from './render.js';
+/* ═══════════════════════════════════════════════════
+   events.js — Bind de eventos globais e busca
+═══════════════════════════════════════════════════ */
+
+import { state, dom } from './state.js';
+import { renderFilterBar, renderContent } from './render.js';
 import { openCartDrawer, closeCartDrawer, sendOrderWhatsApp } from './cart.js';
-import { closeModal }                                         from './modal.js';
-import { openProfileDrawer }                                  from './profile.js'; // ← novo import
+import { closeModal } from './modal.js';
+import { openProfileDrawer, closeProfileDrawer } from './profile.js';
 
 export function bindGlobalEvents() {
   bindSearch();
 
-  // Overlay fecha modal ou drawer aberto
+  /* Overlay fecha modal, drawer de carrinho ou de perfil */
   dom.modalOverlay()?.addEventListener('click', () => {
-    if (dom.cartDrawer()?.classList.contains('open'))    closeCartDrawer();
+    if (dom.cartDrawer()?.classList.contains('open'))         closeCartDrawer();
     else if (document.getElementById('profileDrawer')
-              ?.classList.contains('open'))              window.closeProfileDrawer?.();
-    else                                                 closeModal();
+               ?.classList.contains('open'))                  closeProfileDrawer();
+    else                                                      closeModal();
   });
 
-  // Escape fecha tudo
+  /* Escape — fecha tudo */
   document.addEventListener('keydown', e => {
     if (e.key !== 'Escape') return;
     closeModal();
     closeCartDrawer();
-    window.closeProfileDrawer?.();
+    closeProfileDrawer();
   });
 
-  // Botão carrinho no topo
-  document.getElementById('btnCart')
+  /* Perfil */
+  document.getElementById('btnProfile')
     ?.addEventListener('click', () => {
-      dom.cartDrawer()?.classList.contains('open')
-        ? closeCartDrawer()
-        : openCartDrawer();
+      const drawer = document.getElementById('profileDrawer');
+      if (drawer?.classList.contains('open')) closeProfileDrawer();
+      else openProfileDrawer();
     });
 
-  // ← FIX: fechar carrinho pelo X interno do drawer
+  /* Carrinho (topo) */
+  document.getElementById('btnCart')
+    ?.addEventListener('click', () => {
+      if (dom.cartDrawer()?.classList.contains('open')) closeCartDrawer();
+      else openCartDrawer();
+    });
+
+  /* Fechar carrinho (botão interno ao drawer) */
   document.getElementById('btnCloseCart')
     ?.addEventListener('click', closeCartDrawer);
 
-  // ← FIX: abrir perfil
-  document.getElementById('btnProfile')
-    ?.addEventListener('click', openProfileDrawer);
-
-  // Favoritos → alterna filtro
+  /* Favoritos — alterna filtro */
   document.getElementById('btnFav')
     ?.addEventListener('click', () => {
       state.activeFilter =
@@ -52,10 +59,10 @@ export function bindGlobalEvents() {
         ?.classList.toggle('active', state.activeFilter === 'favoritos');
     });
 
-  // FAB flutuante
+  /* FAB flutuante */
   dom.fabCart()?.addEventListener('click', openCartDrawer);
 
-  // Enviar pedido WA
+  /* Enviar pedido via WhatsApp */
   document.getElementById('btnOrderWa')
     ?.addEventListener('click', sendOrderWhatsApp);
 }
@@ -65,10 +72,10 @@ function bindSearch() {
   const input = dom.searchInput();
   if (!input) return;
 
-  let debounceTimer;
+  let timer;
   input.addEventListener('input', () => {
-    clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(() => {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
       state.search = input.value;
       if (state.search && state.activeFilter !== 'todos') {
         state.activeFilter = 'todos';

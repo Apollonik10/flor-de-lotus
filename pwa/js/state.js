@@ -2,7 +2,6 @@
 
 /* ═══════════════════════════════════════════════════
    state.js — Estado global + DOM refs + Persistência
-   Absorve: lógica de fl_user do antigo pwa-patch.js
 ═══════════════════════════════════════════════════ */
 
 export const state = {
@@ -33,26 +32,21 @@ export const dom = {
   cartTotalValue: () => document.getElementById('cartTotalValue'),
   toast:          () => document.getElementById('toast'),
   emptyState:     () => document.getElementById('emptyState'),
-  profileDrawer:  () => document.getElementById('profileDrawer'),
 };
 
-/* ── Persistência localStorage ── */
 export function loadPersistedData() {
   try {
+    /* Favoritos */
     const favs = JSON.parse(localStorage.getItem('fl_favorites') || '[]');
     favs.forEach(id => state.favorites.add(id));
 
-    const cart = JSON.parse(localStorage.getItem('fl_cart') || '[]');
-    state.cart = cart;
-  } catch (_) { /* silencia erros de parse */ }
+    /* Carrinho */
+    state.cart = JSON.parse(localStorage.getItem('fl_cart') || '[]');
 
-  try {
-    window.FL_USER = JSON.parse(localStorage.getItem('fl_user') || 'null');
-  } catch (_) {
-    window.FL_USER = null;
-  }
-
-  localStorage.setItem('fl_visited', '1');
+    /* Dados do usuário — expõe globalmente para cart.js */
+    const user = JSON.parse(localStorage.getItem('fl_user') || 'null');
+    if (user) window.FL_USER = user;
+  } catch (_) { /* silencia parse errors */ }
 }
 
 export function persistData() {
