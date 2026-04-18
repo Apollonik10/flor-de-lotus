@@ -3,10 +3,10 @@
 export function registerSW() {
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker
-        .register('/flor-de-lotus/service-worker.js', { scope: '/flor-de-lotus/' })  // ← absoluto, era './service-worker.js'
-        .then(() => console.log('[SW] Registrado'))
-        .catch(err => console.warn('[SW] Erro:', err));
+      // Raiz absoluta — não './service-worker.js'
+      navigator.serviceWorker.register('/service-worker.js', { scope: '/' })
+        .then(() => console.log('SW registrado'))
+        .catch(err => console.log('Erro SW:', err));
     });
   }
 }
