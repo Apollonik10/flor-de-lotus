@@ -9,8 +9,8 @@ const _user  = localStorage.getItem('fl_user');
 const _visit = localStorage.getItem('fl_visited');
 
 if (!_user && !_visit) {
-  const onMenu = _path.includes('/pwa/index') || /\/pwa\/?$/.test(_path);
-  if (onMenu) window.location.replace('/flor-de-lotus/pwa/register.html');
+  const onMenu = _path.includes('./index.html') || /\/pwa\/?$/.test(_path);
+  if (onMenu) window.location.replace('./register.html');
 }
 
 // Debug visual — mostra qualquer erro JS na tela

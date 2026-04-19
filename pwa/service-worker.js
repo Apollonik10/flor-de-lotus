@@ -13,8 +13,7 @@ const PRECACHE = [
   '/flor-de-lotus/pwa/register.html',
   '/flor-de-lotus/manifest.json',
 
-  /* fallback imagem */
-  '/page-lotus/assets/images/uramaki.jpg',
+  '/flor-de-lotus/page-lotus/assets/images/uramaki.jpg',
 ];
 
 /* INSTALL */
@@ -68,13 +67,12 @@ self.addEventListener('fetch', e => {
 
   /* IMAGENS */
   if (req.destination === 'image') {
-    e.respondWith(
-      cacheFirst(req, CACHE_DYN)
-        .then(res => res || caches.match('/page-lotus/assets/images/uramaki.jpg'))
-        .catch(() => caches.match('/page-lotus/assets/images/uramaki.jpg'))
-    );
-    return;
-  }
+  e.respondWith(
+    cacheFirst(req, CACHE_DYN)
+      .catch(() => caches.match(FALLBACK_IMAGE))
+  );
+  return;
+}
 
   /* CSS / JS / outros */
   e.respondWith(cacheFirst(req, CACHE_DYN));
