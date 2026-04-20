@@ -1,31 +1,38 @@
 'use strict';
 
-let deferredPrompt;
+let deferredPrompt = null;
 
 window.addEventListener('beforeinstallprompt', (e) => {
+  console.log('🔥 beforeinstallprompt DISPAROU');
+
   e.preventDefault();
   deferredPrompt = e;
-  const btn = document.getElementById('btnInstall');
-  if (btn) btn.style.display = 'flex';
-  // Notifica o drawer se já estiver aberto
+
   document.dispatchEvent(new Event('pwa:installable'));
 });
 
 window.addEventListener('appinstalled', () => {
+  console.log('✅ APP INSTALADO');
+
   deferredPrompt = null;
   document.dispatchEvent(new Event('pwa:installed'));
 });
 
-window.triggerInstall = function () {
-  if (!deferredPrompt) return;
+window.triggerInstall = async function () {
+  if (!deferredPrompt) {
+    alert('Instalação não disponível ainda');
+    return;
+  }
+
   deferredPrompt.prompt();
-  deferredPrompt.userChoice.then((choice) => {
-    deferredPrompt = null;
-  });
+  const choice = await deferredPrompt.userChoice;
+
+  console.log('Escolha do usuário:', choice);
+
+  deferredPrompt = null;
 };
 
-window.isInstallable = () => !!deferredPrompt;
-
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('btnInstall')?.addEventListener('click', window.triggerInstall);
-});
+window.isInstallable = () => {
+  console.log('isInstallable:', !!deferredPrompt);
+  return !!deferredPrompt;
+};
