@@ -64,3 +64,99 @@ if (document.readyState === 'loading') {
 } else {
   init();
 }
+let deferredPrompt = null;
+
+// captura evento PWA
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+});
+
+// fallback: mostra popup mesmo sem evento
+window.addEventListener('load', () => {
+  const jaMostrou = localStorage.getItem('fl_install_popup');
+
+  if (!jaMostrou) {
+    setTimeout(() => {
+      showInstallPopup();
+      localStorage.setItem('fl_install_popup', 'true');
+    }, 3000); // espera 3s pra não ser agressivo
+  }
+});
+
+function showInstallPopup() {
+  const overlay = document.createElement('div');
+  overlay.style.cssText = `
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.6);
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+    padding-top:15vh;
+    z-index:9999;
+  `;
+
+  const popup = document.createElement('div');
+  popup.style.cssText = `
+    background:linear-gradient(135deg, #8B0000, #B22222);
+    color:#fff;
+    padding:20px;
+    border-radius:16px;
+    width:90%;
+    max-width:340px;
+    text-align:center;
+    box-shadow:0 10px 30px rgba(0,0,0,0.4);
+  `;
+
+  popup.innerHTML = `
+    <h2 style="margin-bottom:10px;">🍣 Instale nosso App</h2>
+    <p style="font-size:14px; margin-bottom:15px;">
+      Tenha acesso rápido ao cardápio e pedidos direto no seu celular.
+    </p>
+
+    <button id="installBtn" disabled style="
+      background:#fff;
+      color:#8B0000;
+      border:none;
+      padding:12px;
+      width:100%;
+      border-radius:10px;
+      font-weight:bold;
+      font-size:16px;
+      opacity:0.5;
+    ">
+      Aguarde 10s...
+    </button>
+  `;
+
+  overlay.appendChild(popup);
+  document.body.appendChild(overlay);
+
+  const btn = popup.querySelector('#installBtn');
+
+  let time = 10;
+  const countdown = setInterval(() => {
+    time--;
+    btn.textContent = `Aguarde ${time}s...`;
+
+    if (time <= 0) {
+      clearInterval(countdown);
+      btn.disabled = false;
+      btn.textContent = deferredPrompt ? 'Instalar agora' : 'Ok, entendi';
+      btn.style.opacity = '1';
+    }
+  }, 1000);
+
+  btn.addEventListener('click', async () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      await deferredPrompt.userChoice;
+      deferredPrompt = null;
+    }
+    overlay.remove();
+  });
+}
