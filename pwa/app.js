@@ -37,6 +37,7 @@ import { renderLoyaltyBadge }                       from './js/loyalty.js';
 import { openProfileDrawer, closeProfileDrawer,
          renderProfileDrawer }                      from './js/profile.js';
 import { updateFavBadge }                           from './js/favorites.js';
+import './js/install.js';
 
 async function init() {
   loadPersistedData();
@@ -85,78 +86,31 @@ window.addEventListener('load', () => {
 });
 
 function showInstallPopup() {
-  const overlay = document.createElement('div');
-  overlay.style.cssText = `
-    position:fixed;
-    top:0;
-    left:0;
-    width:100%;
-    height:100%;
-    background:rgba(0,0,0,0.6);
-    display:flex;
-    justify-content:center;
-    align-items:flex-start;
-    padding-top:15vh;
-    z-index:9999;
-  `;
-
   const popup = document.createElement('div');
+
   popup.style.cssText = `
-    background:linear-gradient(135deg, #8B0000, #B22222);
+    position:fixed;
+    top:20%;
+    left:50%;
+    transform:translateX(-50%);
+    background:#111;
     color:#fff;
     padding:20px;
-    border-radius:16px;
+    border-radius:12px;
+    z-index:9999;
     width:90%;
-    max-width:340px;
+    max-width:320px;
     text-align:center;
-    box-shadow:0 10px 30px rgba(0,0,0,0.4);
   `;
 
   popup.innerHTML = `
-    <h2 style="margin-bottom:10px;">🍣 Instale nosso App</h2>
-    <p style="font-size:14px; margin-bottom:15px;">
-      Tenha acesso rápido ao cardápio e pedidos direto no seu celular.
+ <p>👇 O botão para instalar está no seu perfil</p>
+    <p style="font-size:13px;opacity:0.7;">
+      Role até o cartão fidelidade e toque em "Instalar App"
     </p>
-
-    <button id="installBtn" disabled style="
-      background:#fff;
-      color:#8B0000;
-      border:none;
-      padding:12px;
-      width:100%;
-      border-radius:10px;
-      font-weight:bold;
-      font-size:16px;
-      opacity:0.5;
-    ">
-      Aguarde 10s...
-    </button>
   `;
 
-  overlay.appendChild(popup);
-  document.body.appendChild(overlay);
+  document.body.appendChild(popup);
 
-  const btn = popup.querySelector('#installBtn');
-
-  let time = 10;
-  const countdown = setInterval(() => {
-    time--;
-    btn.textContent = `Aguarde ${time}s...`;
-
-    if (time <= 0) {
-      clearInterval(countdown);
-      btn.disabled = false;
-      btn.textContent = deferredPrompt ? 'Instalar agora' : 'Ok, entendi';
-      btn.style.opacity = '1';
-    }
-  }, 1000);
-
-  btn.addEventListener('click', async () => {
-    if (deferredPrompt) {
-      deferredPrompt.prompt();
-      await deferredPrompt.userChoice;
-      deferredPrompt = null;
-    }
-    overlay.remove();
-  });
+  setTimeout(() => popup.remove(), 5000);
 }

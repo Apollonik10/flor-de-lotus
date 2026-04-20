@@ -5,9 +5,10 @@
    · Exibe e edita dados do usuário (localStorage)
    · Mostra progresso do cartão fidelidade
    · Exibe gift cards disponíveis
+   · Seção de instalação do PWA
 ═══════════════════════════════════════════════════ */
 
-import { getLoyaltyStatus, getGiftCards } from './loyalty.js';
+import { getLoyaltyStatus } from './loyalty.js';
 
 const STORAGE_KEY = 'fl_user';
 
@@ -32,7 +33,6 @@ export function openProfileDrawer() {
 
 export function closeProfileDrawer() {
   document.getElementById('profileDrawer')?.classList.remove('open');
-  /* Fecha overlay só se o carrinho também estiver fechado */
   const cartOpen = document.getElementById('cartDrawer')?.classList.contains('open');
   if (!cartOpen) {
     document.getElementById('modalOverlay')?.classList.remove('open');
@@ -45,8 +45,8 @@ export function renderProfileDrawer() {
   const drawer = document.getElementById('profileDrawer');
   if (!drawer) return;
 
-  const user   = getUser();
-  const loyalty = getLoyaltyStatus();
+  const user          = getUser();
+  const loyalty       = getLoyaltyStatus();
   const availableGifts = loyalty.gifts.filter(g => !g.usado);
 
   drawer.innerHTML = `
@@ -58,17 +58,27 @@ export function renderProfileDrawer() {
     </header>
 
     <div class="profile-body" id="profileBody">
-
       ${user ? _renderUserInfo(user) : _renderNoUser()}
-
       ${_renderLoyalty(loyalty, availableGifts)}
-
+      ${_renderInstallSection()}
     </div>
   `;
 
-  /* Bind do botão fechar dentro do drawer */
+  /* Binds pós-render */
   document.getElementById('btnCloseProfile')
     ?.addEventListener('click', closeProfileDrawer);
+
+  document.getElementById('btnInstallDrawer')
+    ?.addEventListener('click', () => window.triggerInstall?.());
+
+  /* Atualiza botão de install em tempo real caso o evento chegue com o drawer aberto */
+  document.addEventListener('pwa:installable', _refreshInstallBtn, { once: true });
+  document.addEventListener('pwa:installed',   _refreshInstallBtn, { once: true });
+}
+
+function _refreshInstallBtn() {
+  const section = document.getElementById('installSection');
+  if (section) section.outerHTML = _renderInstallSection();
 }
 
 /* ─────────────────────────────
@@ -82,10 +92,10 @@ function _renderUserInfo(user) {
         <i class="fas fa-user-circle" aria-hidden="true"></i> Seus Dados
       </p>
 
-      ${_field('name',    'Nome',              user.name    || '—', user.name    || '')}
-      ${_field('phone',   'WhatsApp',          user.phone   || '—', user.phone   || '')}
-      ${_field('address', 'Endereço',          user.address || '—', user.address || '')}
-      ${_field('notes',   'Observações',       user.notes   || '—', user.notes   || '')}
+      ${_field('name',    'Nome',        user.name    || '—', user.name    || '')}
+      ${_field('phone',   'WhatsApp',    user.phone   || '—', user.phone   || '')}
+      ${_field('address', 'Endereço',    user.address || '—', user.address || '')}
+      ${_field('notes',   'Observações', user.notes   || '—', user.notes   || '')}
 
       <div class="profile-field" id="field-allergies">
         <span class="profile-label">Alergias</span>
@@ -107,7 +117,10 @@ function _field(key, label, display, raw) {
       <span class="profile-label">${label}</span>
       <div class="profile-value-row">
         <span class="profile-value">${display}</span>
-        <button class="btn-edit" data-action="edit-field" data-field="${key}" data-value="${safeRaw}"
+        <button class="btn-edit"
+          data-action="edit-field"
+          data-field="${key}"
+          data-value="${safeRaw}"
           aria-label="Editar ${label}">
           <i class="fas fa-pen" aria-hidden="true"></i>
         </button>
@@ -150,7 +163,9 @@ function _renderLoyalty({ progress, needed, pct, available, totalPedidos }, avai
         <p class="loyalty-desc">
           A cada <strong>${needed} pedidos ≥ R$50</strong> você ganha um
           <strong>gift card de R$50</strong> para usar no próximo pedido!
-          ${totalPedidos > 0 ? `<br><small>${totalPedidos} pedido${totalPedidos > 1 ? 's' : ''} no total</small>` : ''}
+          ${totalPedidos > 0
+            ? `<br><small>${totalPedidos} pedido${totalPedidos > 1 ? 's' : ''} no total</small>`
+            : ''}
         </p>
       </div>
 
@@ -176,37 +191,62 @@ function _renderLoyalty({ progress, needed, pct, available, totalPedidos }, avai
   `;
 }
 
+function _renderInstallSection() {
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+    || navigator.standalone === true;
+  const installable  = window.isInstallable?.();
+
+  if (isStandalone) {
+    return `
+      <section class="profile-section" id="installSection">
+        <p class="profile-section-title">
+          <i class="fas fa-mobile-screen" aria-hidden="true"></i> App Instalado
+        </p>
+        <p style="font-size:.82rem;color:var(--text-dim);line-height:1.6">
+          ✅ Você já está usando o app instalado.
+        </p>
+      </section>
+    `;
+  }
+
+  return `
+    <section class="profile-section" id="installSection">
+      <p class="profile-section-title">
+        <i class="fas fa-download" aria-hidden="true"></i> Instalar App
+      </p>
+      <p style="font-size:.82rem;color:var(--text-dim);line-height:1.6;margin-bottom:1rem">
+        Acesse o cardápio mais rápido, sem abrir o navegador. Funciona offline.
+      </p>
+      <button
+        id="btnInstallDrawer"
+        class="btn-go-register"
+        style="width:100%;justify-content:center;${!installable ? 'opacity:.45;pointer-events:none;' : ''}"
+        aria-disabled="${!installable}"
+        aria-label="Instalar aplicativo"
+      >
+        <i class="fas fa-download" aria-hidden="true"></i>
+        ${installable ? 'Baixar App' : 'Abra pelo navegador para instalar'}
+      </button>
+    </section>
+  `;
+}
+
 /* ─────────────────────────────
-   Event delegation no profileBody
-   (evita onclick inline)
+   Event delegation global
 ───────────────────────────── */
 document.addEventListener('click', e => {
   const btn = e.target.closest('[data-action]');
   if (!btn) return;
 
-  const action = btn.dataset.action;
-
-  if (action === 'edit-field') {
-    _startEditField(btn.dataset.field, btn.dataset.value);
-  }
-  if (action === 'save-field') {
-    _saveField(btn.dataset.field);
-  }
-  if (action === 'cancel-edit') {
-    renderProfileDrawer();
-  }
-  if (action === 'edit-allergies') {
-    _startEditAllergies();
-  }
-  if (action === 'save-allergies') {
-    _saveAllergies();
-  }
-  if (action === 'copy-gift') {
-    _copyCode(btn.dataset.code);
+  switch (btn.dataset.action) {
+    case 'edit-field':      _startEditField(btn.dataset.field, btn.dataset.value); break;
+    case 'save-field':      _saveField(btn.dataset.field);                         break;
+    case 'cancel-edit':     renderProfileDrawer();                                 break;
+    case 'edit-allergies':  _startEditAllergies();                                 break;
+    case 'save-allergies':  _saveAllergies();                                      break;
   }
 });
 
-/* Botões copy-gift (fora de data-action para manter a lógica de delegação simples) */
 document.addEventListener('click', e => {
   const btn = e.target.closest('.btn-copy-gift');
   if (!btn) return;
@@ -229,12 +269,10 @@ function _startEditField(field, currentVal) {
       autocomplete="off"
     >
     <div class="edit-actions">
-      <button class="btn-save-edit" data-action="save-field" data-field="${field}"
-        aria-label="Salvar">
+      <button class="btn-save-edit" data-action="save-field" data-field="${field}" aria-label="Salvar">
         <i class="fas fa-check" aria-hidden="true"></i>
       </button>
-      <button class="btn-cancel-edit" data-action="cancel-edit"
-        aria-label="Cancelar">
+      <button class="btn-cancel-edit" data-action="cancel-edit" aria-label="Cancelar">
         <i class="fas fa-times" aria-hidden="true"></i>
       </button>
     </div>
@@ -252,12 +290,12 @@ function _saveField(field) {
 }
 
 const ALLERGY_OPTIONS = [
-  { val: 'Frutos do Mar', icon: 'fa-shrimp' },
-  { val: 'Glúten',        icon: 'fa-wheat-awn' },
-  { val: 'Lactose',       icon: 'fa-droplet' },
+  { val: 'Frutos do Mar', icon: 'fa-shrimp'     },
+  { val: 'Glúten',        icon: 'fa-wheat-awn'  },
+  { val: 'Lactose',       icon: 'fa-droplet'    },
   { val: 'Amendoim',      icon: 'fa-circle-dot' },
-  { val: 'Soja',          icon: 'fa-leaf' },
-  { val: 'Gergelim',      icon: 'fa-seedling' },
+  { val: 'Soja',          icon: 'fa-leaf'       },
+  { val: 'Gergelim',      icon: 'fa-seedling'   },
 ];
 
 function _startEditAllergies() {
