@@ -21,7 +21,7 @@ connect-src *;
     var visited = localStorage.getItem('fl_visited');
     var user    = localStorage.getItem('fl_user');
     if (visited || user) {
-      window.location.replace('./pwa/index.html');
+      window.location.replace('/flor-de-lotus/pwa/index.html');
     }
   })();
 </script>
@@ -495,8 +495,8 @@ connect-src *;
         e em uma experiência que vai além do prato.
       </p>
       <div class="hero-actions">
-        <a href="pwa/register.html" class="btn-primary">
-          <i class="fas fa-utensils" aria-hidden="true"></i> Fazer Pedido Agora
+        <a href="pwa/register.html?install=1" class="btn-primary">
+          <i class="fas fa-download" aria-hidden="true"></i> Baixar Cardápio
         </a>
         <p class="delivery-pill">
           <i class="fas fa-motorcycle" aria-hidden="true"></i> Entregamos para toda Cajazeiras
@@ -532,7 +532,7 @@ connect-src *;
       </div>
 
       <div class="dishes-cta">
-        <a href="pwa/register.html" class="btn-primary reveal d1">Ver Cardápio Completo</a>
+        <a href="pwa/register.html?install=1" class="btn-primary reveal d1"><i class="fas fa-download" aria-hidden="true"></i> Baixar Cardápio</a>
       </div>
     </section>
 

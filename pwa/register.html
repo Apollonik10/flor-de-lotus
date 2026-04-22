@@ -366,6 +366,25 @@ connect-src *;
 
   </div><!-- /card -->
 
+  <!-- Captura prompt de instalação PWA -->
+  <script>
+    'use strict';
+    (function () {
+      var wantsInstall = new URLSearchParams(location.search).get('install') === '1';
+      var deferredPrompt;
+
+      window.addEventListener('beforeinstallprompt', function (e) {
+        e.preventDefault();
+        deferredPrompt = e;
+        if (wantsInstall) deferredPrompt.prompt();
+      });
+
+      window.addEventListener('appinstalled', function () {
+        deferredPrompt = null;
+      });
+    })();
+  </script>
+
   <script>
     'use strict';
 
@@ -461,10 +480,10 @@ connect-src *;
       }, 1000);
     }
 
-    /* ── Service Worker ── */
+/* ── Service Worker ── */
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker
-        .register('/service-worker.js', { scope: '/' })
+        .register('/flor-de-lotus/pwa/service-worker.js', { scope: '/flor-de-lotus/pwa/' })
         .catch(() => {});
     }
   </script>
