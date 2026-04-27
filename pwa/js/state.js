@@ -50,6 +50,11 @@ export function loadPersistedData() {
 }
 
 export function persistData() {
-  localStorage.setItem('fl_favorites', JSON.stringify([...state.favorites]));
-  localStorage.setItem('fl_cart',      JSON.stringify(state.cart));
+  try {
+    localStorage.setItem('fl_favorites', JSON.stringify([...state.favorites]));
+    localStorage.setItem('fl_cart',      JSON.stringify(state.cart));
+  } catch (err) {
+    console.warn('⚠️ Erro ao persistir dados (possível storage cheio):', err);
+    /* Silencia erro para não quebrar UX */
+  }
 }
