@@ -17,13 +17,13 @@ connect-src *;
   <title>Cardápio — Flor de Lótus</title>
 
   <!-- PWA -->
-<link rel="manifest" href="/flor-de-lotus/pwa/manifest.json" />
-<link rel="apple-touch-icon" href="/flor-de-lotus/pwa/icons/icon-192.png" />
-<link rel="icon" type="image/png" sizes="192x192" href="/flor-de-lotus/pwa/icons/favicon.ico">
-<!-- Apple (iPhone) -->
-<link rel="apple-touch-icon" href="/flor-de-lotus/pwa/icons/apple-touch-icon.png">
-<!-- Tema -->
-<meta name="theme-color" content="#000000" />
+  <link rel="manifest" href="./manifest.json" />
+  <link rel="apple-touch-icon" href="./icons/icon-192.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="./icons/favicon.ico">
+  <!-- Apple (iPhone) -->
+  <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+  <!-- Tema -->
+  <meta name="theme-color" content="#000000" />
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -43,7 +43,7 @@ connect-src *;
   ══════════════════════════════ -->
   <header class="top-bar" role="banner">
 
-    <a href="/flor-de-lotus/index.html/" class="top-bar-brand" aria-label="Ir para página inicial">
+    <a href="./" class="top-bar-brand" aria-label="Ir para página inicial">
       <span class="brand-name">Flor de <em>Lótus</em></span>
       <span class="brand-sub" aria-hidden="true">Cardápio</span>
     </a>
@@ -79,12 +79,12 @@ connect-src *;
         <span class="badge" id="cartCount" aria-label="Itens no carrinho" role="status"></span>
       </button>
 
-<!-- botão de instalar -->
-<button class="btn-icon" id="btnInstall" 
-        style="display:none;" 
-        aria-label="Instalar app">
-  <i class="fas fa-download" aria-hidden="true"></i>
-</button>
+      <!-- botão de instalar -->
+      <button class="btn-icon" id="btnInstall" 
+              style="display:none;" 
+              aria-label="Instalar app">
+        <i class="fas fa-download" aria-hidden="true"></i>
+      </button>
 
     </div>
   </header>
