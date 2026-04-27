@@ -24,12 +24,16 @@ window.triggerInstall = async function () {
     return;
   }
 
-  deferredPrompt.prompt();
-  const choice = await deferredPrompt.userChoice;
+  try {
+    deferredPrompt.prompt();
+    const choice = await deferredPrompt.userChoice;
 
-  console.log('Escolha do usuário:', choice);
+    console.log('Escolha do usuário:', choice);
 
-  deferredPrompt = null;
+    deferredPrompt = null;
+  } catch (err) {
+    console.error('❌ Erro ao instalar:', err);
+  }
 };
 
 window.isInstallable = () => {
