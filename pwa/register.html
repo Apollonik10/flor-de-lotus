@@ -480,12 +480,6 @@ connect-src *;
       }, 1000);
     }
 
-/* ── Service Worker ── */
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker
-        .register('/flor-de-lotus/pwa/service-worker.js', { scope: '/flor-de-lotus/pwa/' })
-        .catch(() => {});
-    }
   </script>
 
 </body>
