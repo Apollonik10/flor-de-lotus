@@ -1,18 +1,20 @@
 'use strict';
 
-const VER          = 'v4';
-const CACHE_STATIC = `fl-static-${VER}`;
-const CACHE_DYN    = `fl-dynamic-${VER}`;
+const VER            = 'v5';
+const CACHE_STATIC   = `fl-static-${VER}`;
+const CACHE_DYN      = `fl-dynamic-${VER}`;
+const FALLBACK_IMAGE = '/flor-de-lotus/pwa/icons/fundo1.png';
 
 /* Arquivos pré-cacheados */
 const PRECACHE = [
+  '/flor-de-lotus/index.html',
   '/flor-de-lotus/pwa/index.html',
+  '/flor-de-lotus/pwa/register.html',
   '/flor-de-lotus/pwa/styles.css',
   '/flor-de-lotus/pwa/app.js',
   '/flor-de-lotus/pwa/menu.json',
-  '/flor-de-lotus/pwa/register.html',
-  '/flor-de-lotus/manifest.json',
-
+  '/flor-de-lotus/pwa/manifest.json',
+  '/flor-de-lotus/pwa/icons/fundo1.png',
   '/flor-de-lotus/page-lotus/assets/images/uramaki.jpg',
 ];
 
@@ -67,12 +69,13 @@ self.addEventListener('fetch', e => {
 
   /* IMAGENS */
   if (req.destination === 'image') {
-  e.respondWith(
-    cacheFirst(req, CACHE_DYN)
-      .catch(() => caches.match(FALLBACK_IMAGE))
-  );
-  return;
-}
+    e.respondWith(
+      cacheFirst(req, CACHE_DYN)
+        .then(res => res || caches.match('/page-lotus/assets/images/uramaki.jpg'))
+        .catch(() => caches.match('/page-lotus/assets/images/uramaki.jpg'))
+    );
+    return;
+  }
 
   /* CSS / JS / outros */
   e.respondWith(cacheFirst(req, CACHE_DYN));
