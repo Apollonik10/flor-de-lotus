@@ -4,7 +4,7 @@ export function registerSW() {
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('./service-worker.js', {
-        scope: './'   // ← relativo
+        scope: '/flor-de-lotus/pwa/'   // ← relativo
       })
         .then(() => console.log('SW registrado'))
         .catch(err => console.log('Erro SW:', err));
