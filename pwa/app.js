@@ -2,7 +2,7 @@
 // app.js — sem redirect forçado; o cardápio é acessível sempre.
 /* ═══════════════════════════════════════════════════
    app.js — Bootstrap da aplicação
-═══════════════════════════════════════════════════ */
+════════════════════════════════════════════════════ */
 
 import { loadPersistedData }                        from './js/state.js';
 import { fetchMenu }                                from './js/api.js';
@@ -37,3 +37,22 @@ window.closeProfileDrawer  = closeProfileDrawer;
 window.renderProfileDrawer = renderProfileDrawer;
 
 document.addEventListener('DOMContentLoaded', init);
+
+// Instalação PWA — Controla globalmente a exibição do botão de instalar na top-bar
+(function () {
+  const btnInstall = document.getElementById('btnInstall');
+  function updateBtnInstall() {
+    if (!btnInstall) return;
+    btnInstall.style.display = window.isInstallable && window.isInstallable() ? 'inline-flex' : 'none';
+    btnInstall.setAttribute('aria-disabled', !(window.isInstallable && window.isInstallable()));    
+  }
+  // Associa click corretamente
+  btnInstall?.addEventListener('click', () => window.triggerInstall?.());
+
+  // Atualiza exibição em eventos customizados disparados por install.js
+  document.addEventListener('pwa:installable', updateBtnInstall);
+  document.addEventListener('pwa:installed', updateBtnInstall);
+
+  // Inicializa ao abrir, cobre casos se o evento disparou antes
+  setTimeout(updateBtnInstall, 500);
+})();
