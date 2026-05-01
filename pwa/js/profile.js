@@ -194,7 +194,6 @@ function _renderLoyalty({ progress, needed, pct, available, totalPedidos }, avai
 function _renderInstallSection() {
   const isStandalone = window.matchMedia('(display-mode: standalone)').matches
     || navigator.standalone === true;
-  const installable  = window.isInstallable?.();
 
   if (isStandalone) {
     return `
@@ -203,11 +202,14 @@ function _renderInstallSection() {
           <i class="fas fa-mobile-screen" aria-hidden="true"></i> App Instalado
         </p>
         <p style="font-size:.82rem;color:var(--text-dim);line-height:1.6">
-          ✅ Você já está usando o app instalado.
+          ✅ Você já está usando o app instalado. Aproveite!
         </p>
       </section>
     `;
   }
+
+  // Sempre mostra o botão — se não tiver prompt nativo, abre guia manual
+  const hasPrompt = window.isInstallable?.();
 
   return `
     <section class="profile-section" id="installSection">
@@ -220,12 +222,11 @@ function _renderInstallSection() {
       <button
         id="btnInstallDrawer"
         class="btn-go-register"
-        style="width:100%;justify-content:center;${!installable ? 'opacity:.45;pointer-events:none;' : ''}"
-        aria-disabled="${!installable}"
+        style="width:100%;justify-content:center;"
         aria-label="Instalar aplicativo"
       >
         <i class="fas fa-download" aria-hidden="true"></i>
-        ${installable ? 'Baixar App' : 'Abra pelo navegador para instalar'}
+        ${hasPrompt ? 'Baixar App' : 'Como Instalar'}
       </button>
     </section>
   `;
@@ -234,6 +235,9 @@ function _renderInstallSection() {
 /* ─────────────────────────────
    Event delegation global
 ───────────────────────────── */
+document.getElementById('btnInstallDrawer')
+  ?.addEventListener('click', () => window.triggerInstall?.());
+  
 document.addEventListener('click', e => {
   const btn = e.target.closest('[data-action]');
   if (!btn) return;
