@@ -14,7 +14,6 @@ import { renderLoyaltyBadge }                       from './js/loyalty.js';
 import { openProfileDrawer, closeProfileDrawer,
          renderProfileDrawer }                      from './js/profile.js';
 import { updateFavBadge }                           from './js/favorites.js';
-import './js/install.js';
 
 async function init() {
   loadPersistedData();
