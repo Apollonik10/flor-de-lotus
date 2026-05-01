@@ -1,4 +1,5 @@
 'use strict';
+// app.js — sem redirect forçado; o cardápio é acessível sempre.
 /* ═══════════════════════════════════════════════════
    app.js — Bootstrap da aplicação
 ════════════════════════════════════════════════════ */
@@ -13,7 +14,7 @@ import { renderLoyaltyBadge }                       from './js/loyalty.js';
 import { openProfileDrawer, closeProfileDrawer,
          renderProfileDrawer }                      from './js/profile.js';
 import { updateFavBadge }                           from './js/favorites.js';
-import './js/install.js'; /* ← única fonte do PWA install prompt */
+import './js/install.js';
 
 async function init() {
   loadPersistedData();
@@ -25,6 +26,7 @@ async function init() {
   renderLoyaltyBadge();
   updateFavBadge();
 
+  /* Fechar carrinho pelo X do drawer */
   document.getElementById('btnCloseCart')
     ?.addEventListener('click', closeCartDrawer);
 }
@@ -36,3 +38,5 @@ window.closeProfileDrawer  = closeProfileDrawer;
 window.renderProfileDrawer = renderProfileDrawer;
 
 document.addEventListener('DOMContentLoaded', init);
+
+

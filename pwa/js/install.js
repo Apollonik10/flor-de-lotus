@@ -1,9 +1,7 @@
 'use strict';
-
 /* ═══════════════════════════════════════════════════
-   install.js — PWA Install prompt
-   v2 — Módulo único (importado só pelo app.js)
-        Sem duplicação de listeners
+   install.js — PWA Install prompt (única fonte)
+   v2 — Módulo único, sem duplicação
 ═══════════════════════════════════════════════════ */
 
 let deferredPrompt = null;
@@ -11,14 +9,17 @@ let deferredPrompt = null;
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
   deferredPrompt = e;
-  console.log('[PWA] ✅ beforeinstallprompt capturado');
-
+  console.log('[PWA] beforeinstallprompt capturado ✅');
+  
+  // Dispara evento para quem quiser ouvir
   document.dispatchEvent(new Event('pwa:installable'));
+
+  // Atualiza botão diretamente
   _updateBtn(true);
 });
 
 window.addEventListener('appinstalled', () => {
-  console.log('[PWA] ✅ App instalado com sucesso');
+  console.log('[PWA] App instalado ✅');
   deferredPrompt = null;
   document.dispatchEvent(new Event('pwa:installed'));
   _updateBtn(false);
@@ -43,7 +44,6 @@ window.triggerInstall = async () => {
 
 window.isInstallable = () => !!deferredPrompt;
 
-/* Atualiza visibilidade do botão de install no topo */
 function _updateBtn(show) {
   const btn = document.getElementById('btnInstall');
   if (!btn) return;
@@ -51,14 +51,13 @@ function _updateBtn(show) {
   btn.setAttribute('aria-disabled', String(!show));
 }
 
-/* Bind do clique — garante que o DOM existe */
+// Bind ao DOMContentLoaded para garantir que o botão existe
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', _bindBtn);
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('btnInstall')
+      ?.addEventListener('click', window.triggerInstall);
+  });
 } else {
-  _bindBtn();
-}
-
-function _bindBtn() {
   document.getElementById('btnInstall')
     ?.addEventListener('click', window.triggerInstall);
 }
