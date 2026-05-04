@@ -1,9 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <!-- ADICIONAR LOGO APÓS <head> -->
 <script>
-  // Captura beforeinstallprompt o mais cedo possível
   window.__pwaPrompt = null;
   window.addEventListener('beforeinstallprompt', function(e) {
     e.preventDefault();
@@ -12,6 +10,7 @@
   });
   window.addEventListener('appinstalled', function() {
     window.__pwaPrompt = null;
+    localStorage.setItem('fl_installed', '1');
     document.dispatchEvent(new CustomEvent('pwa:installed'));
   });
 </script>
@@ -31,23 +30,16 @@ connect-src *;
   <title>Cardápio — Flor de Lótus</title>
 
   <!-- PWA -->
-<<<<<<< HEAD
   <link rel="manifest" href="./manifest.json" />
+  <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
   <link rel="apple-touch-icon" href="./icons/icon-192.png" />
   <link rel="icon" type="image/png" sizes="192x192" href="./icons/favicon.ico">
-  <!-- Apple (iPhone) -->
-  <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
-  <!-- Tema -->
   <meta name="theme-color" content="#000000" />
-=======
-<link rel="manifest" href="./manifest.json" />
-<link rel="apple-touch-icon" href="./icons/icon-192.png" />
-<link rel="icon" type="image/png" sizes="192x192" href="./icons/favicon.ico">
-<!-- Apple (iPhone) -->
-<link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
-<!-- Tema -->
-<meta name="theme-color" content="#000000" />
->>>>>>> 0526b40 (backup local antes de atualizar)
+  <!-- iOS PWA standalone -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Flor de Lótus" />
+  <meta name="mobile-web-app-capable" content="yes" />
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -102,7 +94,7 @@ connect-src *;
         <span class="badge" id="cartCount" aria-label="Itens no carrinho" role="status"></span>
       </button>
 
-      <!-- botão de instalar -->
+      <!-- botão de instalar (visível apenas se não instalado) -->
       <button class="btn-icon" id="btnInstall" 
               style="display:none;" 
               aria-label="Instalar app">
