@@ -366,23 +366,17 @@ connect-src *;
 
   </div><!-- /card -->
 
-  <!-- Captura prompt de instalação PWA -->
+  <!-- Captura prompt de instalação PWA (deve ser o mais cedo possível) -->
   <script>
-    'use strict';
-    (function () {
-      var wantsInstall = new URLSearchParams(location.search).get('install') === '1';
-      var deferredPrompt;
-
-      window.addEventListener('beforeinstallprompt', function (e) {
-        e.preventDefault();
-        deferredPrompt = e;
-        if (wantsInstall) deferredPrompt.prompt();
-      });
-
-      window.addEventListener('appinstalled', function () {
-        deferredPrompt = null;
-      });
-    })();
+    window.__pwaPrompt = null;
+    window.addEventListener('beforeinstallprompt', function(e) {
+      e.preventDefault();
+      window.__pwaPrompt = e;
+    });
+    window.addEventListener('appinstalled', function() {
+      window.__pwaPrompt = null;
+      localStorage.setItem('fl_installed', '1');
+    });
   </script>
 
   <script>
@@ -451,6 +445,10 @@ connect-src *;
       localStorage.setItem(VISITED_KEY, '1');
 
       goTo(2);
+      /* Mostra modal de instalação após 800ms (tempo da animação da tela) */
+      setTimeout(() => {
+        if (window.PWAInstall) window.PWAInstall.showModal();
+      }, 800);
       startCountdown();
     });
 
@@ -469,11 +467,14 @@ connect-src *;
       window.location.href = CARDAPIO;
     });
 
-    /* ── Contagem regressiva ── */
+    /* ── Contagem regressiva (pausa se modal aberto) ── */
     function startCountdown() {
-      let n = 3;
+      let n = 5;
       const el = $('countdown-num');
+      el.textContent = n;
       const t = setInterval(() => {
+        /* Pausa enquanto modal de instalação estiver visível */
+        if (document.getElementById('fl-modal')) return;
         n--;
         el.textContent = n;
         if (n <= 0) { clearInterval(t); window.location.href = CARDAPIO; }
@@ -481,6 +482,9 @@ connect-src *;
     }
 
   </script>
+
+  <!-- Lógica de instalação PWA -->
+  <script src="./js/install.js"></script>
 
 </body>
 </html>

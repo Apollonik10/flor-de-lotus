@@ -1,368 +1,422 @@
 'use strict';
 
-/* ═══════════════════════════════════════════════════
-   install.js — Pop-up automático de instalação PWA
-═══════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════
+   pwa/js/install.js  —  Instalação PWA Flor de Lótus
+   Fluxo:
+     1. Cardápio  → banner no topo (após 1.5 s)
+     2. Cadastro  → modal grande após concluir onboarding
+═══════════════════════════════════════════════════════ */
 
-const DISMISS_KEY   = 'fl_install_dismissed';
-const INSTALLED_KEY = 'fl_installed';
-const DISMISS_DAYS  = 3; // dias até mostrar de novo após dispensar
+const K = {
+  installed:  'fl_installed',
+  dismissed:  'fl_banner_dismissed',
+  days:       7,          // dias até o banner reaparecer
+};
 
+/* ── Detecções ─────────────────────────────────────── */
 function isStandalone() {
   return window.matchMedia('(display-mode: standalone)').matches
-      || window.navigator.standalone === true;
+      || navigator.standalone === true;
 }
-
-function wasRecentlyDismissed() {
-  const ts = parseInt(localStorage.getItem(DISMISS_KEY) || '0', 10);
-  if (!ts) return false;
-  return (Date.now() - ts) < DISMISS_DAYS * 24 * 60 * 60 * 1000;
-}
-
 function isIOS() {
   return /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
 }
-
 function isSafariIOS() {
-  return isIOS() && /safari/i.test(navigator.userAgent) && !/crios|fxios|opios/i.test(navigator.userAgent);
+  return isIOS()
+      && /safari/i.test(navigator.userAgent)
+      && !/crios|fxios|opios/i.test(navigator.userAgent);
+}
+function alreadyInstalled() {
+  return isStandalone() || !!localStorage.getItem(K.installed);
+}
+function bannerDismissed() {
+  const ts = parseInt(localStorage.getItem(K.dismissed) || '0', 10);
+  return ts && (Date.now() - ts) < K.days * 864e5;
 }
 
-/* ─── Remove popup se existir ─── */
-function removePopup() {
-  const el = document.getElementById('fl-install-popup');
-  if (el) {
-    el.style.animation = 'flInstallOut .3s ease both';
-    setTimeout(() => el.remove(), 300);
-  }
-}
+/* ── Animações (injetadas uma vez) ─────────────────── */
+(function injectStyles() {
+  if (document.getElementById('fl-pwa-styles')) return;
+  const s = document.createElement('style');
+  s.id = 'fl-pwa-styles';
+  s.textContent = `
+    /* ── Banner topo ── */
+    #fl-banner {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 99990;
+      background: linear-gradient(135deg,#1a1a1a,#111);
+      border-bottom: 1px solid rgba(243,215,207,.18);
+      display: flex; align-items: center; gap: .75rem;
+      padding: .7rem 1rem;
+      font-family: 'Outfit', system-ui, sans-serif;
+      transform: translateY(-100%);
+      transition: transform .4s cubic-bezier(.25,.46,.45,.94);
+    }
+    #fl-banner.fl-visible { transform: translateY(0); }
+    .fl-banner-icon {
+      width: 38px; height: 38px; border-radius: 10px;
+      object-fit: cover; flex-shrink: 0;
+      border: 1px solid rgba(243,215,207,.15);
+    }
+    .fl-banner-text { flex: 1; min-width: 0; }
+    .fl-banner-text strong {
+      display: block; font-size: .82rem; font-weight: 600;
+      color: #f5f5f5; white-space: nowrap; overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .fl-banner-text span {
+      font-size: .72rem; color: rgba(245,245,245,.5);
+    }
+    .fl-banner-btn {
+      flex-shrink: 0; padding: .45rem 1rem;
+      font-family: 'Outfit', system-ui, sans-serif;
+      font-size: .75rem; font-weight: 600;
+      letter-spacing: .08em; text-transform: uppercase;
+      color: #0b0b0b;
+      background: linear-gradient(135deg,#e8b4a2,#d98f7a);
+      border: none; border-radius: 8px; cursor: pointer;
+      transition: opacity .2s;
+    }
+    .fl-banner-btn:active { opacity: .8; }
+    .fl-banner-close {
+      flex-shrink: 0; width: 28px; height: 28px;
+      display: flex; align-items: center; justify-content: center;
+      background: transparent; border: none; cursor: pointer;
+      color: rgba(245,245,245,.4); font-size: 1rem;
+      transition: color .2s;
+    }
+    .fl-banner-close:active { color: rgba(245,245,245,.8); }
 
-/* ─── Cria e exibe o popup ─── */
-function showInstallPopup() {
-  if (document.getElementById('fl-install-popup')) return;
-  if (isStandalone()) return;
-  if (localStorage.getItem(INSTALLED_KEY)) return;
-  if (wasRecentlyDismissed()) return;
-
-  const ios = isIOS();
-  const safariIOS = isSafariIOS();
-  const hasNativePrompt = !!window.__pwaPrompt;
-
-  let bodyHTML = '';
-
-  if (hasNativePrompt) {
-    bodyHTML = `
-      <p class="fl-install-sub">
-        Instale o cardápio no seu celular para acessar com um toque, sem abrir o navegador — como um app de verdade.
-      </p>
-      <button id="fl-install-confirm" class="fl-install-btn-primary">
-        <i class="fas fa-download"></i> Instalar agora
-      </button>
-      <button id="fl-install-later" class="fl-install-btn-ghost">Agora não</button>
-    `;
-  } else if (safariIOS) {
-    bodyHTML = `
-      <p class="fl-install-sub">
-        Adicione o cardápio à sua tela inicial e abra como um app — sem barra de navegação.
-      </p>
-      <ol class="fl-install-steps">
-        <li>Toque no ícone <strong>Compartilhar</strong> <span class="fl-install-icon-demo">□↑</span> na barra inferior do Safari</li>
-        <li>Role e toque em <strong>"Adicionar à Tela de Início"</strong></li>
-        <li>Toque em <strong>Adicionar</strong> no canto superior direito</li>
-      </ol>
-      <div class="fl-install-ios-arrow">
-        <i class="fas fa-arrow-down fl-install-arrow-bounce"></i>
-        <span>Toque em Compartilhar abaixo</span>
-      </div>
-      <button id="fl-install-later" class="fl-install-btn-ghost" style="margin-top:.8rem">Entendi</button>
-    `;
-  } else if (ios) {
-    bodyHTML = `
-      <p class="fl-install-sub">
-        Para instalar, abra este link no <strong>Safari</strong> e use o botão Compartilhar.
-      </p>
-      <button id="fl-install-later" class="fl-install-btn-ghost">Entendi</button>
-    `;
-  } else {
-    bodyHTML = `
-      <p class="fl-install-sub">
-        Adicione o cardápio à tela inicial do seu celular e acesse como um app — sem barra do navegador.
-      </p>
-      <ol class="fl-install-steps">
-        <li>Toque no menu <strong>⋮</strong> no canto superior direito do Chrome</li>
-        <li>Toque em <strong>"Adicionar à tela inicial"</strong></li>
-        <li>Confirme tocando em <strong>Adicionar</strong></li>
-      </ol>
-      <button id="fl-install-later" class="fl-install-btn-ghost" style="margin-top:.8rem">Entendi</button>
-    `;
-  }
-
-  const popup = document.createElement('div');
-  popup.id = 'fl-install-popup';
-  popup.setAttribute('role', 'dialog');
-  popup.setAttribute('aria-modal', 'true');
-  popup.setAttribute('aria-label', 'Instalar app Flor de Lótus');
-  popup.innerHTML = `
-    <style>
-      #fl-install-popup {
-        position: fixed;
-        inset: 0;
-        z-index: 99999;
-        display: flex;
-        align-items: flex-end;
-        justify-content: center;
-        padding: 1rem;
-        background: rgba(0,0,0,.72);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-        animation: flInstallIn .35s cubic-bezier(.25,.46,.45,.94) both;
-      }
-      @keyframes flInstallIn {
-        from { opacity:0; }
-        to   { opacity:1; }
-      }
-      @keyframes flInstallOut {
-        from { opacity:1; }
-        to   { opacity:0; }
-      }
-      .fl-install-card {
-        width: 100%;
-        max-width: 420px;
-        background: #0f0f0f;
-        border: 1px solid rgba(243,215,207,.18);
-        border-radius: 24px 24px 20px 20px;
-        padding: 1.6rem 1.4rem 1.4rem;
-        font-family: 'Outfit', system-ui, sans-serif;
-        animation: flCardIn .4s cubic-bezier(.25,.46,.45,.94) .05s both;
-      }
-      @keyframes flCardIn {
-        from { transform: translateY(60px); opacity:0; }
-        to   { transform: translateY(0);    opacity:1; }
-      }
-      .fl-install-pill {
-        width: 40px; height: 4px;
-        border-radius: 99px;
-        background: rgba(255,255,255,.15);
-        margin: 0 auto 1.4rem;
-      }
-      .fl-install-header {
-        display: flex;
-        align-items: center;
-        gap: .9rem;
-        margin-bottom: 1rem;
-      }
-      .fl-install-logo {
-        width: 56px; height: 56px;
-        border-radius: 14px;
-        object-fit: cover;
-        flex-shrink: 0;
-        border: 1px solid rgba(243,215,207,.15);
-      }
-      .fl-install-title-block {}
-      .fl-install-label {
-        font-size: .6rem;
-        letter-spacing: .2em;
-        text-transform: uppercase;
-        color: #d98f7a;
-        margin-bottom: .2rem;
-        display: flex;
-        align-items: center;
-        gap: .3rem;
-      }
-      .fl-install-title {
-        font-family: 'Cormorant Garamond', Georgia, serif;
-        font-size: 1.45rem;
-        font-weight: 300;
-        color: #f5f5f5;
-        line-height: 1.2;
-      }
-      .fl-install-title em {
-        color: #e8b4a2;
-        font-style: italic;
-      }
-      .fl-install-sub {
-        font-size: .85rem;
-        color: rgba(245,245,245,.6);
-        line-height: 1.65;
-        margin-bottom: 1.2rem;
-      }
-      .fl-install-steps {
-        padding-left: 1.1rem;
-        margin: 0 0 1.2rem;
-        display: flex;
-        flex-direction: column;
-        gap: .55rem;
-      }
-      .fl-install-steps li {
-        font-size: .86rem;
-        color: rgba(245,245,245,.72);
-        line-height: 1.5;
-      }
-      .fl-install-steps li strong {
-        color: #f5f5f5;
-      }
-      .fl-install-icon-demo {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 22px; height: 22px;
-        border: 1.5px solid rgba(243,215,207,.45);
-        border-radius: 5px;
-        font-size: .75rem;
-        color: #d98f7a;
-        vertical-align: middle;
-        margin: 0 2px;
-      }
-      .fl-install-ios-arrow {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: .5rem;
-        font-size: .8rem;
-        color: #d98f7a;
-        margin-top: .6rem;
-        margin-bottom: .4rem;
-      }
-      .fl-install-arrow-bounce {
-        animation: arrowBounce 1.2s ease-in-out infinite;
-      }
-      @keyframes arrowBounce {
-        0%,100% { transform: translateY(0); }
-        50%      { transform: translateY(5px); }
-      }
-      .fl-install-btn-primary {
-        width: 100%;
-        padding: 14px;
-        font-family: 'Outfit', system-ui, sans-serif;
-        font-size: .82rem;
-        font-weight: 600;
-        letter-spacing: .1em;
-        text-transform: uppercase;
-        color: #0b0b0b;
-        background: linear-gradient(135deg, #e8b4a2, #d98f7a);
-        border: none;
-        border-radius: 12px;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: .5rem;
-        margin-bottom: .65rem;
-        transition: opacity .2s;
-      }
-      .fl-install-btn-primary:active { opacity: .85; }
-      .fl-install-btn-ghost {
-        width: 100%;
-        padding: 11px;
-        font-family: 'Outfit', system-ui, sans-serif;
-        font-size: .78rem;
-        font-weight: 400;
-        color: rgba(245,245,245,.45);
-        background: transparent;
-        border: none;
-        border-radius: 10px;
-        cursor: pointer;
-        transition: color .2s;
-      }
-      .fl-install-btn-ghost:active { color: rgba(245,245,245,.75); }
-    </style>
-
-    <div class="fl-install-card">
-      <div class="fl-install-pill"></div>
-
-      <div class="fl-install-header">
-        <img
-          class="fl-install-logo"
-          src="/flor-de-lotus/pwa/icons/icon-192.png"
-          alt="Ícone Flor de Lótus"
-        />
-        <div class="fl-install-title-block">
-          <p class="fl-install-label">
-            <i class="fas fa-mobile-screen-button"></i> App Gratuito
-          </p>
-          <h2 class="fl-install-title">
-            Flor de <em>Lótus</em>
-          </h2>
-        </div>
-      </div>
-
-      ${bodyHTML}
-    </div>
+    /* ── Modal instalação ── */
+    #fl-modal {
+      position: fixed; inset: 0; z-index: 99999;
+      display: flex; align-items: flex-end; justify-content: center;
+      padding: 1rem;
+      background: rgba(0,0,0,.78);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      opacity: 0; pointer-events: none;
+      transition: opacity .35s ease;
+    }
+    #fl-modal.fl-visible {
+      opacity: 1; pointer-events: auto;
+    }
+    .fl-modal-card {
+      width: 100%; max-width: 440px;
+      background: #0f0f0f;
+      border: 1px solid rgba(243,215,207,.18);
+      border-radius: 28px 28px 22px 22px;
+      padding: 1.8rem 1.5rem 1.5rem;
+      font-family: 'Outfit', system-ui, sans-serif;
+      transform: translateY(60px);
+      transition: transform .4s cubic-bezier(.25,.46,.45,.94) .05s;
+    }
+    #fl-modal.fl-visible .fl-modal-card {
+      transform: translateY(0);
+    }
+    .fl-modal-pill {
+      width: 44px; height: 4px; border-radius: 99px;
+      background: rgba(255,255,255,.13);
+      margin: 0 auto 1.6rem;
+    }
+    .fl-modal-header {
+      display: flex; align-items: center; gap: 1rem;
+      margin-bottom: 1.2rem;
+    }
+    .fl-modal-icon {
+      width: 64px; height: 64px; border-radius: 16px;
+      object-fit: cover; flex-shrink: 0;
+      border: 1px solid rgba(243,215,207,.15);
+      box-shadow: 0 8px 24px rgba(0,0,0,.4);
+    }
+    .fl-modal-label {
+      font-size: .6rem; letter-spacing: .22em;
+      text-transform: uppercase; color: #d98f7a;
+      margin-bottom: .25rem;
+      display: flex; align-items: center; gap: .3rem;
+    }
+    .fl-modal-title {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.55rem; font-weight: 300;
+      color: #f5f5f5; line-height: 1.2;
+    }
+    .fl-modal-title em { color: #e8b4a2; font-style: italic; }
+    .fl-modal-desc {
+      font-size: .88rem; color: rgba(245,245,245,.58);
+      line-height: 1.7; margin-bottom: 1.4rem;
+    }
+    /* Benefícios */
+    .fl-modal-perks {
+      display: flex; flex-direction: column; gap: .55rem;
+      margin-bottom: 1.5rem;
+    }
+    .fl-modal-perk {
+      display: flex; align-items: center; gap: .65rem;
+      font-size: .84rem; color: rgba(245,245,245,.72);
+    }
+    .fl-modal-perk i {
+      width: 20px; text-align: center;
+      color: #d98f7a; flex-shrink: 0;
+    }
+    /* Passos iOS */
+    .fl-ios-steps {
+      padding: .9rem 1rem;
+      background: rgba(232,180,162,.07);
+      border: 1px solid rgba(232,180,162,.18);
+      border-radius: 12px;
+      margin-bottom: 1.4rem;
+    }
+    .fl-ios-steps ol {
+      padding-left: 1.1rem;
+      display: flex; flex-direction: column; gap: .5rem;
+    }
+    .fl-ios-steps li {
+      font-size: .85rem; color: rgba(245,245,245,.7); line-height: 1.5;
+    }
+    .fl-ios-steps li strong { color: #f5f5f5; }
+    .fl-ios-share {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 24px; height: 24px;
+      border: 1.5px solid rgba(243,215,207,.4);
+      border-radius: 5px; font-size: .75rem;
+      color: #d98f7a; vertical-align: middle; margin: 0 2px;
+    }
+    .fl-ios-arrow {
+      text-align: center; margin-top: .8rem;
+      font-size: .8rem; color: #d98f7a;
+    }
+    .fl-ios-arrow i { animation: flBounce 1.2s ease-in-out infinite; }
+    @keyframes flBounce {
+      0%,100% { transform: translateY(0); }
+      50%      { transform: translateY(5px); }
+    }
+    /* Botões */
+    .fl-modal-btn-install {
+      width: 100%; padding: 15px;
+      font-family: 'Outfit', system-ui, sans-serif;
+      font-size: .85rem; font-weight: 600;
+      letter-spacing: .12em; text-transform: uppercase;
+      color: #0b0b0b;
+      background: linear-gradient(135deg, #e8b4a2, #d98f7a);
+      border: none; border-radius: 14px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: .5rem;
+      margin-bottom: .75rem;
+      box-shadow: 0 8px 24px rgba(217,143,122,.3);
+      transition: opacity .2s, transform .2s;
+    }
+    .fl-modal-btn-install:active { opacity: .85; transform: scale(.98); }
+    .fl-modal-btn-later {
+      width: 100%; padding: 12px;
+      font-family: 'Outfit', system-ui, sans-serif;
+      font-size: .8rem; color: rgba(245,245,245,.38);
+      background: transparent; border: none; cursor: pointer;
+      transition: color .2s;
+    }
+    .fl-modal-btn-later:active { color: rgba(245,245,245,.7); }
   `;
+  document.head.appendChild(s);
+})();
 
-  document.body.appendChild(popup);
+/* ── Banner (cardápio) ─────────────────────────────── */
+function showBanner() {
+  if (alreadyInstalled() || bannerDismissed()) return;
+  if (document.getElementById('fl-banner')) return;
 
-  /* Fechar ao clicar no fundo */
-  popup.addEventListener('click', e => {
-    if (e.target === popup) dismiss();
+  const el = document.createElement('div');
+  el.id = 'fl-banner';
+  el.innerHTML = `
+    <img class="fl-banner-icon"
+         src="/flor-de-lotus/pwa/icons/icon-192.png"
+         alt="Ícone Flor de Lótus">
+    <div class="fl-banner-text">
+      <strong>Flor de Lótus</strong>
+      <span>Instale e acesse como app</span>
+    </div>
+    <button class="fl-banner-btn" id="fl-banner-install">Instalar</button>
+    <button class="fl-banner-close" id="fl-banner-close" aria-label="Fechar">
+      <i class="fas fa-times"></i>
+    </button>
+  `;
+  document.body.prepend(el);
+
+  /* empurra o conteúdo para baixo */
+  requestAnimationFrame(() => {
+    el.classList.add('fl-visible');
+    document.body.style.paddingTop =
+      (parseInt(document.body.style.paddingTop || '0') + el.offsetHeight) + 'px';
   });
 
-  /* Botão confirmar (Android/Chrome nativo) */
-  const btnConfirm = document.getElementById('fl-install-confirm');
-  if (btnConfirm) {
-    btnConfirm.addEventListener('click', async () => {
-      if (window.__pwaPrompt) {
-        try {
-          window.__pwaPrompt.prompt();
-          const { outcome } = await window.__pwaPrompt.userChoice;
-          if (outcome === 'accepted') {
-            window.__pwaPrompt = null;
-            localStorage.setItem(INSTALLED_KEY, '1');
-          }
-        } catch (err) {
-          console.warn('[install] prompt error:', err);
+  document.getElementById('fl-banner-install').addEventListener('click', () => {
+    _closeBanner(false);
+    showModal();
+  });
+
+  document.getElementById('fl-banner-close').addEventListener('click', () => {
+    _closeBanner(true);
+  });
+}
+
+function _closeBanner(dismiss) {
+  const el = document.getElementById('fl-banner');
+  if (!el) return;
+  if (dismiss) localStorage.setItem(K.dismissed, String(Date.now()));
+  el.classList.remove('fl-visible');
+  setTimeout(() => el.remove(), 400);
+  document.body.style.paddingTop = '';
+}
+
+/* ── Modal instalação (após cadastro) ─────────────── */
+function showModal() {
+  if (alreadyInstalled()) return;
+  if (document.getElementById('fl-modal')) return;
+
+  const hasPrompt = !!window.__pwaPrompt;
+  const safIOS    = isSafariIOS();
+  const otherIOS  = isIOS() && !safIOS;
+
+  let innerHTML = '';
+
+  if (hasPrompt) {
+    innerHTML = `
+      <div class="fl-modal-perks">
+        <div class="fl-modal-perk"><i class="fas fa-bolt"></i> Abre com um toque — sem abrir o navegador</div>
+        <div class="fl-modal-perk"><i class="fas fa-wifi-slash"></i> Funciona mesmo sem internet</div>
+        <div class="fl-modal-perk"><i class="fas fa-expand"></i> Tela cheia, sem barra de endereço</div>
+      </div>
+      <button id="fl-modal-install" class="fl-modal-btn-install">
+        <i class="fas fa-download"></i> Instalar agora — é grátis
+      </button>
+      <button id="fl-modal-later" class="fl-modal-btn-later">Agora não</button>
+    `;
+  } else if (safIOS) {
+    innerHTML = `
+      <div class="fl-ios-steps">
+        <ol>
+          <li>Toque em <span class="fl-ios-share">□↑</span> <strong>Compartilhar</strong> na barra do Safari</li>
+          <li>Role e toque em <strong>"Adicionar à Tela de Início"</strong></li>
+          <li>Toque em <strong>Adicionar</strong> — pronto!</li>
+        </ol>
+        <p class="fl-ios-arrow"><i class="fas fa-arrow-down"></i> Compartilhar fica lá embaixo</p>
+      </div>
+      <button id="fl-modal-later" class="fl-modal-btn-later">Entendi, farei depois</button>
+    `;
+  } else if (otherIOS) {
+    innerHTML = `
+      <p class="fl-modal-desc">
+        Para instalar no iPhone, abra este link no <strong>Safari</strong>
+        e toque em Compartilhar → "Adicionar à Tela de Início".
+      </p>
+      <button id="fl-modal-later" class="fl-modal-btn-later">Entendi</button>
+    `;
+  } else {
+    /* Android sem prompt ainda (Chrome pode demorar 1 visita) */
+    innerHTML = `
+      <div class="fl-modal-perks">
+        <div class="fl-modal-perk"><i class="fas fa-bolt"></i> Abre com um toque na tela inicial</div>
+        <div class="fl-modal-perk"><i class="fas fa-expand"></i> Sem barra do navegador</div>
+        <div class="fl-modal-perk"><i class="fas fa-wifi-slash"></i> Funciona offline</div>
+      </div>
+      <div class="fl-ios-steps">
+        <ol>
+          <li>Toque em <strong>⋮</strong> no canto superior direito do Chrome</li>
+          <li>Toque em <strong>"Adicionar à tela inicial"</strong></li>
+          <li>Confirme tocando em <strong>Adicionar</strong></li>
+        </ol>
+      </div>
+      <button id="fl-modal-later" class="fl-modal-btn-later">Entendi</button>
+    `;
+  }
+
+  const el = document.createElement('div');
+  el.id = 'fl-modal';
+  el.setAttribute('role', 'dialog');
+  el.setAttribute('aria-modal', 'true');
+  el.innerHTML = `
+    <div class="fl-modal-card">
+      <div class="fl-modal-pill"></div>
+      <div class="fl-modal-header">
+        <img class="fl-modal-icon"
+             src="/flor-de-lotus/pwa/icons/icon-192.png"
+             alt="Flor de Lótus">
+        <div>
+          <p class="fl-modal-label"><i class="fas fa-mobile-screen-button"></i> App gratuito</p>
+          <h2 class="fl-modal-title">Flor de <em>Lótus</em></h2>
+        </div>
+      </div>
+      <p class="fl-modal-desc">
+        Salve o cardápio na sua tela inicial e acesse como um app de verdade — rápido, bonito e sem complicação.
+      </p>
+      ${innerHTML}
+    </div>
+  `;
+  document.body.appendChild(el);
+
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => el.classList.add('fl-visible'));
+  });
+
+  /* Fecha ao clicar no fundo */
+  el.addEventListener('click', e => {
+    if (e.target === el) _closeModal();
+  });
+
+  /* Botão instalar (Android nativo) */
+  document.getElementById('fl-modal-install')?.addEventListener('click', async () => {
+    if (window.__pwaPrompt) {
+      try {
+        window.__pwaPrompt.prompt();
+        const { outcome } = await window.__pwaPrompt.userChoice;
+        if (outcome === 'accepted') {
+          window.__pwaPrompt = null;
+          localStorage.setItem(K.installed, '1');
         }
+      } catch (err) {
+        console.warn('[PWA] prompt error:', err);
       }
-      removePopup();
-    });
-  }
+    }
+    _closeModal();
+  });
 
-  /* Botão dispensar */
-  const btnLater = document.getElementById('fl-install-later');
-  if (btnLater) {
-    btnLater.addEventListener('click', dismiss);
-  }
+  /* Botão fechar */
+  document.getElementById('fl-modal-later')?.addEventListener('click', _closeModal);
 }
 
-function dismiss() {
-  localStorage.setItem(DISMISS_KEY, String(Date.now()));
-  removePopup();
+function _closeModal() {
+  const el = document.getElementById('fl-modal');
+  if (!el) return;
+  el.classList.remove('fl-visible');
+  setTimeout(() => el.remove(), 400);
 }
 
-/* ─── Botão install na top-bar ─── */
-window.isInstallable = () => !!window.__pwaPrompt;
+/* ── API pública ───────────────────────────────────── */
+window.PWAInstall = { showBanner, showModal };
 
-window.triggerInstall = () => {
-  localStorage.removeItem(DISMISS_KEY);
-  showInstallPopup();
-};
-
-/* ─── Inicialização ─── */
+/* ── Auto-init no cardápio (index.html) ────────────── */
 document.addEventListener('DOMContentLoaded', () => {
-  const btn = document.getElementById('btnInstall');
+  const isCardapio = !!document.getElementById('mainContent');
+  if (!isCardapio) return;
 
-  function updateBtn() {
-    if (!btn) return;
-    if (isStandalone() || localStorage.getItem(INSTALLED_KEY)) {
+  /* Botão de download na top-bar (secundário) */
+  const btn = document.getElementById('btnInstall');
+  if (btn) {
+    if (alreadyInstalled()) {
       btn.style.display = 'none';
     } else {
       btn.style.display = 'inline-flex';
+      btn.addEventListener('click', () => {
+        localStorage.removeItem(K.dismissed);
+        showModal();
+      });
     }
   }
 
-  updateBtn();
-  document.addEventListener('pwa:installable', updateBtn);
   document.addEventListener('pwa:installed', () => {
+    _closeBanner(false);
+    _closeModal();
     if (btn) btn.style.display = 'none';
-    removePopup();
   });
 
-  btn?.addEventListener('click', () => window.triggerInstall());
-
-  /* Pop-up automático: exibe 2s após carregar,
-     mas só se não estiver em modo standalone e não dispensou recentemente */
-  if (!isStandalone() && !localStorage.getItem(INSTALLED_KEY) && !wasRecentlyDismissed()) {
-    setTimeout(() => {
-      showInstallPopup();
-    }, 2000);
+  /* Banner aparece 1.5 s após carregar */
+  if (!alreadyInstalled() && !bannerDismissed()) {
+    setTimeout(showBanner, 1500);
   }
 });
