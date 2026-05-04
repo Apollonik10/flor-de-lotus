@@ -1,42 +1,46 @@
 'use strict';
 
-const VER            = 'v5';
-const CACHE_STATIC   = `fl-static-${VER}`;
-const CACHE_DYN      = `fl-dynamic-${VER}`;
-const FALLBACK_IMAGE = '/flor-de-lotus/pwa/icons/fundo1.png';
+const VER          = 'v6';
+const CACHE_STATIC = `fl-static-${VER}`;
+const CACHE_DYN    = `fl-dynamic-${VER}`;
 
-/* Arquivos pré-cacheados */
+/* Arquivos essenciais — se um falhar, o resto continua */
 const PRECACHE = [
-  '/flor-de-lotus/index.html',
   '/flor-de-lotus/pwa/index.html',
-  '/flor-de-lotus/pwa/register.html',
   '/flor-de-lotus/pwa/styles.css',
   '/flor-de-lotus/pwa/app.js',
   '/flor-de-lotus/pwa/menu.json',
   '/flor-de-lotus/pwa/manifest.json',
+  '/flor-de-lotus/pwa/icons/icon-192.png',
+  '/flor-de-lotus/pwa/icons/icon-512.png',
   '/flor-de-lotus/pwa/icons/fundo1.png',
-  '/flor-de-lotus/page-lotus/assets/images/uramaki.jpg',
 ];
 
-/* INSTALL */
+/* INSTALL — cache individual, nunca falha por causa de 1 arquivo */
 self.addEventListener('install', e => {
   e.waitUntil(
-    caches.open(CACHE_STATIC)
-      .then(cache => cache.addAll(PRECACHE))
-      .then(() => self.skipWaiting())
+    caches.open(CACHE_STATIC).then(async cache => {
+      await Promise.allSettled(
+        PRECACHE.map(url =>
+          cache.add(url).catch(err =>
+            console.warn('[SW] falha ao cachear:', url, err)
+          )
+        )
+      );
+    }).then(() => self.skipWaiting())
   );
 });
 
-/* ACTIVATE */
+/* ACTIVATE — limpa caches antigos */
 self.addEventListener('activate', e => {
   e.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(
+    caches.keys()
+      .then(keys => Promise.all(
         keys
           .filter(k => k !== CACHE_STATIC && k !== CACHE_DYN)
           .map(k => caches.delete(k))
-      )
-    ).then(() => self.clients.claim())
+      ))
+      .then(() => self.clients.claim())
   );
 });
 
@@ -47,17 +51,16 @@ self.addEventListener('fetch', e => {
 
   const url = new URL(req.url);
 
-  /* CDN (fonts/icons) */
+  /* CDN externo (fontes/ícones) → cache first */
   const isExt = url.hostname.includes('fonts.googleapis.com')
-    || url.hostname.includes('fonts.gstatic.com')
-    || url.hostname.includes('cdnjs.cloudflare.com');
-
+             || url.hostname.includes('fonts.gstatic.com')
+             || url.hostname.includes('cdnjs.cloudflare.com');
   if (isExt) {
     e.respondWith(cacheFirst(req, CACHE_DYN));
     return;
   }
 
-  /* HTML / JSON */
+  /* HTML / JSON → stale-while-revalidate */
   if (
     req.destination === 'document' ||
     url.pathname.endsWith('.html') ||
@@ -67,50 +70,43 @@ self.addEventListener('fetch', e => {
     return;
   }
 
-  /* IMAGENS */
+  /* Imagens → cache first com fallback */
   if (req.destination === 'image') {
     e.respondWith(
-      cacheFirst(req, CACHE_DYN)
-        .then(res => res || caches.match('/page-lotus/assets/images/uramaki.jpg'))
-        .catch(() => caches.match('/page-lotus/assets/images/uramaki.jpg'))
+      cacheFirst(req, CACHE_DYN).catch(() =>
+        caches.match('/flor-de-lotus/pwa/icons/fundo1.png')
+      )
     );
     return;
   }
 
-  /* CSS / JS / outros */
+  /* CSS / JS / outros → cache first */
   e.respondWith(cacheFirst(req, CACHE_DYN));
 });
 
-/* CACHE FIRST (seguro) */
+/* ── Helpers ── */
+
 async function cacheFirst(req, cacheName) {
-  const cache = await caches.open(cacheName);
+  const cache  = await caches.open(cacheName);
   const cached = await cache.match(req);
   if (cached) return cached;
-
   try {
     const fresh = await fetch(req);
-    if (fresh && fresh.ok) {
-      cache.put(req, fresh.clone());
-      return fresh;
-    }
-  } catch (err) {}
-
-  return cached || new Response('Offline', { status: 503 });
+    if (fresh && fresh.ok) cache.put(req, fresh.clone());
+    return fresh;
+  } catch {
+    return cached || new Response('Offline', { status: 503 });
+  }
 }
 
-/* STALE WHILE REVALIDATE */
 async function staleWhileRevalidate(req) {
-  const cache = await caches.open(CACHE_STATIC);
+  const cache  = await caches.open(CACHE_STATIC);
   const cached = await cache.match(req);
-
   const fetchPromise = fetch(req)
     .then(res => {
-      if (res && res.ok) {
-        cache.put(req, res.clone());
-      }
+      if (res && res.ok) cache.put(req, res.clone());
       return res;
     })
     .catch(() => cached);
-
   return cached || fetchPromise;
 }
