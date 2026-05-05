@@ -47,7 +47,28 @@ const server = http.createServer((req, res) => {
   const filePath = path.join(ROOT_DIR, urlPath);
 
   fs.stat(filePath, (err, stat) => {
-    if (err || !stat.isFile()) {
+    if (err) {
+      res.writeHead(404, { 'Content-Type': 'text/plain' });
+      res.end('Not Found: ' + urlPath);
+      return;
+    }
+
+    /* Diretório → tenta index.html dentro dele */
+    if (stat.isDirectory()) {
+      const indexPath = path.join(filePath, 'index.html');
+      fs.stat(indexPath, (e2, s2) => {
+        if (e2 || !s2.isFile()) {
+          res.writeHead(404, { 'Content-Type': 'text/plain' });
+          res.end('Not Found: ' + urlPath);
+          return;
+        }
+        res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+        fs.createReadStream(indexPath).pipe(res);
+      });
+      return;
+    }
+
+    if (!stat.isFile()) {
       res.writeHead(404, { 'Content-Type': 'text/plain' });
       res.end('Not Found: ' + urlPath);
       return;
