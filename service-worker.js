@@ -1,12 +1,12 @@
 'use strict';
 
-const VER          = 'v8';
+const VER          = 'v9';
 const CACHE_STATIC = `fl-static-${VER}`;
 const CACHE_DYN    = `fl-dynamic-${VER}`;
 
 /* Arquivos essenciais — se um falhar, o resto continua */
 const PRECACHE = [
-  '/flor-de-lotus/apps/cardapio/cardapio.html',
+  '/flor-de-lotus/apps/cardapio/index.html',
   '/flor-de-lotus/apps/cardapio/styles.css',
   '/flor-de-lotus/apps/cardapio/app.js',
   '/flor-de-lotus/public/menu.json',

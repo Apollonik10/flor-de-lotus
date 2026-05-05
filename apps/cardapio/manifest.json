@@ -3,7 +3,7 @@
   "short_name": "Flor de Lótus",
   "description": "Cardápio digital da Flor de Lótus Culinária Oriental — Cajazeiras, PB",
 
-  "start_url": "./cardapio.html",
+  "start_url": "./index.html",
   "scope": "./",
 
   "display": "standalone",
