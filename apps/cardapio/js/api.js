@@ -6,7 +6,7 @@
 import { state, dom } from './state.js';
 
 // URL absoluta — funciona em qualquer contexto do GitHub Pages
-const MENU_URL = '../../data/menu.json';
+const MENU_URL = '/flor-de-lotus/public/menu.json';
 
 export async function fetchMenu() {
   try {
