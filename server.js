@@ -26,7 +26,7 @@ const MIME_TYPES = {
 
 const server = http.createServer((req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Service-Worker-Allowed', '/flor-de-lotus/pwa/');
+  res.setHeader('Service-Worker-Allowed', '/flor-de-lotus/');
 
   let urlPath = req.url.split('?')[0];
 
