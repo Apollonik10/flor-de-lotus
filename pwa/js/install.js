@@ -225,7 +225,7 @@ function showBanner() {
   el.id = 'fl-banner';
   el.innerHTML = `
     <img class="fl-banner-icon"
-         src="/flor-de-lotus/pwa/icons/icon-192.png"
+         src="../icons/icon-192.png"
          alt="Ícone Flor de Lótus">
     <div class="fl-banner-text">
       <strong>Flor de Lótus</strong>
@@ -335,7 +335,7 @@ function showModal() {
       <div class="fl-modal-pill"></div>
       <div class="fl-modal-header">
         <img class="fl-modal-icon"
-             src="/flor-de-lotus/pwa/icons/icon-192.png"
+             src="../icons/icon-192.png"
              alt="Flor de Lótus">
         <div>
           <p class="fl-modal-label"><i class="fas fa-mobile-screen-button"></i> App gratuito</p>

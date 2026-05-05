@@ -60,7 +60,6 @@ export function renderProfileDrawer() {
     <div class="profile-body" id="profileBody">
       ${user ? _renderUserInfo(user) : _renderNoUser()}
       ${_renderLoyalty(loyalty, availableGifts)}
-      ${_renderInstallSection()}
     </div>
   `;
 
@@ -68,17 +67,6 @@ export function renderProfileDrawer() {
   document.getElementById('btnCloseProfile')
     ?.addEventListener('click', closeProfileDrawer);
 
-  document.getElementById('btnInstallDrawer')
-    ?.addEventListener('click', () => window.triggerInstall?.());
-
-  /* Atualiza botão de install em tempo real caso o evento chegue com o drawer aberto */
-  document.addEventListener('pwa:installable', _refreshInstallBtn, { once: true });
-  document.addEventListener('pwa:installed',   _refreshInstallBtn, { once: true });
-}
-
-function _refreshInstallBtn() {
-  const section = document.getElementById('installSection');
-  if (section) section.outerHTML = _renderInstallSection();
 }
 
 /* ─────────────────────────────
@@ -191,52 +179,9 @@ function _renderLoyalty({ progress, needed, pct, available, totalPedidos }, avai
   `;
 }
 
-function _renderInstallSection() {
-  const isStandalone = window.matchMedia('(display-mode: standalone)').matches
-    || navigator.standalone === true;
-
-  if (isStandalone) {
-    return `
-      <section class="profile-section" id="installSection">
-        <p class="profile-section-title">
-          <i class="fas fa-mobile-screen" aria-hidden="true"></i> App Instalado
-        </p>
-        <p style="font-size:.82rem;color:var(--text-dim);line-height:1.6">
-          ✅ Você já está usando o app instalado. Aproveite!
-        </p>
-      </section>
-    `;
-  }
-
-  // Sempre mostra o botão — se não tiver prompt nativo, abre guia manual
-  const hasPrompt = window.isInstallable?.();
-
-  return `
-    <section class="profile-section" id="installSection">
-      <p class="profile-section-title">
-        <i class="fas fa-download" aria-hidden="true"></i> Instalar App
-      </p>
-      <p style="font-size:.82rem;color:var(--text-dim);line-height:1.6;margin-bottom:1rem">
-        Acesse o cardápio mais rápido, sem abrir o navegador. Funciona offline.
-      </p>
-      <button
-        id="btnInstallDrawer"
-        class="btn-go-register"
-        style="width:100%;justify-content:center;"
-        aria-label="Instalar aplicativo"
-      >
-        <i class="fas fa-download" aria-hidden="true"></i>
-        ${hasPrompt ? 'Baixar App' : 'Como Instalar'}
-      </button>
-    </section>
-  `;
-}
-
 /* ─────────────────────────────
    Event delegation global
 ───────────────────────────── */
-document.getElementById('btnInstallDrawer')
-  ?.addEventListener('click', () => window.triggerInstall?.());
   
 document.addEventListener('click', e => {
   const btn = e.target.closest('[data-action]');
