@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0b0b0b">
+  <meta name="robots" content="noindex">
+  <title>Admin — Flor de Lótus</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <style>
+    /* ── Tokens (espelho de styles.css) ── */
+    :root {
+      --black:      #0b0b0b;
+      --surface:    #111111;
+      --surface2:   #161616;
+      --pink-light: #f3d7cf;
+      --pink:       #e8b4a2;
+      --pink-dark:  #d98f7a;
+      --white:      #f5f5f5;
+      --text-dim:   rgba(245,245,245,.62);
+      --text-faint: rgba(245,245,245,.32);
+      --green:      #25D366;
+      --red:        #c73a32;
+      --amber:      #f59e0b;
+      --glass-bd:   rgba(243,215,207,.16);
+      --easing:     cubic-bezier(.25,.46,.45,.94);
+      --font-d:     'Cormorant Garamond', Georgia, serif;
+      --font-b:     'Outfit', system-ui, sans-serif;
+    }
+
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    html { -webkit-tap-highlight-color: transparent; }
+    body {
+      background: var(--black);
+      color: var(--white);
+      font-family: var(--font-b);
+      font-weight: 300;
+      min-height: 100dvh;
+      overflow-x: hidden;
+    }
+
+    /* ══════════════════════════════════
+       PIN SCREEN
+    ══════════════════════════════════ */
+    #pinScreen {
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+      gap: 1.8rem;
+    }
+
+    .pin-brand { text-align: center; }
+    .pin-logo  {
+      font-family: var(--font-d);
+      font-size: 1.9rem; font-weight: 400;
+      letter-spacing: .04em;
+    }
+    .pin-logo em { color: var(--pink-dark); font-style: normal; }
+    .pin-tag {
+      font-size: .62rem; letter-spacing: .22em;
+      text-transform: uppercase; color: var(--text-faint);
+      margin-top: .25rem;
+    }
+
+    .pin-dots {
+      display: flex; gap: .75rem;
+    }
+    .pin-dot {
+      width: 13px; height: 13px; border-radius: 50%;
+      border: 1.5px solid rgba(243,215,207,.22);
+      transition: all .2s var(--easing);
+    }
+    .pin-dot.filled {
+      background: var(--pink-dark);
+      border-color: var(--pink-dark);
+      transform: scale(1.1);
+    }
+
+    .pin-hint  { font-size: .78rem; color: var(--text-faint); text-align: center; min-height: 1.1rem; }
+    .pin-error { font-size: .78rem; color: var(--red);        text-align: center; min-height: 1.1rem; }
+
+    .pin-pad {
+      display: grid;
+      grid-template-columns: repeat(3, 70px);
+      grid-template-rows: repeat(4, 70px);
+      gap: .65rem;
+    }
+    .pin-btn {
+      width: 70px; height: 70px; border-radius: 50%;
+      background: rgba(255,255,255,.055);
+      border: 1px solid var(--glass-bd);
+      color: var(--white);
+      font-family: var(--font-b); font-size: 1.5rem; font-weight: 300;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      transition: background .15s;
+      user-select: none;
+    }
+    .pin-btn:active    { background: rgba(217,143,122,.22); }
+    .pin-btn.pin-del   { font-size: 1rem; color: var(--text-dim); }
+    .pin-btn.pin-empty { visibility: hidden; pointer-events: none; }
+
+    /* ══════════════════════════════════
+       DASHBOARD
+    ══════════════════════════════════ */
+    #dashboard { display: none; }
+
+    /* Barra superior fixa */
+    .admin-bar {
+      position: sticky; top: 0; z-index: 200;
+      background: rgba(0,0,0,.88);
+      backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--glass-bd);
+      padding: .75rem 1rem;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: .8rem;
+    }
+    .admin-title {
+      font-family: var(--font-d); font-size: 1.2rem; font-weight: 300;
+      line-height: 1;
+    }
+    .admin-title em { color: var(--pink); font-style: italic; }
+    .admin-title small {
+      display: block; font-family: var(--font-b);
+      font-size: .58rem; letter-spacing: .18em;
+      text-transform: uppercase; color: var(--text-faint); margin-top: 1px;
+    }
+
+    .bar-right { display: flex; align-items: center; gap: .6rem; }
+
+    /* Indicador realtime */
+    .live-pill {
+      display: flex; align-items: center; gap: .4rem;
+      padding: 4px 10px; border-radius: 999px;
+      border: 1px solid rgba(37,211,102,.25);
+      background: rgba(37,211,102,.08);
+    }
+    .live-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--green);
+      animation: livePulse 2s ease-in-out infinite;
+    }
+    .live-dot.off { background: var(--text-faint); animation: none; }
+    .live-label {
+      font-size: .62rem; font-weight: 600;
+      letter-spacing: .1em; text-transform: uppercase;
+      color: var(--green);
+    }
+    .live-label.off { color: var(--text-faint); }
+    @keyframes livePulse {
+      0%,100% { opacity:1 } 50% { opacity:.3 }
+    }
+
+    .btn-logout {
+      background: none; border: 1px solid var(--glass-bd);
+      color: var(--text-dim); font-family: var(--font-b);
+      font-size: .68rem; font-weight: 500;
+      letter-spacing: .1em; text-transform: uppercase;
+      padding: 6px 12px; border-radius: 999px; cursor: pointer;
+      transition: color .2s, border-color .2s;
+    }
+    .btn-logout:hover { color: var(--pink); border-color: var(--pink-dark); }
+
+    /* Stats */
+    .stats-strip {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: .6rem; padding: .9rem 1rem;
+    }
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--glass-bd); border-radius: 14px;
+      padding: .85rem .7rem; text-align: center;
+    }
+    .stat-num {
+      font-family: var(--font-d); font-size: 1.7rem;
+      font-weight: 300; color: var(--pink-light); line-height: 1;
+      margin-bottom: .2rem;
+    }
+    .stat-lbl {
+      font-size: .58rem; letter-spacing: .14em;
+      text-transform: uppercase; color: var(--text-faint);
+    }
+
+    /* Tabs */
+    .tabs {
+      display: flex; overflow-x: auto; scrollbar-width: none;
+      padding: 0 1rem;
+      border-bottom: 1px solid rgba(243,215,207,.07);
+      gap: 0;
+    }
+    .tabs::-webkit-scrollbar { display: none; }
+    .tab-btn {
+      flex-shrink: 0;
+      padding: 10px 16px;
+      font-family: var(--font-b); font-size: .7rem;
+      font-weight: 500; letter-spacing: .1em; text-transform: uppercase;
+      color: var(--text-faint); background: none;
+      border: none; border-bottom: 2px solid transparent;
+      cursor: pointer; white-space: nowrap;
+      transition: color .2s, border-color .2s;
+    }
+    .tab-btn.active {
+      color: var(--pink-dark); border-bottom-color: var(--pink-dark);
+    }
+
+    /* Lista de pedidos */
+    .orders-list {
+      padding: .8rem 1rem 5rem;
+      display: flex; flex-direction: column; gap: .75rem;
+    }
+
+    /* Card do pedido */
+    .order-card {
+      background: var(--surface);
+      border: 1px solid var(--glass-bd); border-radius: 14px;
+      overflow: hidden;
+      transition: border-color .3s;
+    }
+    .order-card.s-preparando { border-color: rgba(245,158,11,.30); }
+    .order-card.s-pronto     { border-color: rgba(37,211,102,.30); }
+    .order-card.s-entregue   { opacity: .48; }
+
+    /* Cabeçalho do card (clicável) */
+    .order-head {
+      display: flex; align-items: flex-start; gap: .75rem;
+      padding: .9rem 1rem; cursor: pointer;
+    }
+    .order-meta { flex: 1; min-width: 0; }
+    .order-num  {
+      font-size: .6rem; letter-spacing: .12em; color: var(--text-faint);
+      text-transform: uppercase; margin-bottom: .1rem;
+    }
+    .order-client {
+      font-size: .9rem; font-weight: 500; color: var(--white);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .order-time { font-size: .7rem; color: var(--text-faint); margin-top: .1rem; }
+
+    .order-right { display: flex; flex-direction: column; align-items: flex-end; gap: .35rem; flex-shrink: 0; }
+    .order-total {
+      font-family: var(--font-d); font-size: 1.15rem;
+      color: var(--pink-light); white-space: nowrap;
+    }
+
+    /* Badge de status */
+    .status-badge {
+      padding: 3px 9px; border-radius: 999px;
+      font-size: .6rem; font-weight: 600;
+      letter-spacing: .1em; text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .badge-pendente   { background:rgba(199,58,50,.14);  color:#e87070; border:1px solid rgba(199,58,50,.3); }
+    .badge-preparando { background:rgba(245,158,11,.12); color:#fbbf24; border:1px solid rgba(245,158,11,.3); }
+    .badge-pronto     { background:rgba(37,211,102,.12); color:#4ade80; border:1px solid rgba(37,211,102,.3); }
+    .badge-entregue   { background:rgba(255,255,255,.05);color:var(--text-faint);border:1px solid var(--glass-bd); }
+
+    /* Corpo expansível */
+    .order-body {
+      display: none;
+      padding: 0 1rem 1rem;
+      border-top: 1px solid rgba(255,255,255,.05);
+    }
+    .order-body.open { display: block; }
+
+    /* Info do cliente */
+    .client-info {
+      display: flex; gap: .6rem; align-items: center;
+      padding: .7rem 0; margin-bottom: .4rem;
+      border-bottom: 1px solid rgba(255,255,255,.04);
+    }
+    .client-info-text { flex: 1; min-width: 0; }
+    .client-phone-line {
+      font-size: .8rem; color: var(--text-dim);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .client-addr-line {
+      font-size: .75rem; color: var(--text-faint);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      margin-top: .1rem;
+    }
+    .btn-call {
+      flex-shrink: 0; width: 38px; height: 38px; border-radius: 50%;
+      background: rgba(37,211,102,.12); border: 1px solid rgba(37,211,102,.25);
+      color: var(--green); font-size: .9rem;
+      display: flex; align-items: center; justify-content: center;
+      text-decoration: none; transition: background .2s;
+    }
+    .btn-call:hover { background: rgba(37,211,102,.22); }
+
+    /* Itens do pedido */
+    .items-list {
+      list-style: none; display: flex; flex-direction: column;
+      gap: .35rem; margin: .75rem 0;
+    }
+    .item-row {
+      display: flex; justify-content: space-between;
+      font-size: .83rem; color: var(--text-dim);
+    }
+    .item-qty  { color: var(--pink-dark); font-weight: 600; margin-right: .35rem; }
+    .item-sabor{ font-size: .78em; color: var(--text-faint); }
+    .item-price{ flex-shrink: 0; color: var(--text-faint); }
+
+    /* Botões de status */
+    .status-actions {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: .45rem; margin-top: .85rem;
+    }
+    .btn-status {
+      padding: 10px 8px;
+      font-family: var(--font-b); font-size: .68rem;
+      font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+      background: rgba(255,255,255,.04);
+      border: 1px solid var(--glass-bd); border-radius: 9px;
+      color: var(--text-faint); cursor: pointer;
+      transition: all .2s;
+    }
+    .btn-status.is-current,
+    .btn-status:hover { background:rgba(217,143,122,.1); border-color:var(--pink-dark); color:var(--pink); }
+    .btn-status.is-current[data-s="entregue"],
+    .btn-status:hover[data-s="entregue"]  { background:rgba(37,211,102,.1); border-color:rgba(37,211,102,.4); color:#4ade80; }
+    .btn-status.is-current[data-s="pendente"],
+    .btn-status:hover[data-s="pendente"]  { background:rgba(199,58,50,.1); border-color:rgba(199,58,50,.35); color:#e87070; }
+
+    /* Empty state */
+    .orders-empty {
+      padding: 4rem 1rem; text-align: center; color: var(--text-faint);
+    }
+    .orders-empty i { font-size: 2rem; display:block; margin-bottom:1rem; }
+    .orders-empty p { font-size: .9rem; }
+
+    /* Barra de loading */
+    #loadBar {
+      position: fixed; top:0; left:0; z-index:9999;
+      height: 2px; width: 0;
+      background: linear-gradient(90deg, var(--pink-dark), var(--pink));
+      transition: width .4s var(--easing), opacity .3s;
+    }
+
+    /* Toast de novo pedido */
+    .new-order-toast {
+      position: fixed; bottom: 24px; left: 50%;
+      transform: translateX(-50%) translateY(10px);
+      z-index: 500;
+      padding: 10px 22px; border-radius: 999px;
+      background: rgba(37,211,102,.18);
+      border: 1px solid rgba(37,211,102,.35);
+      color: #4ade80; font-size: .82rem; font-weight: 500;
+      white-space: nowrap;
+      opacity: 0; transition: opacity .3s, transform .3s;
+      pointer-events: none;
+    }
+    .new-order-toast.show { opacity:1; transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+
+<div id="loadBar"></div>
+
+<!-- ══════════════════════════════
+     PIN SCREEN
+══════════════════════════════ -->
+<div id="pinScreen">
+  <div class="pin-brand">
+    <p class="pin-logo">Flor de <em>Lótus</em></p>
+    <p class="pin-tag">Área Admin</p>
+  </div>
+
+  <div class="pin-dots" id="pinDots">
+    <div class="pin-dot" id="pd0"></div>
+    <div class="pin-dot" id="pd1"></div>
+    <div class="pin-dot" id="pd2"></div>
+    <div class="pin-dot" id="pd3"></div>
+  </div>
+
+  <p class="pin-error" id="pinError"></p>
+  <p class="pin-hint"  id="pinHint"></p>
+
+  <div class="pin-pad">
+    <button class="pin-btn" data-d="1">1</button>
+    <button class="pin-btn" data-d="2">2</button>
+    <button class="pin-btn" data-d="3">3</button>
+    <button class="pin-btn" data-d="4">4</button>
+    <button class="pin-btn" data-d="5">5</button>
+    <button class="pin-btn" data-d="6">6</button>
+    <button class="pin-btn" data-d="7">7</button>
+    <button class="pin-btn" data-d="8">8</button>
+    <button class="pin-btn" data-d="9">9</button>
+    <button class="pin-btn pin-empty" disabled aria-hidden="true"></button>
+    <button class="pin-btn" data-d="0">0</button>
+    <button class="pin-btn pin-del" id="pinDel">
+      <i class="fas fa-delete-left"></i>
+    </button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     DASHBOARD
+══════════════════════════════ -->
+<div id="dashboard">
+
+  <header class="admin-bar">
+    <div>
+      <p class="admin-title">Admin <em>Lótus</em><small>painel de pedidos</small></p>
+    </div>
+    <div class="bar-right">
+      <div class="live-pill" id="livePill">
+        <div class="live-dot off" id="liveDot"></div>
+        <span class="live-label off" id="liveLabel">—</span>
+      </div>
+      <button class="btn-logout" id="btnLogout">Sair</button>
+    </div>
+  </header>
+
+  <div class="stats-strip">
+    <div class="stat-card">
+      <p class="stat-num" id="statToday">—</p>
+      <p class="stat-lbl">Hoje</p>
+    </div>
+    <div class="stat-card">
+      <p class="stat-num" id="statPending">—</p>
+      <p class="stat-lbl">Pendentes</p>
+    </div>
+    <div class="stat-card">
+      <p class="stat-num" id="statRevenue">—</p>
+      <p class="stat-lbl">Receita hoje</p>
+    </div>
+  </div>
+
+  <div class="tabs" role="tablist">
+    <button class="tab-btn active" data-tab="pendente"   role="tab">🔴 Pendentes</button>
+    <button class="tab-btn"        data-tab="preparando" role="tab">🟡 Preparo</button>
+    <button class="tab-btn"        data-tab="pronto"     role="tab">🟢 Prontos</button>
+    <button class="tab-btn"        data-tab="todos"      role="tab">Todos</button>
+  </div>
+
+  <div class="orders-list" id="ordersList" aria-live="polite"></div>
+
+</div>
+
+<div class="new-order-toast" id="newOrderToast">
+  🍣 Novo pedido chegou!
+</div>
+
+<script type="module">
+'use strict';
+
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+/* ── Config ── */
+const SUPABASE_URL  = 'https://aflglnnruovheztrqneg.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFmbGdsbm5ydW92aGV6dHJxbmVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMDAwNjUsImV4cCI6MjA5Mzg3NjA2NX0.2LOqKN-SX52PbhBtLZA4cHpmjnj3hnOb9qz2N1ROYdU';
+const PIN_KEY      = 'fl_admin_pin';
+const SESSION_KEY  = 'fl_admin_sess';   // sessionStorage — limpa ao fechar aba
+const SESSION_TTL  = 4 * 60 * 60 * 1000; // 4h em ms
+
+const db = createClient(SUPABASE_URL, SUPABASE_ANON);
+
+/* ── Helpers DOM ── */
+const $  = id => document.getElementById(id);
+const fmt = v  => Number(v || 0).toFixed(2).replace('.', ',');
+const todayStr = () => new Date().toLocaleDateString('pt-BR');
+
+function timeAgo(iso) {
+  const m = Math.floor((Date.now() - new Date(iso)) / 60000);
+  if (m < 1)  return 'agora';
+  if (m < 60) return `${m}min`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h}h atrás`;
+  return `${Math.floor(h / 24)}d atrás`;
+}
+
+/* ── Estado ── */
+let orders    = [];
+let activeTab = 'pendente';
+
+/* ══════════════════════════════════════════════════
+   PIN
+══════════════════════════════════════════════════ */
+let pinBuffer = '';
+
+function isSessionValid() {
+  try {
+    const raw = sessionStorage.getItem(SESSION_KEY);
+    if (!raw) return false;
+    const { ts } = JSON.parse(raw);
+    return (Date.now() - ts) < SESSION_TTL;
+  } catch { return false; }
+}
+function setSession()   { sessionStorage.setItem(SESSION_KEY, JSON.stringify({ ts: Date.now() })); }
+function clearSession() { sessionStorage.removeItem(SESSION_KEY); }
+
+function isPinSet() { return !!localStorage.getItem(PIN_KEY); }
+function verifyPin(input) {
+  const stored = localStorage.getItem(PIN_KEY);
+  if (!stored) {
+    // Primeiro acesso: define o PIN
+    localStorage.setItem(PIN_KEY, input);
+    return true;
+  }
+  return stored === input;
+}
+
+function updatePinDots() {
+  for (let i = 0; i < 4; i++) {
+    $(`pd${i}`).classList.toggle('filled', i < pinBuffer.length);
+  }
+}
+
+/* Botões do teclado PIN */
+document.querySelectorAll('.pin-btn[data-d]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    if (pinBuffer.length >= 4) return;
+    pinBuffer += btn.dataset.d;
+    updatePinDots();
+    $('pinError').textContent = '';
+
+    if (pinBuffer.length === 4) {
+      // Pequeno delay para visual do último dot
+      setTimeout(() => {
+        if (verifyPin(pinBuffer)) {
+          setSession();
+          enterDashboard();
+        } else {
+          $('pinError').textContent = 'PIN incorreto. Tente de novo.';
+          pinBuffer = '';
+          updatePinDots();
+        }
+      }, 180);
+    }
+  });
+});
+
+$('pinDel').addEventListener('click', () => {
+  pinBuffer = pinBuffer.slice(0, -1);
+  updatePinDots();
+  $('pinError').textContent = '';
+});
+
+/* Logout */
+$('btnLogout').addEventListener('click', () => {
+  clearSession();
+  location.reload();
+});
+
+/* ══════════════════════════════════════════════════
+   DASHBOARD
+══════════════════════════════════════════════════ */
+async function enterDashboard() {
+  $('pinScreen').style.display  = 'none';
+  $('dashboard').style.display  = 'block';
+
+  setLoad(true);
+  await loadOrders();
+  setLoad(false);
+
+  updateStats();
+  renderOrders();
+  subscribeRealtime();
+}
+
+/* Loader */
+function setLoad(on) {
+  const bar = $('loadBar');
+  bar.style.width   = on ? '70%' : '100%';
+  bar.style.opacity = '1';
+  if (!on) setTimeout(() => { bar.style.opacity = '0'; bar.style.width = '0'; }, 400);
+}
+
+/* Carrega todos os pedidos */
+async function loadOrders() {
+  const { data, error } = await db
+    .from('orders')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) { console.warn('[admin] loadOrders:', error.message); return; }
+  orders = data || [];
+}
+
+/* Realtime */
+function subscribeRealtime() {
+  db.channel('admin-orders')
+    .on(
+      'postgres_changes',
+      { event: '*', schema: 'public', table: 'orders' },
+      payload => {
+        if (payload.eventType === 'INSERT') {
+          orders.unshift(payload.new);
+          notifyNewOrder();
+        } else if (payload.eventType === 'UPDATE') {
+          const i = orders.findIndex(o => o.id === payload.new.id);
+          if (i >= 0) orders[i] = payload.new;
+        } else if (payload.eventType === 'DELETE') {
+          orders = orders.filter(o => o.id !== payload.old.id);
+        }
+        updateStats();
+        renderOrders();
+      }
+    )
+    .subscribe(status => {
+      const connected = status === 'SUBSCRIBED';
+      $('liveDot').classList.toggle('off', !connected);
+      $('liveLabel').classList.toggle('off', !connected);
+      $('liveLabel').textContent = connected ? 'ao vivo' : '—';
+    });
+}
+
+/* Notificação de novo pedido */
+function notifyNewOrder() {
+  beep();
+  if (navigator.vibrate) navigator.vibrate([150, 80, 150]);
+  const toast = $('newOrderToast');
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3500);
+}
+
+function beep() {
+  try {
+    const ctx  = new AudioContext();
+    const osc  = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(880, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(660, ctx.currentTime + 0.15);
+    gain.gain.setValueAtTime(0.25, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.4);
+  } catch (_) {}
+}
+
+/* ── Stats ── */
+function updateStats() {
+  const today        = new Date().toISOString().slice(0, 10);
+  const todayOrders  = orders.filter(o => o.created_at?.slice(0, 10) === today);
+  const pendingCount = orders.filter(o => o.status === 'pendente').length;
+  const revenue      = todayOrders.reduce((s, o) => s + (o.total || 0), 0);
+
+  $('statToday').textContent   = todayOrders.length;
+  $('statPending').textContent = pendingCount;
+  $('statRevenue').textContent = `R$${fmt(revenue)}`;
+}
+
+/* ── Tabs ── */
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeTab = btn.dataset.tab;
+    renderOrders();
+  });
+});
+
+/* ── Render ── */
+function renderOrders() {
+  const list = $('ordersList');
+
+  const filtered = activeTab === 'todos'
+    ? orders
+    : orders.filter(o => o.status === activeTab);
+
+  if (!filtered.length) {
+    list.innerHTML = `
+      <div class="orders-empty">
+        <i class="fas fa-bowl-rice"></i>
+        <p>${activeTab === 'todos' ? 'Nenhum pedido ainda.' : 'Nenhum pedido ' + activeTab + '.'}</p>
+      </div>`;
+    return;
+  }
+
+  list.innerHTML = filtered.map(order => _orderCardHTML(order)).join('');
+
+  /* Eventos: expandir card */
+  list.querySelectorAll('[data-expand]').forEach(el => {
+    el.addEventListener('click', () => {
+      const body = document.getElementById(`body-${el.dataset.expand}`);
+      body?.classList.toggle('open');
+    });
+  });
+
+  /* Eventos: mudar status */
+  list.querySelectorAll('.btn-status').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      updateStatus(btn.dataset.id, btn.dataset.s);
+    });
+  });
+}
+
+function _orderCardHTML(o) {
+  const clientName  = o.client_name    || `Cliente ${String(o.id).slice(-4).toUpperCase()}`;
+  const clientPhone = o.client_phone   || null;
+  const clientAddr  = o.client_address || null;
+
+  const statusLabels = {
+    pendente:   '🔴 Pendente',
+    preparando: '🟡 Preparo',
+    pronto:     '🟢 Pronto',
+    entregue:   '✅ Entregue',
+  };
+
+  const clientInfoHTML = (clientPhone || clientAddr) ? `
+    <div class="client-info">
+      <div class="client-info-text">
+        ${clientPhone ? `<p class="client-phone-line"><i class="fas fa-phone-alt" style="color:var(--pink-dark);margin-right:.3rem;font-size:.8em"></i>${clientPhone}</p>` : ''}
+        ${clientAddr  ? `<p class="client-addr-line"><i class="fas fa-map-marker-alt" style="margin-right:.35rem;font-size:.8em"></i>${clientAddr}</p>` : ''}
+      </div>
+      ${clientPhone
+        ? `<a class="btn-call" href="tel:${clientPhone.replace(/\D/g,'')}" aria-label="Ligar para ${clientName}">
+             <i class="fas fa-phone-alt"></i>
+           </a>`
+        : ''}
+    </div>` : '';
+
+  const itemsHTML = Array.isArray(o.items) ? o.items.map(it => `
+    <li class="item-row">
+      <span>
+        <span class="item-qty">${it.qty}×</span>${it.nome}
+        ${it.sabor ? `<span class="item-sabor"> (${it.sabor})</span>` : ''}
+      </span>
+      <span class="item-price">R$ ${fmt((it.preco || 0) * it.qty)}</span>
+    </li>`).join('') : '';
+
+  const statusBtns = ['pendente','preparando','pronto','entregue'].map(s => `
+    <button class="btn-status ${o.status === s ? 'is-current' : ''}"
+            data-id="${o.id}" data-s="${s}">
+      ${statusLabels[s]}
+    </button>`).join('');
+
+  return `
+    <div class="order-card s-${o.status}" data-id="${o.id}">
+      <div class="order-head" data-expand="${o.id}">
+        <div class="order-meta">
+          <p class="order-num">#${String(o.id).slice(-6).toUpperCase()}</p>
+          <p class="order-client">${clientName}</p>
+          <p class="order-time">${timeAgo(o.created_at)}</p>
+        </div>
+        <div class="order-right">
+          <span class="status-badge badge-${o.status}">${o.status}</span>
+          <span class="order-total">R$ ${fmt(o.total)}</span>
+        </div>
+      </div>
+      <div class="order-body" id="body-${o.id}">
+        ${clientInfoHTML}
+        <ul class="items-list">${itemsHTML}</ul>
+        <div class="status-actions">${statusBtns}</div>
+      </div>
+    </div>`;
+}
+
+/* ── Atualiza status no Supabase ── */
+async function updateStatus(orderId, newStatus) {
+  // Otimista: atualiza local primeiro
+  const i = orders.findIndex(o => o.id === orderId);
+  if (i >= 0) orders[i].status = newStatus;
+  updateStats();
+  renderOrders();
+
+  const { error } = await db
+    .from('orders')
+    .update({ status: newStatus })
+    .eq('id', orderId);
+
+  if (error) {
+    console.warn('[admin] updateStatus:', error.message);
+    // Reverte em caso de erro
+    await loadOrders();
+    updateStats();
+    renderOrders();
+  }
+}
+
+/* ══════════════════════════════════════════════════
+   INIT
+══════════════════════════════════════════════════ */
+if (!isPinSet()) {
+  $('pinHint').textContent = 'Digite um PIN de 4 dígitos para criar o seu acesso';
+}
+
+// Sessão ainda válida → vai direto
+if (isSessionValid()) {
+  enterDashboard();
+}
+</script>
+</body>
+</html>
