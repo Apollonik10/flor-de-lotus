@@ -1,64 +1,144 @@
 'use strict';
 
 /* ═══════════════════════════════════════════════════
-   order-tracking.js — Tela de acompanhamento pós-pedido
-   Mostra status em tempo real via Supabase Realtime.
-   Abre como bottom sheet após o pedido ser enviado.
+   order-tracking.js — Acompanhamento de pedido
+   v2.0 — Persistência em localStorage + FAB reabrir
+   
+   Fluxo:
+   1. sendOrderWhatsApp() chama showOrderTracking()
+   2. Estado salvo em localStorage (fl_active_order)
+   3. FAB verde aparece na tela principal
+   4. Cliente pode fechar e reabrir o modal
+   5. Pedido some ao ser marcado "entregue"
 ═══════════════════════════════════════════════════ */
 
 import { getSupabase } from './db.js';
 import { formatPrice }  from './utils.js';
 
+const STORAGE_KEY = 'fl_active_order';
+
 let _realtimeSub = null;
 
 const STATUS_STEPS = [
-  { key: 'pendente',   label: 'Recebido',   icon: 'fa-clock'      },
-  { key: 'preparando', label: 'Preparando', icon: 'fa-fire-burner' },
-  { key: 'pronto',     label: 'Pronto!',    icon: 'fa-bell'        },
-  { key: 'entregue',   label: 'Entregue',   icon: 'fa-motorcycle'  },
+  { key: 'pendente',   label: 'Recebido',   icon: 'fa-clock'       },
+  { key: 'preparando', label: 'Preparando', icon: 'fa-fire-burner'  },
+  { key: 'pronto',     label: 'Pronto!',    icon: 'fa-bell'         },
+  { key: 'entregue',   label: 'Entregue',   icon: 'fa-motorcycle'   },
 ];
 
-/* ── Abre a tela de acompanhamento ── */
+/* ════════════════════════════════════════
+   API pública
+════════════════════════════════════════ */
+
+/** Chamado após envio do pedido */
 export function showOrderTracking(orderId, cart, total) {
-  _cleanup();
+  _saveActiveOrder({ orderId, cart, total, status: 'pendente' });
+  _showFab(true);
+  _openModal();
+}
+
+/** Verifica ao iniciar o app se há pedido ativo */
+export function checkActiveOrder() {
+  const order = _loadActiveOrder();
+  if (!order) return;
+
+  // Pedido entregue há mais de 2h → descarta
+  const age = Date.now() - new Date(order.savedAt).getTime();
+  if (order.status === 'entregue' && age > 2 * 60 * 60 * 1000) {
+    _clearActiveOrder();
+    return;
+  }
+
+  // Pedido muito antigo (6h) sem update → descarta
+  if (age > 6 * 60 * 60 * 1000) {
+    _clearActiveOrder();
+    return;
+  }
+
+  _showFab(true);
+}
+
+/** Abre o modal com dados do pedido ativo */
+export function reopenTracking() {
+  _openModal();
+}
+
+/** Fecha o modal (mantém localStorage e FAB) */
+export function closeOrderTracking() {
+  _closeModal();
+  // NÃO limpa localStorage — cliente pode reabrir
+}
+
+/* ════════════════════════════════════════
+   FAB de acompanhamento
+════════════════════════════════════════ */
+
+function _showFab(visible) {
+  const fab = document.getElementById('fabTrack');
+  if (!fab) return;
+  fab.classList.toggle('visible', visible);
+}
+
+/* ════════════════════════════════════════
+   Modal
+════════════════════════════════════════ */
+
+function _openModal() {
+  const order = _loadActiveOrder();
+  if (!order) return;
+
+  // Fecha modal anterior se existir
+  _closeModal(false);
 
   const overlay = document.getElementById('modalOverlay');
-  const modal   = _buildModal(orderId, cart, total);
+  const modal   = _buildModal(order);
 
   document.body.appendChild(modal);
   overlay?.classList.add('open');
   document.body.style.overflow = 'hidden';
 
-  // Animação de entrada
   requestAnimationFrame(() => {
     requestAnimationFrame(() => modal.classList.add('open'));
   });
 
-  // Fecha pelo botão X
+  // Botão fechar
   modal.querySelector('.btn-tracking-close')
     ?.addEventListener('click', closeOrderTracking);
 
-  // Realtime: só se tiver orderId (insert pode ter falhado)
-  if (orderId) {
-    _subscribeToOrder(orderId, modal);
+  // Subscreve realtime se tiver orderId e status não for final
+  if (order.orderId && order.status !== 'entregue') {
+    _subscribeRealtime(order.orderId, modal);
+  }
+
+  // Reflete status atual salvo
+  if (order.status && order.status !== 'pendente') {
+    _updateSteps(modal, order.status);
   }
 }
 
-export function closeOrderTracking() {
+function _closeModal(restoreScroll = true) {
   const modal = document.getElementById('orderTrackingModal');
   if (!modal) return;
 
   modal.classList.remove('open');
   setTimeout(() => modal.remove(), 420);
 
-  document.getElementById('modalOverlay')?.classList.remove('open');
-  document.body.style.overflow = '';
+  // Só remove overlay se nenhum outro drawer estiver aberto
+  const cartOpen    = document.getElementById('cartDrawer')?.classList.contains('open');
+  const profileOpen = document.getElementById('profileDrawer')?.classList.contains('open');
+  if (!cartOpen && !profileOpen) {
+    document.getElementById('modalOverlay')?.classList.remove('open');
+    if (restoreScroll) document.body.style.overflow = '';
+  }
 
-  _cleanup();
+  _unsubscribeRealtime();
 }
 
-/* ── Constrói o HTML do modal ── */
-function _buildModal(orderId, cart, total) {
+/* ════════════════════════════════════════
+   Construção do HTML
+════════════════════════════════════════ */
+
+function _buildModal({ orderId, cart, total, status }) {
   const el = document.createElement('article');
   el.id        = 'orderTrackingModal';
   el.className = 'order-tracking-modal';
@@ -70,18 +150,8 @@ function _buildModal(orderId, cart, total) {
     ? String(orderId).slice(-6).toUpperCase()
     : null;
 
-  const itemLines = cart.map(c => `
-    <div class="tracking-item">
-      <span class="tracking-item-qty">${c.qty}×</span>
-      <span class="tracking-item-name">
-        ${c.nome}${c.sabor ? ` <small>(${c.sabor})</small>` : ''}
-      </span>
-      <span class="tracking-item-price">R$ ${formatPrice(c.preco * c.qty)}</span>
-    </div>
-  `).join('');
-
   const stepsHTML = STATUS_STEPS.map((s, i) => `
-    <div class="tracking-step ${i === 0 ? 'active' : ''}" data-status="${s.key}">
+    <div class="tracking-step ${status === s.key ? 'active' : ''}" data-status="${s.key}">
       <div class="tracking-step-icon">
         <i class="fas ${s.icon}" aria-hidden="true"></i>
       </div>
@@ -92,6 +162,23 @@ function _buildModal(orderId, cart, total) {
       : ''}
   `).join('');
 
+  const itemLines = cart.map(c => `
+    <div class="tracking-item">
+      <span class="tracking-item-qty">${c.qty}×</span>
+      <span class="tracking-item-name">
+        ${c.nome}${c.sabor ? ` <small>(${c.sabor})</small>` : ''}
+      </span>
+      <span class="tracking-item-price">R$ ${formatPrice(c.preco * c.qty)}</span>
+    </div>
+  `).join('');
+
+  const statusMessages = {
+    pendente:   'Aguardando o restaurante confirmar...',
+    preparando: '🔥 Seu pedido está sendo preparado!',
+    pronto:     '🛎️ Pedido pronto! Saindo para entrega.',
+    entregue:   '🏍️ Pedido entregue. Bom apetite!',
+  };
+
   el.innerHTML = `
     <div class="modal-handle" role="presentation"></div>
 
@@ -100,35 +187,26 @@ function _buildModal(orderId, cart, total) {
     </button>
 
     <div class="tracking-body">
-
       <div class="tracking-header">
-        ${shortId
-          ? `<p class="tracking-eyebrow">Pedido #${shortId}</p>`
-          : `<p class="tracking-eyebrow">Pedido enviado</p>`}
-        <h2 class="tracking-title">Pedido <em>enviado!</em></h2>
-        <p class="tracking-sub">
-          ${orderId
-            ? 'Acompanhe o status aqui em tempo real ↓'
-            : 'Seu pedido foi enviado pelo WhatsApp.'}
+        <p class="tracking-eyebrow">
+          ${shortId ? `Pedido #${shortId}` : 'Seu pedido'}
+        </p>
+        <h2 class="tracking-title">Acompanhar <em>pedido</em></h2>
+        <p class="tracking-sub" id="trackingSub">
+          ${statusMessages[status] || statusMessages.pendente}
         </p>
       </div>
 
-      <!-- Progresso de status -->
       <div class="tracking-steps" id="trackingSteps"
            role="list" aria-label="Progresso do pedido">
         ${stepsHTML}
       </div>
 
-      <!-- Nota WhatsApp -->
       <div class="tracking-wa-note">
         <i class="fab fa-whatsapp" aria-hidden="true"></i>
-        <span>
-          Mensagem enviada para o restaurante pelo WhatsApp.
-          Atualizaremos o status aqui quando o preparo começar.
-        </span>
+        <span>Pedido enviado pelo WhatsApp. O status atualiza aqui quando o restaurante alterar.</span>
       </div>
 
-      <!-- Resumo do pedido -->
       <div class="tracking-items">
         <p class="tracking-items-title">Resumo do pedido</p>
         ${itemLines}
@@ -137,19 +215,23 @@ function _buildModal(orderId, cart, total) {
           <span>R$ ${formatPrice(total)}</span>
         </div>
       </div>
-
     </div>
   `;
 
   return el;
 }
 
-/* ── Realtime: escuta mudanças nesse pedido específico ── */
-function _subscribeToOrder(orderId, modal) {
+/* ════════════════════════════════════════
+   Realtime Supabase
+════════════════════════════════════════ */
+
+function _subscribeRealtime(orderId, modal) {
+  _unsubscribeRealtime();
+
   const db = getSupabase();
 
   _realtimeSub = db
-    .channel(`tracking-order-${orderId}`)
+    .channel(`tracking-${orderId}`)
     .on(
       'postgres_changes',
       {
@@ -158,16 +240,46 @@ function _subscribeToOrder(orderId, modal) {
         table:  'orders',
         filter: `id=eq.${orderId}`,
       },
-      payload => {
-        _updateSteps(modal, payload.new.status);
+      ({ new: updated }) => {
+        const newStatus = updated.status;
+
+        // Salva novo status localmente
+        const order = _loadActiveOrder();
+        if (order) {
+          order.status = newStatus;
+          _saveActiveOrder(order);
+        }
+
+        // Atualiza UI
+        _updateSteps(modal, newStatus);
+        _updateSubtitle(modal, newStatus);
+
+        // Vibração
+        if (navigator.vibrate) navigator.vibrate(120);
+
+        // Pedido entregue → limpa após 5min
+        if (newStatus === 'entregue') {
+          setTimeout(() => {
+            _clearActiveOrder();
+            _showFab(false);
+          }, 5 * 60 * 1000);
+        }
       }
     )
-    .subscribe(status => {
-      console.log('[tracking] realtime:', status);
-    });
+    .subscribe();
 }
 
-/* ── Atualiza os steps visuais ── */
+function _unsubscribeRealtime() {
+  if (_realtimeSub) {
+    _realtimeSub.unsubscribe?.();
+    _realtimeSub = null;
+  }
+}
+
+/* ════════════════════════════════════════
+   Atualização visual
+════════════════════════════════════════ */
+
 function _updateSteps(modal, currentStatus) {
   const steps     = modal.querySelectorAll('.tracking-step');
   const statusIdx = STATUS_STEPS.findIndex(s => s.key === currentStatus);
@@ -177,25 +289,41 @@ function _updateSteps(modal, currentStatus) {
     if (i < statusIdx) step.classList.add('done');
     if (i === statusIdx) step.classList.add('active');
   });
+}
 
-  // Feedback tátil
-  if (navigator.vibrate) navigator.vibrate(120);
+function _updateSubtitle(modal, status) {
+  const messages = {
+    preparando: '🔥 Seu pedido está sendo preparado!',
+    pronto:     '🛎️ Pedido pronto! Saindo para entrega.',
+    entregue:   '🏍️ Pedido entregue. Bom apetite!',
+  };
+  const sub = modal.querySelector('#trackingSub');
+  if (sub && messages[status]) sub.textContent = messages[status];
+}
 
-  // Atualiza subtítulo
-  const sub = modal.querySelector('.tracking-sub');
-  if (sub) {
-    const messages = {
-      preparando: '🔥 Seu pedido está sendo preparado!',
-      pronto:     '🛎️ Pedido pronto! Aguardando entrega.',
-      entregue:   '🏍️ Pedido a caminho. Obrigado!',
-    };
-    sub.textContent = messages[currentStatus] || sub.textContent;
+/* ════════════════════════════════════════
+   localStorage helpers
+════════════════════════════════════════ */
+
+function _saveActiveOrder(data) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      ...data,
+      savedAt: new Date().toISOString(),
+    }));
+  } catch (err) {
+    console.warn('[tracking] save:', err.message);
   }
 }
 
-function _cleanup() {
-  if (_realtimeSub) {
-    _realtimeSub.unsubscribe?.();
-    _realtimeSub = null;
+function _loadActiveOrder() {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+  } catch {
+    return null;
   }
+}
+
+function _clearActiveOrder() {
+  localStorage.removeItem(STORAGE_KEY);
 }

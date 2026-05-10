@@ -13,7 +13,7 @@ style-src * 'unsafe-inline';
 font-src * data:;
 connect-src *;
 ">
-  
+
   <title>Bem-vindo — Flor de Lótus</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -34,6 +34,7 @@ connect-src *;
       --glass-bg:    rgba(14,14,14,.75);
       --glass-bd:    rgba(243,215,207,.18);
       --text-dim:    rgba(245,245,245,.65);
+      --text-faint:  rgba(245,245,245,.35);
       --easing:      cubic-bezier(.25,.46,.45,.94);
       --font-d:      'Cormorant Garamond', Georgia, serif;
       --font-b:      'Outfit', system-ui, sans-serif;
@@ -71,7 +72,6 @@ connect-src *;
       position: relative;
       overflow: hidden;
     }
-    /* Brilho interno */
     .card::before {
       content:''; position:absolute; inset:0;
       border-radius: inherit;
@@ -79,7 +79,7 @@ connect-src *;
       pointer-events: none;
     }
 
-    /* ── Logo / Header ── */
+    /* ── Logo ── */
     .logo {
       font-family: var(--font-d);
       font-size: 1.9rem; font-weight: 400;
@@ -143,7 +143,7 @@ connect-src *;
     .field textarea,
     .field select {
       width: 100%; padding: 12px 14px;
-      font-family: var(--font-b); font-size: 1rem; /* 16px — evita zoom iOS */
+      font-family: var(--font-b); font-size: 1rem;
       color: var(--white);
       background: rgba(255,255,255,.07);
       border: 1px solid var(--glass-bd); border-radius: 10px;
@@ -154,13 +154,35 @@ connect-src *;
     .field input::placeholder,
     .field textarea::placeholder { color: rgba(245,245,245,.35); }
     .field input:focus,
-    .field textarea:focus,
-    .field select:focus {
+    .field textarea:focus {
       border-color: var(--pink-dark);
       background: rgba(255,255,255,.1);
     }
     .field textarea { resize: none; height: 88px; }
-    .field select option { background: #1a1a1a; color: var(--white); }
+
+    /* ── Campo de endereço com botão de localização ── */
+    .addr-wrap {
+      display: flex; gap: .5rem; align-items: stretch;
+    }
+    .addr-wrap input { flex: 1; }
+    .btn-location {
+      flex-shrink: 0; width: 46px; border-radius: 10px;
+      background: rgba(255,255,255,.07);
+      border: 1px solid var(--glass-bd);
+      color: var(--pink-dark); font-size: 1rem;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: background .2s, border-color .2s, color .2s;
+    }
+    .btn-location:hover   { background: rgba(255,255,255,.12); border-color: var(--pink-dark); }
+    .btn-location.success { color: var(--green-wa); border-color: rgba(37,211,102,.4); background: rgba(37,211,102,.08); }
+    .btn-location:disabled{ opacity: .5; cursor: default; }
+    .location-hint {
+      font-size: .7rem; color: var(--text-faint);
+      margin-top: .35rem; min-height: 1rem;
+      transition: color .3s;
+    }
+    .location-hint.success { color: rgba(37,211,102,.7); }
+    .location-hint.error   { color: rgba(199,58,50,.8); }
 
     /* ── Checkboxes de alergia ── */
     .allergy-grid {
@@ -183,7 +205,6 @@ connect-src *;
       color: var(--white);
     }
     .allergy-item input { display: none; }
-    .allergy-item i { font-size: .9rem; color: inherit; }
 
     /* ── Botões ── */
     .btn-primary {
@@ -208,7 +229,7 @@ connect-src *;
     }
     .btn-skip:hover { color: var(--pink); }
 
-    /* ── Screen 3: Sucesso ── */
+    /* ── Screen 2: Sucesso ── */
     .success-icon {
       width: 72px; height: 72px; border-radius: 50%;
       background: rgba(37,211,102,.15);
@@ -222,7 +243,6 @@ connect-src *;
     }
     .countdown strong { color: var(--pink); }
 
-    /* ── Nota sobre backend ── */
     .info-note {
       display: flex; gap: .6rem; align-items: flex-start;
       padding: .9rem 1rem;
@@ -246,6 +266,19 @@ connect-src *;
 </head>
 <body>
 
+  <!-- Captura prompt de instalação PWA o mais cedo possível -->
+  <script>
+    window.__pwaPrompt = null;
+    window.addEventListener('beforeinstallprompt', function(e) {
+      e.preventDefault();
+      window.__pwaPrompt = e;
+    });
+    window.addEventListener('appinstalled', function() {
+      window.__pwaPrompt = null;
+      localStorage.setItem('fl_installed', '1');
+    });
+  </script>
+
   <div class="card">
 
     <!-- Logo -->
@@ -259,7 +292,9 @@ connect-src *;
       <div class="step-dot"        id="dot2"></div>
     </div>
 
-    <!-- ── Screen 0: Dados básicos ── -->
+    <!-- ══════════════════════════════
+         Screen 0: Dados básicos
+    ══════════════════════════════ -->
     <div class="screen active" id="screen-0">
       <h1 class="screen-title">Seus <em>dados</em></h1>
       <p class="screen-desc">
@@ -278,20 +313,39 @@ connect-src *;
                autocomplete="tel" inputmode="tel" maxlength="20" />
       </div>
 
+      <!-- Endereço com botão de geolocalização -->
       <div class="field">
-        <label for="inp-addr">Endereço de entrega (opcional)</label>
-        <input id="inp-addr" type="text"
-               placeholder="Rua, número, bairro — Cajazeiras, PB"
-               autocomplete="street-address" maxlength="120" />
+        <label for="inp-addr">
+          Endereço de entrega
+          <span style="font-weight:300; text-transform:none; letter-spacing:0; color:var(--text-faint);"> — opcional</span>
+        </label>
+        <div class="addr-wrap">
+          <input id="inp-addr" type="text"
+                 placeholder="Rua, número, bairro..."
+                 autocomplete="street-address" maxlength="140" />
+          <button type="button" id="btn-location"
+                  class="btn-location"
+                  aria-label="Usar minha localização"
+                  title="Preencher endereço pela localização GPS">
+            <i class="fas fa-location-dot" id="loc-icon"></i>
+          </button>
+        </div>
+        <p class="location-hint" id="location-hint">
+          Toque em 📍 para preencher automaticamente pelo GPS
+        </p>
       </div>
 
       <button class="btn-primary" id="btn-next-0" type="button">
         <i class="fas fa-arrow-right" aria-hidden="true"></i> Continuar
       </button>
-      <button class="btn-skip" id="btn-skip-0" type="button">Pular e ir direto ao cardápio</button>
+      <button class="btn-skip" id="btn-skip-0" type="button">
+        Pular e ir direto ao cardápio
+      </button>
     </div>
 
-    <!-- ── Screen 1: Alergias ── -->
+    <!-- ══════════════════════════════
+         Screen 1: Alergias
+    ══════════════════════════════ -->
     <div class="screen" id="screen-1">
       <h2 class="screen-title">Alguma <em>alergia</em>?</h2>
       <p class="screen-desc">
@@ -327,7 +381,8 @@ connect-src *;
 
       <div class="field">
         <label for="inp-notes">Outras observações (opcional)</label>
-        <textarea id="inp-notes" placeholder="Ex: sem molho shoyu, pouca pimenta..."></textarea>
+        <textarea id="inp-notes"
+                  placeholder="Ex: sem molho shoyu, pouca pimenta..."></textarea>
       </div>
 
       <button class="btn-primary" id="btn-next-1" type="button">
@@ -336,14 +391,17 @@ connect-src *;
       <button class="btn-skip" id="btn-back-1" type="button">← Voltar</button>
     </div>
 
-    <!-- ── Screen 2: Sucesso ── -->
+    <!-- ══════════════════════════════
+         Screen 2: Sucesso
+    ══════════════════════════════ -->
     <div class="screen" id="screen-2">
       <div class="success-icon" aria-hidden="true">
         <i class="fab fa-whatsapp"></i>
       </div>
       <h2 class="screen-title" style="text-align:center">Tudo <em>pronto</em>!</h2>
       <p class="screen-desc" style="text-align:center">
-        Seus dados foram salvos no celular. Os pedidos via WhatsApp já virão com nome e endereço preenchidos.
+        Seus dados foram salvos no celular. Os pedidos via WhatsApp já virão com
+        nome e endereço preenchidos.
       </p>
 
       <button class="btn-primary" id="btn-go" type="button">
@@ -351,33 +409,23 @@ connect-src *;
       </button>
 
       <p class="countdown">
-        Indo automaticamente em <strong id="countdown-num">3</strong>s...
+        Indo automaticamente em <strong id="countdown-num">5</strong>s...
       </p>
 
       <div class="info-note">
         <i class="fas fa-info-circle"></i>
         <span>
-          Estes dados ficam <strong>só no seu celular</strong> — não enviamos para nenhum servidor.
-          Para histórico de pedidos e conta sincronizada entre dispositivos, é necessário um
-          backend (Node.js + banco de dados).
+          Estes dados ficam <strong>só no seu celular</strong> — não enviamos
+          para nenhum servidor. Para histórico sincronizado entre dispositivos,
+          é necessário um backend.
         </span>
       </div>
     </div>
 
   </div><!-- /card -->
 
-  <!-- Captura prompt de instalação PWA (deve ser o mais cedo possível) -->
-  <script>
-    window.__pwaPrompt = null;
-    window.addEventListener('beforeinstallprompt', function(e) {
-      e.preventDefault();
-      window.__pwaPrompt = e;
-    });
-    window.addEventListener('appinstalled', function() {
-      window.__pwaPrompt = null;
-      localStorage.setItem('fl_installed', '1');
-    });
-  </script>
+  <!-- Script de instalação PWA -->
+  <script src="./js/install.js"></script>
 
   <script>
     'use strict';
@@ -392,11 +440,11 @@ connect-src *;
       window.location.replace(CARDAPIO);
     }
 
-    /* ── Dados em memória durante o cadastro ── */
+    /* ── Dados temporários ── */
     let userData = { name: '', phone: '', address: '', allergies: [], notes: '' };
 
     /* ── Helpers DOM ── */
-    const $ = id => document.getElementById(id);
+    const $        = id => document.getElementById(id);
     const screens  = document.querySelectorAll('.screen');
     const dots     = document.querySelectorAll('.step-dot');
     let   current  = 0;
@@ -411,7 +459,93 @@ connect-src *;
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    /* ── Screen 0 → 1 ── */
+    /* ════════════════════════════════════════
+       GEOLOCALIZAÇÃO
+    ════════════════════════════════════════ */
+    (function bindGeolocation() {
+      const btnLoc = $('btn-location');
+      const inpAddr = $('inp-addr');
+      const hint    = $('location-hint');
+      const icon    = $('loc-icon');
+
+      if (!btnLoc) return;
+
+      btnLoc.addEventListener('click', () => {
+        if (!navigator.geolocation) {
+          hint.textContent = 'Geolocalização não suportada neste dispositivo.';
+          hint.className   = 'location-hint error';
+          return;
+        }
+
+        // Estado de carregamento
+        btnLoc.disabled  = true;
+        icon.className   = 'fas fa-spinner fa-spin';
+        hint.textContent = 'Obtendo localização...';
+        hint.className   = 'location-hint';
+
+        navigator.geolocation.getCurrentPosition(
+          async ({ coords }) => {
+            const { latitude, longitude } = coords;
+
+            try {
+              /* Reverse geocode — OpenStreetMap Nominatim (gratuito, sem chave) */
+              const res = await fetch(
+                `https://nominatim.openstreetmap.org/reverse` +
+                `?lat=${latitude}&lon=${longitude}&format=json&addressdetails=1`,
+                { headers: { 'Accept-Language': 'pt-BR' } }
+              );
+
+              if (!res.ok) throw new Error('nominatim_error');
+
+              const { address: a } = await res.json();
+
+              const rua    = a.road || a.pedestrian || a.footway || '';
+              const numero = a.house_number || '';
+              const bairro = a.suburb || a.neighbourhood || a.quarter || a.city_district || '';
+              const cidade = a.city || a.town || a.village || 'Cajazeiras';
+              const estado = a.state_code || a.state || 'PB';
+
+              const parts  = [rua, numero, bairro].filter(Boolean).join(', ');
+              inpAddr.value = parts
+                ? `${parts} — ${cidade}, ${estado}`
+                : `${latitude.toFixed(5)}, ${longitude.toFixed(5)}`;
+
+              hint.textContent = '✓ Localização preenchida — edite se precisar';
+              hint.className   = 'location-hint success';
+              icon.className   = 'fas fa-check';
+              btnLoc.classList.add('success');
+
+            } catch {
+              /* Fallback com coordenadas brutas */
+              inpAddr.value    = `${latitude.toFixed(5)}, ${longitude.toFixed(5)}`;
+              hint.textContent = 'Endereço aproximado — confirme ou edite.';
+              hint.className   = 'location-hint';
+              icon.className   = 'fas fa-location-dot';
+              btnLoc.disabled  = false;
+            }
+          },
+          (err) => {
+            btnLoc.disabled = false;
+            icon.className  = 'fas fa-location-dot';
+
+            const msgs = {
+              1: 'Permissão negada. Ative a localização nas configurações.',
+              2: 'Localização indisponível. Digite o endereço manualmente.',
+              3: 'Tempo esgotado. Tente novamente.',
+            };
+            hint.textContent = msgs[err.code] || 'Erro ao obter localização.';
+            hint.className   = 'location-hint error';
+          },
+          { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+        );
+      });
+    })();
+
+    /* ════════════════════════════════════════
+       NAVEGAÇÃO ENTRE TELAS
+    ════════════════════════════════════════ */
+
+    /* Screen 0 → 1 */
     $('btn-next-0').addEventListener('click', () => {
       const name = $('inp-name').value.trim();
       if (!name) {
@@ -431,60 +565,58 @@ connect-src *;
       window.location.href = CARDAPIO;
     });
 
-    /* ── Screen 1 → 2 ── */
+    /* Screen 1 → 2 */
     $('btn-next-1').addEventListener('click', () => {
-      userData.allergies = [...document.querySelectorAll('input[name="allergy"]:checked')]
-        .map(el => el.value);
+      userData.allergies = [
+        ...document.querySelectorAll('input[name="allergy"]:checked')
+      ].map(el => el.value);
       userData.notes = $('inp-notes').value.trim();
 
-      /* Salva no localStorage */
       localStorage.setItem(STORAGE_KEY, JSON.stringify({
         ...userData,
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
       }));
       localStorage.setItem(VISITED_KEY, '1');
 
       goTo(2);
-      /* Mostra modal de instalação após 800ms (tempo da animação da tela) */
+
+      /* Modal de instalação PWA após animação */
       setTimeout(() => {
         if (window.PWAInstall) window.PWAInstall.showModal();
       }, 800);
+
       startCountdown();
     });
 
+    /* Voltar da tela 1 para a 0 */
     $('btn-back-1').addEventListener('click', () => {
       screens[current].classList.remove('active');
-      dots[current].classList.remove('active');
-      dots[current].classList.remove('done');
+      dots[current].classList.remove('active', 'done');
       current = 0;
       screens[0].classList.add('active');
       dots[0].classList.remove('done');
       dots[0].classList.add('active');
     });
 
-    /* ── Screen 2: ir ao cardápio ── */
+    /* Ir ao cardápio */
     $('btn-go').addEventListener('click', () => {
       window.location.href = CARDAPIO;
     });
 
-    /* ── Contagem regressiva (pausa se modal aberto) ── */
+    /* Contagem regressiva — pausa enquanto modal PWA estiver aberto */
     function startCountdown() {
-      let n = 5;
-      const el = $('countdown-num');
+      let n     = 5;
+      const el  = $('countdown-num');
       el.textContent = n;
+
       const t = setInterval(() => {
-        /* Pausa enquanto modal de instalação estiver visível */
-        if (document.getElementById('fl-modal')) return;
+        if (document.getElementById('fl-modal')) return; // pausa
         n--;
         el.textContent = n;
         if (n <= 0) { clearInterval(t); window.location.href = CARDAPIO; }
       }, 1000);
     }
-
   </script>
-
-  <!-- Lógica de instalação PWA -->
-  <script src="./js/install.js"></script>
 
 </body>
 </html>

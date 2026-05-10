@@ -17,9 +17,13 @@ import {
   renderProfileDrawer
 } from './js/profile.js';
 
-import { updateFavBadge }      from './js/favorites.js';
-import { syncProfile }         from './js/db.js';
-import { closeOrderTracking }  from './js/order-tracking.js';
+import { updateFavBadge }                    from './js/favorites.js';
+import { syncProfile }                       from './js/db.js';
+import {
+  checkActiveOrder,
+  reopenTracking,
+  closeOrderTracking,
+} from './js/order-tracking.js';
 
 async function init() {
   loadPersistedData();
@@ -36,20 +40,27 @@ async function init() {
   renderLoyaltyBadge();
   updateFavBadge();
 
-  // Sync em background (não trava a UI)
+  // Verifica se há pedido ativo do localStorage (mostra FAB se sim)
+  checkActiveOrder();
+
+  // Sync em background
   syncProfile().catch(() => {});
 
-  /* Fechar carrinho pelo X do drawer */
+  /* Fechar carrinho */
   document.getElementById('btnCloseCart')
     ?.addEventListener('click', closeCartDrawer);
 
-  /* Escape fecha tela de acompanhamento também */
+  /* FAB "Acompanhar pedido" */
+  document.getElementById('fabTrack')
+    ?.addEventListener('click', reopenTracking);
+
+  /* Escape fecha tudo */
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape') closeOrderTracking();
   });
 }
 
-/* Expõe para onclick gerados dinamicamente */
+/* Expõe para onclick inline */
 window.changeCartQty       = changeCartQty;
 window.openProfileDrawer   = openProfileDrawer;
 window.closeProfileDrawer  = closeProfileDrawer;
