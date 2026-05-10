@@ -877,3 +877,135 @@ body {
 #closePopup {
   background: #eee;
 }
+
+/* ═══════════════════════════════════════════
+   17. ORDER TRACKING (bottom sheet pós-pedido)
+═══════════════════════════════════════════ */
+
+.order-tracking-modal {
+  position: fixed;
+  bottom: 0; left: 0; right: 0; z-index: 500;
+  max-height: 88dvh;
+  overflow-y: auto; scrollbar-width: thin;
+
+  background: rgba(10,10,10,.96);
+  backdrop-filter: blur(28px); -webkit-backdrop-filter: blur(28px);
+  border: 1px solid var(--glass-border);
+  border-bottom: none;
+  border-radius: 24px 24px 0 0;
+  box-shadow: 0 -16px 64px rgba(0,0,0,.7);
+
+  transform: translateY(100%);
+  transition: transform .42s var(--easing);
+}
+.order-tracking-modal.open { transform: translateY(0); }
+
+.tracking-body { padding: 1rem 1.2rem 2rem; }
+
+/* Header */
+.tracking-eyebrow {
+  font-size: .62rem; letter-spacing: .2em; text-transform: uppercase;
+  color: var(--lotus-pink-dark); margin-bottom: .35rem;
+}
+.tracking-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem,5vw,2rem);
+  font-weight: 300; color: var(--white-soft); line-height: 1.1;
+  margin-bottom: .3rem;
+}
+.tracking-title em { color: var(--green-wa); font-style: italic; }
+.tracking-sub {
+  font-size: .82rem; color: var(--text-dim);
+  margin-bottom: 1.4rem; transition: color .4s;
+}
+
+/* Steps de status */
+.tracking-steps {
+  display: flex; align-items: flex-start;
+  justify-content: center; gap: 0;
+  margin-bottom: 1.4rem; overflow-x: auto;
+  scrollbar-width: none;
+}
+.tracking-steps::-webkit-scrollbar { display: none; }
+
+.tracking-step {
+  display: flex; flex-direction: column; align-items: center; gap: .4rem;
+  flex-shrink: 0;
+}
+.tracking-step-icon {
+  width: 42px; height: 42px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,.05);
+  border: 1.5px solid rgba(243,215,207,.12);
+  color: var(--text-faint); font-size: .9rem;
+  transition: all .4s var(--easing);
+}
+.tracking-step.active .tracking-step-icon {
+  background: rgba(37,211,102,.14);
+  border-color: rgba(37,211,102,.5);
+  color: var(--green-wa);
+  box-shadow: 0 0 18px rgba(37,211,102,.22);
+}
+.tracking-step.done .tracking-step-icon {
+  background: rgba(37,211,102,.07);
+  border-color: rgba(37,211,102,.25);
+  color: rgba(37,211,102,.55);
+}
+.tracking-step-label {
+  font-size: .58rem; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--text-faint); white-space: nowrap; text-align: center;
+  transition: color .4s;
+}
+.tracking-step.active .tracking-step-label { color: var(--green-wa); }
+.tracking-step.done   .tracking-step-label { color: rgba(37,211,102,.45); }
+
+/* Linha conectora entre steps */
+.tracking-connector {
+  flex-shrink: 0;
+  width: clamp(16px, 5vw, 36px);
+  height: 1.5px;
+  background: rgba(243,215,207,.10);
+  margin-top: 21px; /* alinha ao centro dos ícones */
+}
+
+/* Nota WhatsApp */
+.tracking-wa-note {
+  display: flex; align-items: flex-start; gap: .6rem;
+  padding: .8rem 1rem; border-radius: 10px;
+  background: rgba(37,211,102,.06);
+  border: 1px solid rgba(37,211,102,.16);
+  font-size: .8rem; color: var(--text-dim); line-height: 1.55;
+  margin-bottom: 1.2rem;
+}
+.tracking-wa-note .fa-whatsapp { color: var(--green-wa); font-size: 1rem; flex-shrink: 0; margin-top: .05rem; }
+
+/* Resumo */
+.tracking-items-title {
+  font-size: .65rem; letter-spacing: .16em; text-transform: uppercase;
+  color: var(--lotus-pink-dark); margin-bottom: .7rem;
+}
+.tracking-items {
+  display: flex; flex-direction: column; gap: .45rem;
+}
+.tracking-item {
+  display: flex; align-items: baseline; gap: .4rem;
+  font-size: .84rem; color: var(--text-dim);
+}
+.tracking-item-qty  { color: var(--lotus-pink-dark); font-weight: 600; flex-shrink: 0; }
+.tracking-item-name { flex: 1; }
+.tracking-item-name small { color: var(--text-faint); font-size: .78em; }
+.tracking-item-price {
+  flex-shrink: 0;
+  font-family: var(--font-display);
+  color: var(--lotus-pink-light);
+}
+.tracking-total {
+  display: flex; justify-content: space-between; align-items: baseline;
+  padding-top: .7rem; margin-top: .3rem;
+  border-top: 1px solid rgba(255,255,255,.07);
+  font-size: .88rem; font-weight: 500; color: var(--text-dim);
+}
+.tracking-total span:last-child {
+  font-family: var(--font-display);
+  font-size: 1.25rem; color: var(--lotus-pink-light);
+}
