@@ -5,9 +5,10 @@
    · Exibe e edita dados do usuário (localStorage)
    · Mostra progresso do cartão fidelidade
    · Exibe gift cards disponíveis
-   · Seção de instalação do PWA
+   v2.1 — syncProfile integrado
 ═══════════════════════════════════════════════════ */
 
+import { syncProfile }      from './db.js';
 import { getLoyaltyStatus } from './loyalty.js';
 
 const STORAGE_KEY = 'fl_user';
@@ -45,8 +46,8 @@ export function renderProfileDrawer() {
   const drawer = document.getElementById('profileDrawer');
   if (!drawer) return;
 
-  const user          = getUser();
-  const loyalty       = getLoyaltyStatus();
+  const user           = getUser();
+  const loyalty        = getLoyaltyStatus();
   const availableGifts = loyalty.gifts.filter(g => !g.usado);
 
   drawer.innerHTML = `
@@ -63,10 +64,8 @@ export function renderProfileDrawer() {
     </div>
   `;
 
-  /* Binds pós-render */
   document.getElementById('btnCloseProfile')
     ?.addEventListener('click', closeProfileDrawer);
-
 }
 
 /* ─────────────────────────────
@@ -182,17 +181,17 @@ function _renderLoyalty({ progress, needed, pct, available, totalPedidos }, avai
 /* ─────────────────────────────
    Event delegation global
 ───────────────────────────── */
-  
+
 document.addEventListener('click', e => {
   const btn = e.target.closest('[data-action]');
   if (!btn) return;
 
   switch (btn.dataset.action) {
-    case 'edit-field':      _startEditField(btn.dataset.field, btn.dataset.value); break;
-    case 'save-field':      _saveField(btn.dataset.field);                         break;
-    case 'cancel-edit':     renderProfileDrawer();                                 break;
-    case 'edit-allergies':  _startEditAllergies();                                 break;
-    case 'save-allergies':  _saveAllergies();                                      break;
+    case 'edit-field':     _startEditField(btn.dataset.field, btn.dataset.value); break;
+    case 'save-field':     _saveField(btn.dataset.field);                         break;
+    case 'cancel-edit':    renderProfileDrawer();                                 break;
+    case 'edit-allergies': _startEditAllergies();                                 break;
+    case 'save-allergies': _saveAllergies();                                      break;
   }
 });
 
@@ -205,7 +204,12 @@ document.addEventListener('click', e => {
 /* ─────────────────────────────
    Edição inline
 ───────────────────────────── */
-const LABELS = { name: 'Nome', phone: 'WhatsApp', address: 'Endereço', notes: 'Observações' };
+const LABELS = {
+  name:    'Nome',
+  phone:   'WhatsApp',
+  address: 'Endereço',
+  notes:   'Observações',
+};
 
 function _startEditField(field, currentVal) {
   const fieldEl = document.getElementById(`field-${field}`);
@@ -229,12 +233,14 @@ function _startEditField(field, currentVal) {
   document.getElementById(`edit-input-${field}`)?.focus();
 }
 
+/* ── Salva campo de texto + sync Supabase ── */
 function _saveField(field) {
   const input = document.getElementById(`edit-input-${field}`);
   if (!input) return;
-  const user = getUser() || {};
-  user[field] = input.value.trim();
+  const user   = getUser() || {};
+  user[field]  = input.value.trim();
   saveUser(user);
+  syncProfile().catch(() => {}); // sync em background, silencia offline
   renderProfileDrawer();
 }
 
@@ -274,12 +280,14 @@ function _startEditAllergies() {
   `;
 }
 
+/* ── Salva alergias + sync Supabase ── */
 function _saveAllergies() {
   const checked = [...document.querySelectorAll('input[name="edit-allergy"]:checked')]
     .map(el => el.value);
-  const user = getUser() || {};
+  const user     = getUser() || {};
   user.allergies = checked;
   saveUser(user);
+  syncProfile().catch(() => {}); // sync em background, silencia offline
   renderProfileDrawer();
 }
 
