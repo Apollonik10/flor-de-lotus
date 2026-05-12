@@ -194,13 +194,20 @@ connect-src *;
   <!-- ══════════════════════════════
        FAB CARRINHO (flutuante)
   ══════════════════════════════ -->
-  <button class="fab-cart" id="fabCart" aria-label="Abrir carrinho">
-    <i class="fas fa-bag-shopping" aria-hidden="true"></i>
-    <span class="fab-cart-count" id="fabCartCount">0 itens</span>
-  </button>
-
-  <!-- Toast -->
-  <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+<!-- FAB CARRINHO (flutuante — canto direito) -->
+<button class="fab-cart" id="fabCart" aria-label="Abrir carrinho">
+  <i class="fas fa-bag-shopping" aria-hidden="true"></i>
+  <span class="fab-cart-count" id="fabCartCount">0 itens</span>
+</button>
+ 
+<!-- FAB ACOMPANHAR PEDIDO (centro, acima do FAB do carrinho) -->
+<button class="fab-track" id="fabTrack" aria-label="Acompanhar pedido">
+  <i class="fas fa-motorcycle" aria-hidden="true"></i>
+  <span>Acompanhar pedido</span>
+</button>
+ 
+<!-- Toast -->
+<div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
 
 <script src="./js/install.js"></script>
 <script type="module" src="./app.js"></script>
