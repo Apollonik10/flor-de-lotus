@@ -19,11 +19,7 @@ import {
 
 import { updateFavBadge }                    from './js/favorites.js';
 import { syncProfile }                       from './js/db.js';
-import {
-  checkActiveOrder,
-  reopenTracking,
-  closeOrderTracking,
-} from './js/order-tracking.js';
+import { checkActiveOrder, reopenTracking, closeOrderTracking, cancelOrder } from './js/order-tracking.js';
 
 async function init() {
   loadPersistedData();

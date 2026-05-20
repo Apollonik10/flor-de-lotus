@@ -2,19 +2,25 @@
 
 /* ═══════════════════════════════════════════════════
    order-tracking.js — Acompanhamento de pedido
-   v3.0 — Fixes:
-     · FAB corretamente controlado via DOM
-     · Realtime reconecta ao reabrir modal
-     · Botão cancelar pedido
-     · Tratamento graceful de orderId null
+   v4.0 — Fixes:
+     · Realtime reassinado no boot (checkActiveOrder)
+     · Reconexão automática em CLOSED / CHANNEL_ERROR
+     · Background subscription (sem modal aberto)
+     · Fallback polling a cada 30s
+     · orderId null: UI adaptada, polling permanece
 ═══════════════════════════════════════════════════ */
 
 import { getSupabase } from './db.js';
 import { formatPrice }  from './utils.js';
 
-const STORAGE_KEY = 'fl_active_order';
+const STORAGE_KEY   = 'fl_active_order';
+const POLL_INTERVAL = 30_000;   // 30s fallback
+const MAX_ORDER_AGE = 8 * 3600_000;   // 8h
+const DELIVERED_TTL = 2 * 3600_000;   // 2h após entregue
 
-let _realtimeSub = null;
+let _realtimeSub  = null;
+let _pollTimer    = null;
+let _retryTimer   = null;
 
 const STATUS_STEPS = [
   { key: 'pendente',   label: 'Recebido',   icon: 'fa-clock'       },
@@ -27,33 +33,39 @@ const STATUS_STEPS = [
    API pública
 ════════════════════════════════════════ */
 
-/** Chamado após envio do pedido */
+/** Chamado imediatamente após envio do pedido */
 export function showOrderTracking(orderId, cart, total) {
   _saveActiveOrder({ orderId, cart, total, status: 'pendente' });
   _showFab(true);
+  _startBackground(orderId);   // inicia realtime/polling sem precisar abrir modal
   _openModal();
 }
 
-/** Verifica ao iniciar o app se há pedido ativo */
+/**
+ * Verifica pedido ativo ao iniciar o app.
+ * Se encontrar um orderId válido, reassina o realtime imediatamente.
+ */
 export function checkActiveOrder() {
   const order = _loadActiveOrder();
   if (!order) return;
 
   const age = Date.now() - new Date(order.savedAt).getTime();
 
-  // Pedido entregue há mais de 2h → descarta
-  if (order.status === 'entregue' && age > 2 * 60 * 60 * 1000) {
+  if (order.status === 'entregue' && age > DELIVERED_TTL) {
     _clearActiveOrder();
     return;
   }
-
-  // Pedido muito antigo (6h) → descarta
-  if (age > 6 * 60 * 60 * 1000) {
+  if (age > MAX_ORDER_AGE) {
     _clearActiveOrder();
     return;
   }
 
   _showFab(true);
+
+  // ✅ FIX PRINCIPAL: reassina realtime no boot, não espera o usuário clicar
+  if (order.status !== 'entregue') {
+    _startBackground(order.orderId);
+  }
 }
 
 /** Abre o modal com dados do pedido ativo */
@@ -61,30 +73,77 @@ export function reopenTracking() {
   _openModal();
 }
 
-/** Fecha o modal (mantém localStorage e FAB) */
+/** Fecha o modal (mantém localStorage, FAB e realtime ativos) */
 export function closeOrderTracking() {
   _closeModal();
-  // NÃO limpa localStorage — cliente pode reabrir
+  // realtime permanece ativo em background — NÃO cancela aqui
 }
 
 /** Cancela o pedido completamente */
 export function cancelOrder() {
-  _unsubscribeRealtime();
+  _stopBackground();
   _clearActiveOrder();
   _showFab(false);
   _closeModal();
 }
 
 /* ════════════════════════════════════════
-   FAB de acompanhamento
+   Background: realtime + polling fallback
+════════════════════════════════════════ */
+
+/**
+ * Inicia realtime se orderId existe, ou polling fallback se não existe.
+ * Pode ser chamado múltiplas vezes — cancela a sessão anterior primeiro.
+ */
+function _startBackground(orderId) {
+  _stopBackground();   // garante limpeza
+
+  if (orderId) {
+    _subscribeRealtime(orderId);
+  }
+
+  // Polling como seguro: atualiza estado mesmo sem realtime (ex: RLS bloqueado)
+  _pollTimer = setInterval(() => _pollOrderStatus(orderId), POLL_INTERVAL);
+}
+
+function _stopBackground() {
+  _unsubscribeRealtime();
+  clearInterval(_pollTimer);
+  clearTimeout(_retryTimer);
+  _pollTimer  = null;
+  _retryTimer = null;
+}
+
+/** Polling manual: busca status atual do Supabase */
+async function _pollOrderStatus(orderId) {
+  if (!orderId) return;
+
+  try {
+    const db = getSupabase();
+    const { data, error } = await db
+      .from('orders')
+      .select('status')
+      .eq('id', orderId)
+      .single();
+
+    if (error || !data) return;
+
+    const current = _loadActiveOrder();
+    if (!current || current.status === data.status) return;
+
+    // Status mudou → aplica sem precisar de realtime
+    _onStatusChange(orderId, data.status);
+  } catch (_) { /* offline — silencia */ }
+}
+
+/* ════════════════════════════════════════
+   FAB
 ════════════════════════════════════════ */
 
 function _showFab(visible) {
-  // Aguarda o DOM estar pronto caso seja chamado muito cedo
   const tryShow = () => {
     const fab = document.getElementById('fabTrack');
     if (!fab) {
-      // Tenta novamente após o DOM carregar
       if (visible) setTimeout(tryShow, 300);
       return;
     }
@@ -101,11 +160,7 @@ function _openModal() {
   const order = _loadActiveOrder();
   if (!order) return;
 
-  // Fecha modal anterior se existir
   _closeModal(false);
-
-  // Cancela subscrição antiga antes de criar nova
-  _unsubscribeRealtime();
 
   const overlay = document.getElementById('modalOverlay');
   const modal   = _buildModal(order);
@@ -118,26 +173,18 @@ function _openModal() {
     requestAnimationFrame(() => modal.classList.add('open'));
   });
 
-  // Botão fechar
   modal.querySelector('.btn-tracking-close')
     ?.addEventListener('click', closeOrderTracking);
 
-  // Botão cancelar pedido
   modal.querySelector('.btn-tracking-cancel')
     ?.addEventListener('click', () => {
-      if (confirm('Cancelar acompanhamento do pedido?')) {
-        cancelOrder();
-      }
+      if (confirm('Limpar acompanhamento deste pedido?')) cancelOrder();
     });
 
-  // Subscreve realtime se tiver orderId e status não for final
-  if (order.orderId && order.status !== 'entregue') {
-    _subscribeRealtime(order.orderId, modal);
-  }
-
-  // Reflete status atual salvo
+  // Reflete status já salvo localmente
   if (order.status && order.status !== 'pendente') {
     _updateSteps(modal, order.status);
+    _updateSubtitle(modal, order.status);
   }
 }
 
@@ -154,25 +201,21 @@ function _closeModal(restoreScroll = true) {
     document.getElementById('modalOverlay')?.classList.remove('open');
     if (restoreScroll) document.body.style.overflow = '';
   }
-
-  // NÃO cancela realtime aqui — só cancela no cancelOrder() ou ao reabrir
 }
 
 /* ════════════════════════════════════════
-   Construção do HTML
+   HTML do modal
 ════════════════════════════════════════ */
 
 function _buildModal({ orderId, cart, total, status }) {
   const el = document.createElement('article');
   el.id        = 'orderTrackingModal';
   el.className = 'order-tracking-modal';
-  el.setAttribute('role',       'dialog');
+  el.setAttribute('role', 'dialog');
   el.setAttribute('aria-modal', 'true');
   el.setAttribute('aria-label', 'Acompanhar pedido');
 
-  const shortId = orderId
-    ? String(orderId).slice(-6).toUpperCase()
-    : null;
+  const shortId = orderId ? String(orderId).slice(-6).toUpperCase() : null;
 
   const stepsHTML = STATUS_STEPS.map((s, i) => `
     <div class="tracking-step ${status === s.key ? 'active' : ''}" data-status="${s.key}">
@@ -181,9 +224,7 @@ function _buildModal({ orderId, cart, total, status }) {
       </div>
       <span class="tracking-step-label">${s.label}</span>
     </div>
-    ${i < STATUS_STEPS.length - 1
-      ? '<div class="tracking-connector"></div>'
-      : ''}
+    ${i < STATUS_STEPS.length - 1 ? '<div class="tracking-connector"></div>' : ''}
   `).join('');
 
   const itemLines = cart.map(c => `
@@ -203,8 +244,8 @@ function _buildModal({ orderId, cart, total, status }) {
     entregue:   '🏍️ Pedido entregue. Bom apetite!',
   };
 
-  // Mostra botão cancelar apenas se pedido não foi entregue
   const showCancel = status !== 'entregue';
+  const hasRealtime = !!orderId;
 
   el.innerHTML = `
     <div class="modal-handle" role="presentation"></div>
@@ -233,8 +274,8 @@ function _buildModal({ orderId, cart, total, status }) {
         <i class="fab fa-whatsapp" aria-hidden="true"></i>
         <span>
           Pedido enviado pelo WhatsApp.
-          ${orderId
-            ? 'O status atualiza aqui em tempo real.'
+          ${hasRealtime
+            ? 'Status atualiza aqui automaticamente.'
             : 'Confirme o status diretamente pelo WhatsApp.'}
         </span>
       </div>
@@ -249,7 +290,7 @@ function _buildModal({ orderId, cart, total, status }) {
       </div>
 
       ${showCancel ? `
-        <button class="btn-tracking-cancel" aria-label="Cancelar acompanhamento">
+        <button class="btn-tracking-cancel" aria-label="Limpar acompanhamento">
           <i class="fas fa-trash-alt" aria-hidden="true"></i>
           Limpar acompanhamento
         </button>
@@ -261,14 +302,12 @@ function _buildModal({ orderId, cart, total, status }) {
 }
 
 /* ════════════════════════════════════════
-   Realtime Supabase
+   Realtime Supabase — com reconexão
 ════════════════════════════════════════ */
 
-function _subscribeRealtime(orderId, modal) {
-  const db = getSupabase();
-
-  // Nome único por orderId para evitar canal duplicado
-  const channelName = `tracking-${orderId}-${Date.now()}`;
+function _subscribeRealtime(orderId) {
+  const db          = getSupabase();
+  const channelName = `tracking-${orderId}`;
 
   _realtimeSub = db
     .channel(channelName)
@@ -281,50 +320,64 @@ function _subscribeRealtime(orderId, modal) {
         filter: `id=eq.${orderId}`,
       },
       ({ new: updated }) => {
-        const newStatus = updated.status;
-
-        // Salva novo status localmente
-        const order = _loadActiveOrder();
-        if (order) {
-          order.status = newStatus;
-          _saveActiveOrder(order);
-        }
-
-        // Atualiza UI (modal pode ter sido reaberto, pega o atual)
-        const currentModal = document.getElementById('orderTrackingModal');
-        if (currentModal) {
-          _updateSteps(currentModal, newStatus);
-          _updateSubtitle(currentModal, newStatus);
-
-          // Remove botão cancelar se entregue
-          if (newStatus === 'entregue') {
-            currentModal.querySelector('.btn-tracking-cancel')?.remove();
-          }
-        }
-
-        // Vibração de feedback
-        if (navigator.vibrate) navigator.vibrate(120);
-
-        // Pedido entregue → limpa após 3min
-        if (newStatus === 'entregue') {
-          setTimeout(() => {
-            _clearActiveOrder();
-            _showFab(false);
-          }, 3 * 60 * 1000);
-        }
+        _onStatusChange(orderId, updated.status);
       }
     )
-    .subscribe((status) => {
-      console.log('[tracking] realtime status:', status, 'orderId:', orderId);
+    .subscribe((status, err) => {
+      console.log('[tracking] realtime:', status, orderId);
+
+      if (status === 'CLOSED' || status === 'CHANNEL_ERROR') {
+        // Reconecta após 5s — não inunda o servidor
+        _retryTimer = setTimeout(() => {
+          console.log('[tracking] reconectando...');
+          _subscribeRealtime(orderId);
+        }, 5_000);
+      }
     });
 }
 
 function _unsubscribeRealtime() {
   if (_realtimeSub) {
-    try {
-      _realtimeSub.unsubscribe();
-    } catch (_) {}
+    try { _realtimeSub.unsubscribe(); } catch (_) {}
     _realtimeSub = null;
+  }
+  clearTimeout(_retryTimer);
+  _retryTimer = null;
+}
+
+/* ════════════════════════════════════════
+   Mudança de status (realtime OU polling)
+════════════════════════════════════════ */
+
+function _onStatusChange(orderId, newStatus) {
+  // Persiste novo status
+  const order = _loadActiveOrder();
+  if (order) {
+    order.status = newStatus;
+    _saveActiveOrder(order);
+  }
+
+  // Atualiza modal se estiver aberto
+  const modal = document.getElementById('orderTrackingModal');
+  if (modal) {
+    _updateSteps(modal, newStatus);
+    _updateSubtitle(modal, newStatus);
+
+    if (newStatus === 'entregue') {
+      modal.querySelector('.btn-tracking-cancel')?.remove();
+    }
+  }
+
+  // Vibração de feedback ao mudar status
+  if (navigator.vibrate) navigator.vibrate(120);
+
+  // Entregue → limpa após 2min e para background
+  if (newStatus === 'entregue') {
+    setTimeout(() => {
+      _stopBackground();
+      _clearActiveOrder();
+      _showFab(false);
+    }, DELIVERED_TTL);
   }
 }
 
@@ -371,9 +424,7 @@ function _saveActiveOrder(data) {
 function _loadActiveOrder() {
   try {
     return JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
-  } catch {
-    return null;
-  }
+  } catch { return null; }
 }
 
 function _clearActiveOrder() {
