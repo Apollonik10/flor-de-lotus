@@ -238,9 +238,18 @@
       text-transform: uppercase; margin-bottom: .1rem;
     }
     .order-client {
-      font-size: .9rem; font-weight: 500; color: var(--white);
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    }
+  font-size: .9rem;
+  font-weight: 500;
+  color: var(--white);
+  line-height: 1.4;
+
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+
+  overflow: hidden;
+  word-break: break-word;
+}
     .order-time { font-size: .7rem; color: var(--text-faint); margin-top: .1rem; }
 
     .order-right { display: flex; flex-direction: column; align-items: flex-end; gap: .35rem; flex-shrink: 0; }
@@ -280,11 +289,15 @@
       font-size: .8rem; color: var(--text-dim);
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
-    .client-addr-line {
-      font-size: .75rem; color: var(--text-faint);
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-      margin-top: .1rem;
-    }
+   .client-addr-line {
+  font-size: .75rem;
+  color: var(--text-faint);
+  margin-top: .1rem;
+  line-height: 1.5;
+
+  white-space: normal;
+  word-break: break-word;
+}
     .btn-call {
       flex-shrink: 0; width: 38px; height: 38px; border-radius: 50%;
       background: rgba(37,211,102,.12); border: 1px solid rgba(37,211,102,.25);
@@ -437,6 +450,8 @@
     <button class="tab-btn active" data-tab="pendente"   role="tab">🔴 Pendentes</button>
     <button class="tab-btn"        data-tab="preparando" role="tab">🟡 Preparo</button>
     <button class="tab-btn"        data-tab="pronto"     role="tab">🟢 Prontos</button>
+    <button class="tab-btn" data-tab="historico">
+  📦 Histórico</button>
     <button class="tab-btn"        data-tab="todos"      role="tab">Todos</button>
   </div>
 
@@ -563,6 +578,7 @@ async function enterDashboard() {
   updateStats();
   renderOrders();
   subscribeRealtime();
+  requestNotificationPermission();
 }
 
 /* Loader */
@@ -620,22 +636,52 @@ function notifyNewOrder() {
   toast.classList.add('show');
   setTimeout(() => toast.classList.remove('show'), 3500);
 }
+if (Notification.permission === 'granted') {
+  new Notification('Novo pedido 🍣', {
+    body: 'Você recebeu um novo pedido.',
+    icon: '/icons/icon-192.png'
+  });
+}
 
 function beep() {
   try {
-    const ctx  = new AudioContext();
-    const osc  = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(880, ctx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(660, ctx.currentTime + 0.15);
-    gain.gain.setValueAtTime(0.25, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
-    osc.start(ctx.currentTime);
-    osc.stop(ctx.currentTime + 0.4);
-  } catch (_) {}
+    const ctx = new AudioContext();
+
+    const playTone = (freq, start, duration) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+
+      gain.gain.setValueAtTime(0.001, start);
+      gain.gain.exponentialRampToValueAtTime(0.18, start + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.001, start + duration);
+
+      osc.start(start);
+      osc.stop(start + duration);
+    };
+
+    const now = ctx.currentTime;
+
+    playTone(880, now, 0.25);
+    playTone(660, now + 0.25, 0.25);
+    playTone(990, now + 0.5, 0.35);
+
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+async function requestNotificationPermission() {
+  if ('Notification' in window) {
+    if (Notification.permission !== 'granted') {
+      await Notification.requestPermission();
+    }
+  }
 }
 
 /* ── Stats ── */
@@ -664,9 +710,12 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
 function renderOrders() {
   const list = $('ordersList');
 
-  const filtered = activeTab === 'todos'
-    ? orders
-    : orders.filter(o => o.status === activeTab);
+  const filtered =
+  activeTab === 'todos'
+    ? orders.filter(o => o.status !== 'entregue')
+    : activeTab === 'historico'
+      ? orders.filter(o => o.status === 'entregue')
+      : orders.filter(o => o.status === activeTab);
 
   if (!filtered.length) {
     list.innerHTML = `
