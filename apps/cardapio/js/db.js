@@ -65,24 +65,29 @@ export async function syncProfile() {
 // ── Salvar pedido no Supabase ────────────────────
 // Inclui dados do cliente para o dashboard admin ver
 // sem precisar fazer join com profiles.
-export async function saveOrder(cart, total) {
+export async function saveOrder(cart, total, payMethod, trocoVal) {
   const db       = getSupabase();
   const deviceId = getDeviceId();
   const user     = _getUserLocal();
 
+  const row = {
+    device_id:      deviceId,
+    client_name:    user?.name    || null,
+    client_phone:   user?.phone   || null,
+    client_address: user?.address || null,
+    items:          cart,
+    total:          total,
+    whatsapp_sent:  true,
+    status:         'pendente',
+  };
+
+  if (payMethod) row.payment_method = payMethod;
+  if (payMethod === 'dinheiro' && trocoVal) row.troco_para = Number(trocoVal);
+
   try {
     const { data, error } = await db
       .from('orders')
-      .insert({
-        device_id:      deviceId,
-        client_name:    user?.name    || null,
-        client_phone:   user?.phone   || null,
-        client_address: user?.address || null,
-        items:          cart,
-        total:          total,
-        whatsapp_sent:  true,
-        status:         'pendente',
-      })
+      .insert(row)
       .select('id')
       .single();
 
