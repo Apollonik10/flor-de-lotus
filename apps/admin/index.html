@@ -333,6 +333,14 @@
       white-space: normal;
     }
 
+    .order-datetime {
+      font-size: 0.8rem;
+      color: #888;
+      margin-bottom: 0.5rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid #303030;
+    }
+
     .order-total {
       font-size: 1.2rem;
       font-weight: bold;
@@ -610,13 +618,26 @@
       showLoading(true);
       try {
         const data = await db.select('orders?select=*&order=created_at.desc');
+        console.log('[loadOrders] Raw data from Supabase:', data);
+        
         if (Array.isArray(data)) {
-          orders = data;
+          orders = data.map(o => {
+            // Debug: log primeiro pedido para entender estrutura
+            if (orders.length === 0) {
+              console.log('[loadOrders] First order structure:', o);
+              console.log('[loadOrders] Items field:', o.items, 'Type:', typeof o.items);
+            }
+            return o;
+          });
+          
           updateStats();
           renderOrders();
         } else if (data.error) {
           showError(`Erro ao carregar pedidos: ${data.error.message}`);
           console.error('[loadOrders] Supabase error:', data.error);
+        } else {
+          console.warn('[loadOrders] Unexpected data format:', data);
+          showError('Formato de dados inesperado do servidor');
         }
       } catch (err) {
         showError('Erro ao conectar ao servidor');
@@ -686,6 +707,39 @@
       renderOrders();
     }
 
+    function formatDateTime(isoString) {
+      if (!isoString) return 'Data desconhecida';
+      try {
+        const date = new Date(isoString);
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        return `${day}/${month}/${year} às ${hours}:${minutes}`;
+      } catch (e) {
+        return 'Data inválida';
+      }
+    }
+
+    function parseItems(itemsData) {
+      // Se items for string JSON, fazer parse
+      if (typeof itemsData === 'string') {
+        try {
+          return JSON.parse(itemsData);
+        } catch (e) {
+          console.warn('[parseItems] Failed to parse items string:', itemsData, e);
+          return [];
+        }
+      }
+      // Se for array, retornar direto
+      if (Array.isArray(itemsData)) {
+        return itemsData;
+      }
+      // Senão, retornar vazio
+      return [];
+    }
+
     function renderOrders() {
       let filtered = orders;
 
@@ -711,7 +765,19 @@
         return;
       }
 
-      container.innerHTML = filtered.map(o => `
+      container.innerHTML = filtered.map(o => {
+        const items = parseItems(o.items);
+        const itemsHTML = items.length > 0 
+          ? items.map(item => `
+              <div class="order-item">
+                <span class="order-item-qty">${item.quantity}x</span>
+                <span class="order-item-name">${item.name || 'Item sem nome'}</span>
+                <span class="order-item-price">${item.price ? `R$ ${(item.price * item.quantity).toFixed(2)}` : ''}</span>
+              </div>
+            `).join('')
+          : '<div class="order-item"><span style="color: #888;">Nenhum item</span></div>';
+
+        return `
         <div class="order-card">
           <div class="order-header">
             <div>
@@ -722,6 +788,10 @@
             <span class="order-status ${o.status}">${o.status}</span>
           </div>
 
+          <div class="order-datetime">
+            🕐 ${formatDateTime(o.created_at)}
+          </div>
+
           <div class="order-address">
             <strong>📍 Endereço:</strong><br/>
             ${o.client_address || 'Não informado'}
@@ -729,13 +799,7 @@
 
           <div class="order-items">
             <strong>🍜 Itens:</strong>
-            ${(o.items || []).map(item => `
-              <div class="order-item">
-                <span class="order-item-qty">${item.quantity}x</span>
-                <span class="order-item-name">${item.name}</span>
-                <span class="order-item-price">${item.price ? `R$ ${(item.price * item.quantity).toFixed(2)}` : ''}</span>
-              </div>
-            `).join('')}
+            ${itemsHTML}
           </div>
 
           ${o.special_notes ? `
@@ -756,7 +820,8 @@
             ${o.status !== 'entregue' ? `<button class="order-actions button btn-remove" onclick="removeOrder('${o.id}')">🗑️ Remover</button>` : ''}
           </div>
         </div>
-      `).join('');
+      `;
+      }).join('');
     }
 
     // ============ NOTIFICATIONS ============
