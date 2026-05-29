@@ -504,6 +504,10 @@
       </div>
     </div>
     <div class="header-actions">
+      <button class="btn" id="btnInstall" title="Instalar App" style="display:none"
+              onclick="window._installPWA && window._installPWA()">
+        <i class="fas fa-download"></i>
+      </button>
       <button class="btn" onclick="refreshOrders()" title="Atualizar">
         <i class="fas fa-rotate-right"></i>
       </button>
@@ -572,6 +576,18 @@
   let pollTimer = null;
   let alarmTimer = null;
   let knownIds  = new Set();
+  let _audioCtx = null;   /* singleton AudioContext */
+
+  /* Desbloqueia AudioContext na primeira interação do usuário */
+  function _unlockAudio() {
+    if (_audioCtx) return;
+    _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (_audioCtx.state === 'suspended') _audioCtx.resume();
+    document.removeEventListener('click', _unlockAudio);
+    document.removeEventListener('touchend', _unlockAudio);
+  }
+  document.addEventListener('click',    _unlockAudio, { once: true });
+  document.addEventListener('touchend', _unlockAudio, { once: true });
 
   const $ = id => document.getElementById(id);
 
@@ -728,6 +744,7 @@
 
     const oldStatus = order.status;
     order.status = newStatus;
+    updateStats();   /* ← atualiza contadores imediatamente */
     renderOrders();
 
     const { error } = await supabase
@@ -737,6 +754,7 @@
 
     if (error) {
       order.status = oldStatus;
+      updateStats();
       renderOrders();
       showError(`Erro ao atualizar: ${error.message}`);
     } else {
@@ -932,11 +950,18 @@
 
   function playChime() {
     try {
-      const ctx = new (window.AudioContext || window.webkitAudioContext)();
-      if (ctx.state === 'suspended') ctx.resume();
+      const ctx = _audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+      if (!_audioCtx) _audioCtx = ctx;
+
+      /* Se ainda suspenso (ex: iOS antes de gesto) tenta desbloquear e agenda */
+      if (ctx.state === 'suspended') {
+        ctx.resume().then(() => playChime());
+        return;
+      }
+
       const t = ctx.currentTime;
 
-      function note(freq, start, dur, gain = 0.45) {
+      function note(freq, start, dur, gain = 0.5) {
         const osc = ctx.createOscillator();
         const env = ctx.createGain();
         osc.connect(env); env.connect(ctx.destination);
@@ -948,9 +973,9 @@
         osc.start(start); osc.stop(start + dur + 0.05);
       }
 
-      note(880, t,       0.15, 0.5);
-      note(880, t + 0.2, 0.15, 0.5);
-      note(1175,t + 0.4, 0.3,  0.5);
+      note(880,  t,       0.15, 0.55);
+      note(880,  t + 0.2, 0.15, 0.55);
+      note(1175, t + 0.4, 0.3,  0.55);
     } catch (e) { /* silencia */ }
   }
 
@@ -980,19 +1005,35 @@
     } catch (e) { /* silencia */ }
   }
 
-  /* ═══════════════ SERVICE WORKER ═══════════════ */
+  /* ═══════════════ SERVICE WORKER + PWA INSTALL ═══════════════ */
   function registerServiceWorker() {
     if (!('serviceWorker' in navigator)) return;
     navigator.serviceWorker.register('./admin-sw.js')
-      .then(reg => {
-        if ('periodicSync' in reg) {
-          reg.periodicSync.register('fl-check-orders', {
-            minInterval: 15 * 60 * 1000,
-          }).catch(() => {});
-        }
-      })
       .catch(err => console.warn('[SW]', err));
   }
+
+  /* Captura prompt de instalação PWA */
+  let _installPrompt = null;
+  window.addEventListener('beforeinstallprompt', e => {
+    e.preventDefault();
+    _installPrompt = e;
+    const btn = $('btnInstall');
+    if (btn) btn.style.display = '';
+  });
+  window._installPWA = async function() {
+    if (!_installPrompt) return;
+    const result = await _installPrompt.prompt();
+    if (result.outcome === 'accepted') {
+      const btn = $('btnInstall');
+      if (btn) btn.style.display = 'none';
+      _installPrompt = null;
+    }
+  };
+  window.addEventListener('appinstalled', () => {
+    const btn = $('btnInstall');
+    if (btn) btn.style.display = 'none';
+    _installPrompt = null;
+  });
 
   /* ═══════════════ UTILS ═══════════════ */
   window.removeOrder = function(id) {
