@@ -149,13 +149,75 @@ export function renderCartDrawer() {
       </div>
     </div>
   `).join('');
+
+  /* ── Renderiza seletor de pagamento ── */
+  _renderPaymentSelector();
 }
+
+/* Injeta/atualiza o seletor de pagamento no cart-summary */
+function _renderPaymentSelector() {
+  const summaryEl = dom.cartSummary();
+  if (!summaryEl) return;
+
+  /* Evita duplicar */
+  if (summaryEl.querySelector('.payment-selector')) return;
+
+  const ps = document.createElement('div');
+  ps.className = 'payment-selector';
+  ps.innerHTML = `
+    <p class="payment-label">💳 Forma de pagamento</p>
+    <div class="payment-options">
+      <button class="pay-btn" data-pay="cartao" onclick="window._selectPayment('cartao',this)">
+        <i class="fas fa-credit-card"></i> Cartão
+      </button>
+      <button class="pay-btn" data-pay="pix" onclick="window._selectPayment('pix',this)">
+        <i class="fas fa-qrcode"></i> Pix
+      </button>
+      <button class="pay-btn" data-pay="dinheiro" onclick="window._selectPayment('dinheiro',this)">
+        <i class="fas fa-money-bill-wave"></i> Dinheiro
+      </button>
+    </div>
+    <div class="troco-wrap" id="trocoWrap" style="display:none">
+      <label class="troco-label" for="trocoInput">Precisa de troco para quanto?</label>
+      <input id="trocoInput" class="troco-input" type="number" min="0" step="0.01"
+             placeholder="Ex: 50,00" inputmode="decimal" />
+    </div>
+  `;
+
+  /* Insere antes do botão WhatsApp */
+  const waBtn = summaryEl.querySelector('.btn-order-wa') || summaryEl.querySelector('#btnOrderWa');
+  summaryEl.insertBefore(ps, waBtn);
+
+  /* Restaura seleção anterior se existia */
+  const saved = window._FL_PAYMENT;
+  if (saved) window._selectPayment(saved, summaryEl.querySelector(`[data-pay="${saved}"]`));
+}
+
+/* ── Seleciona forma de pagamento (global) ── */
+window._FL_PAYMENT = null;
+window._selectPayment = function(method, btn) {
+  window._FL_PAYMENT = method;
+  /* Destaca botão ativo */
+  document.querySelectorAll('.pay-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  /* Mostra/oculta campo de troco */
+  const wrap = document.getElementById('trocoWrap');
+  if (wrap) wrap.style.display = method === 'dinheiro' ? 'block' : 'none';
+};
 
 /* ── Enviar pedido WhatsApp ── */
 export async function sendOrderWhatsApp() {
   if (!state.cart.length) return;
 
   const total = state.cart.reduce((s, c) => s + c.preco * c.qty, 0);
+
+  /* ── Pagamento ── */
+  const payMethod  = window._FL_PAYMENT;
+  const trocoVal   = document.getElementById('trocoInput')?.value;
+  const payLabels  = { cartao: '💳 Cartão', pix: '🟣 Pix', dinheiro: '💵 Dinheiro' };
+  const pagamento  = payMethod
+    ? `*Pagamento:* ${payLabels[payMethod] || payMethod}${payMethod === 'dinheiro' && trocoVal ? ` (troco para R$ ${trocoVal})` : ''}`
+    : '';
 
   /* ── Linhas do pedido ── */
   const lines = state.cart.map(c => {
@@ -184,6 +246,7 @@ export async function sendOrderWhatsApp() {
     '',
     `*Total: R$ ${formatPrice(total)}*`,
     '',
+    pagamento,
     endereco, alergia, notas, semEnd,
   ]
     .filter(Boolean)
@@ -195,11 +258,14 @@ export async function sendOrderWhatsApp() {
   /* ── 1. Salva no Supabase (aguarda para pegar o ID) ── */
   let orderId = null;
   try {
-    orderId = await saveOrder(cartSnapshot, total);
+    orderId = await saveOrder(cartSnapshot, total, payMethod, trocoVal);
     if (!orderId) console.warn('[cart] saveOrder retornou null — verifique RLS no Supabase');
   } catch (err) {
     console.warn('[cart] saveOrder falhou:', err.message);
   }
+
+  /* Reseta pagamento */
+  window._FL_PAYMENT = null;
 
   /* ── 2. Abre WhatsApp ── */
   window.open(
