@@ -14,7 +14,7 @@ import { getSupabase } from './db.js';
 import { formatPrice }  from './utils.js';
 
 const STORAGE_KEY   = 'fl_active_order';
-const POLL_INTERVAL = 30_000;   // 30s fallback
+const POLL_INTERVAL = 5_000;    // 5s fallback (garante atualização rápida)
 const MAX_ORDER_AGE = 8 * 3600_000;   // 8h
 const DELIVERED_TTL = 2 * 3600_000;   // 2h após entregue
 
