@@ -12,29 +12,28 @@ A mobile-first Progressive Web App (PWA) digital menu for Flor de Lótus, a Japa
 ## Project Structure
 ```
 /
-├── index.html              # Landing/marketing page (redirects to PWA if returning user)
-├── server.js               # Node.js static file server (port 5000)
-├── pwa/
-│   ├── index.html          # Main PWA app shell
-│   ├── register.html       # User registration page
-│   ├── app.js              # App bootstrap (imports all modules)
-│   ├── styles.css          # Main stylesheet
-│   ├── menu.json           # Menu data
-│   ├── manifest.json       # PWA manifest
-│   ├── service-worker.js   # Service worker (caching strategies)
-│   ├── js/                 # ES module components
-│   │   ├── api.js, state.js, render.js, events.js
-│   │   ├── cart.js, favorites.js, loyalty.js, profile.js
-│   │   ├── modal.js, toast.js, utils.js, sw.js, install.js
-│   └── icons/              # PWA icons (192, 512, maskable, favicon)
-├── page-lotus/
-│   └── assets/images/      # Food/product images
+├── index.html              # Landing/marketing page
+├── server.js               # Node.js static file server
+├── service-worker.js       # Root Service worker
+├── apps/
+│   ├── cardapio/           # Main PWA app shell
+│   │   ├── index.html
+│   │   ├── register.html
+│   │   ├── app.js
+│   │   ├── styles.css
+│   │   ├── manifest.json
+│   │   ├── js/             # ES module components
+│   │   └── icons/          # PWA icons
+│   └── admin/              # Admin dashboard
+├── public/
+│   ├── assets/images/      # Food/product images
+│   └── menu.json           # Menu data
 ```
 
 ## URL Structure
 All content is served under the `/flor-de-lotus/` base path:
 - Landing page: `/flor-de-lotus/index.html`
-- PWA app: `/flor-de-lotus/pwa/index.html`
+- PWA app: `/flor-de-lotus/apps/cardapio/index.html`
 - Root `/` redirects to `/flor-de-lotus/index.html`
 
 ## Features

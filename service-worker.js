@@ -73,7 +73,7 @@ self.addEventListener('fetch', e => {
   if (req.destination === 'image') {
     e.respondWith(
       cacheFirst(req, CACHE_DYN).catch(() =>
-        caches.match('/flor-de-lotus/pwa/icons/fundo1.png')
+        caches.match('/flor-de-lotus/public/assets/images/fundo1.png')
       )
     );
     return;
