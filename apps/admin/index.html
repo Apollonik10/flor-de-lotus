@@ -483,8 +483,10 @@
     <input type="password" id="pin2" maxlength="1" inputmode="numeric" />
     <input type="password" id="pin3" maxlength="1" inputmode="numeric" />
     <input type="password" id="pin4" maxlength="1" inputmode="numeric" />
+    <input type="password" id="pin5" maxlength="1" inputmode="numeric" />
+    <input type="password" id="pin6" maxlength="1" inputmode="numeric" />
   </div>
-  <button class="pin-btn" onclick="verifyPin()">Entrar</button>
+  <button class="pin-btn" id="btnVerify" onclick="verifyPin()">Entrar</button>
   <p class="pin-error" id="pinError"></p>
 </div>
 
@@ -563,10 +565,14 @@
   /* ═══════════════ CONFIG ═══════════════ */
   const SUPABASE_URL  = 'https://aflglnnruovheztrqneg.supabase.co';
   const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFmbGdsbm5ydW92aGV6dHJxbmVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMDAwNjUsImV4cCI6MjA5Mzg3NjA2NX0.2LOqKN-SX52PbhBtLZA4cHpmjnj3hnOb9qz2N1ROYdU';
-  const ADMIN_PIN     = '1234';
+  const ADMIN_EMAIL   = 'admin@flordelotus.com';
 
   const supabase = createClient(SUPABASE_URL, SUPABASE_ANON, {
-    auth: { persistSession: false },
+    auth: { 
+      persistSession: true,
+      autoRefreshToken: true,
+      storageKey: 'fl_admin_session'
+    },
   });
 
   /* ═══════════════ STATE ═══════════════ */
@@ -576,44 +582,62 @@
   let pollTimer = null;
   let alarmTimer = null;
   let knownIds  = new Set();
-  let _audioCtx = null;   /* singleton AudioContext */
-
-  /* Desbloqueia AudioContext na primeira interação do usuário */
-  function _unlockAudio() {
-    if (_audioCtx) return;
-    _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    if (_audioCtx.state === 'suspended') _audioCtx.resume();
-    document.removeEventListener('click', _unlockAudio);
-    document.removeEventListener('touchend', _unlockAudio);
-  }
-  document.addEventListener('click',    _unlockAudio, { once: true });
-  document.addEventListener('touchend', _unlockAudio, { once: true });
+  let _audioCtx = null;
 
   const $ = id => document.getElementById(id);
 
-  /* ═══════════════ PIN ═══════════════ */
-  window.verifyPin = function() {
-    const pin = ['pin1','pin2','pin3','pin4'].map(id => $(id).value).join('');
-    if (pin === ADMIN_PIN) {
+  /* ═══════════════ AUTH CHECK ═══════════════ */
+  async function checkSession() {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) {
       enterDashboard();
-    } else {
-      $('pinError').textContent = 'PIN incorreto. Tente novamente.';
-      ['pin1','pin2','pin3','pin4'].forEach(id => { $(id).value = ''; });
-      $('pin1').focus();
+    }
+  }
+
+  /* ═══════════════ PIN ═══════════════ */
+  window.verifyPin = async function() {
+    const pin = ['pin1','pin2','pin3','pin4','pin5','pin6'].map(id => $(id).value).join('');
+    if (pin.length < 6) return;
+
+    const btn = $('btnVerify');
+    const err = $('pinError');
+    
+    btn.disabled = true;
+    btn.textContent = 'Verificando...';
+    err.textContent = '';
+
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: ADMIN_EMAIL,
+        password: pin
+      });
+
+      if (error) {
+        err.textContent = 'PIN incorreto ou erro de acesso.';
+        ['pin1','pin2','pin3','pin4','pin5','pin6'].forEach(id => { $(id).value = ''; });
+        $('pin1').focus();
+      } else {
+        enterDashboard();
+      }
+    } catch (e) {
+      err.textContent = 'Erro de conexão.';
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Entrar';
     }
   };
 
   /* Auto-advance PIN inputs */
-  ['pin1','pin2','pin3','pin4'].forEach((id, i, arr) => {
+  ['pin1','pin2','pin3','pin4','pin5','pin6'].forEach((id, i, arr) => {
     const el = $(id);
     if (!el) return;
     el.addEventListener('keyup', e => {
       if (e.key === 'Backspace') {
         el.value = '';
         if (i > 0) $(arr[i-1]).focus();
-      } else if (el.value && i < 3) {
+      } else if (el.value && i < 5) {
         $(arr[i+1]).focus();
-      } else if (el.value && i === 3) {
+      } else if (el.value && i === 5) {
         window.verifyPin();
       }
     });
@@ -1046,13 +1070,14 @@
   };
 
   window.refreshOrders = loadOrders;
-  window.logout = function() {
+  window.logout = async function() {
     if (!confirm('Sair do painel?')) return;
     clearInterval(pollTimer);
     if (rtChannel) supabase.removeChannel(rtChannel);
+    await supabase.auth.signOut();
     $('dashboard').style.display = 'none';
     $('pinScreen').style.display = 'flex';
-    ['pin1','pin2','pin3','pin4'].forEach(id => { $(id).value = ''; });
+    ['pin1','pin2','pin3','pin4','pin5','pin6'].forEach(id => { $(id).value = ''; });
     $('pin1').focus();
   };
 
@@ -1081,6 +1106,7 @@
   window.switchTabByName = window.switchTabByName;
 
   /* Init */
+  checkSession();
   $('pin1').focus();
 </script>
 </body>
