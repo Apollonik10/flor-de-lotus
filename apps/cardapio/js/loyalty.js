@@ -3,8 +3,10 @@
 /* ═══════════════════════════════════════════════════
    loyalty.js — Cartão Fidelidade
    · A cada 10 pedidos ≥ R$50 → gift card de R$50
-   · Tudo em localStorage (sem backend)
+   · Tudo em localStorage (com sync Supabase)
 ═══════════════════════════════════════════════════ */
+
+import { getDeviceId, fetchLoyalty, syncLoyalty } from './db.js';
 
 const ORDERS_KEY      = 'fl_orders';
 const GIFTS_KEY       = 'fl_gift_cards';
@@ -12,19 +14,86 @@ const MIN_VALUE       = 50;
 const ORDERS_PER_GIFT = 10;
 const GIFT_VALUE      = 50;
 
+/* ── Inicialização: Sincroniza Supabase → LocalStorage ── */
+export async function initLoyalty() {
+  const deviceId = getDeviceId();
+  const remote = await fetchLoyalty(deviceId);
+
+  if (!remote) {
+    // Se não tem nada remoto, mas tem local, sobe pro Supabase
+    const localOrders = getOrders();
+    const localGifts  = getGiftCards();
+    if (localOrders.length > 0 || localGifts.length > 0) {
+      await syncLoyalty(localOrders, localGifts);
+    }
+    return;
+  }
+
+  let localOrders = getOrders();
+  let localGifts  = getGiftCards();
+  let changed     = false;
+
+  // 1. Sincroniza Pedidos (pelo contador)
+  if (remote.total_orders > localOrders.length) {
+    const diff = remote.total_orders - localOrders.length;
+    for (let i = 0; i < diff; i++) {
+      localOrders.push({
+        id:    'sync-' + Date.now() + '-' + i,
+        valor: MIN_VALUE,
+        data:  new Date().toISOString(),
+        synced: true
+      });
+    }
+    localStorage.setItem(ORDERS_KEY, JSON.stringify(localOrders));
+    changed = true;
+  }
+
+  // 2. Sincroniza Gift Cards (merge pelo código)
+  const remoteGifts = remote.gift_cards || [];
+  remoteGifts.forEach(rg => {
+    const idx = localGifts.findIndex(lg => lg.code === rg.code);
+    if (idx === -1) {
+      localGifts.push(rg);
+      changed = true;
+    } else {
+      // Se o remoto diz que foi usado, atualiza local
+      if (rg.usado && !localGifts[idx].usado) {
+        localGifts[idx].usado = true;
+        changed = true;
+      }
+    }
+  });
+
+  if (changed) {
+    localStorage.setItem(GIFTS_KEY, JSON.stringify(localGifts));
+    renderLoyaltyBadge();
+  }
+
+  // Se local tem mais que o remoto, sincroniza local -> remoto
+  if (localOrders.length > remote.total_orders || localGifts.length > remoteGifts.length) {
+    await syncLoyalty(localOrders, localGifts);
+  }
+}
+
 /* ── Registra pedido e retorna gift card se gerado ── */
 export function recordOrder(total) {
   if (total < MIN_VALUE) return null;
 
   const orders = getOrders();
-  orders.push({
+  const newOrder = {
     id:    Date.now(),
     valor: total,
     data:  new Date().toISOString(),
-  });
+  };
+  orders.push(newOrder);
   localStorage.setItem(ORDERS_KEY, JSON.stringify(orders));
 
-  return checkAndGenerateGift(orders);
+  const gift = checkAndGenerateGift(orders);
+
+  // Sync imediato
+  syncLoyalty(orders, getGiftCards()).catch(() => {});
+
+  return gift;
 }
 
 /* ── Status atual da fidelidade ── */

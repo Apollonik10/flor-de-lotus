@@ -5,12 +5,12 @@
 ════════════════════════════════════════════════════ */
 
 import { loadPersistedData }              from './js/state.js';
-import { fetchMenu, checkStoreStatus }    from './js/api.js';
+import { fetchMenu, checkStoreStatus, subscribeToRealtimeUpdates } from './js/api.js';
 import { renderFilterBar, renderContent } from './js/render.js';
 import { bindGlobalEvents }               from './js/events.js';
 import { registerSW }                     from './js/sw.js';
-import { changeCartQty, closeCartDrawer } from './js/cart.js';
-import { renderLoyaltyBadge }             from './js/loyalty.js';
+import { changeCartQty, closeCartDrawer, updateCartUI } from './js/cart.js';
+import { renderLoyaltyBadge, initLoyalty }             from './js/loyalty.js';
 import {
   openProfileDrawer,
   closeProfileDrawer,
@@ -38,6 +38,8 @@ async function init() {
 
   renderFilterBar();
   renderContent();
+  updateCartUI();
+  renderProfileDrawer();
 
   // Ativa Realtime para atualizações dinâmicas
   subscribeToRealtimeUpdates((type, data) => {
@@ -59,6 +61,9 @@ async function init() {
 
   renderLoyaltyBadge();
   updateFavBadge();
+
+  // Sincroniza fidelidade (Supabase)
+  initLoyalty().catch(() => {});
 
   // Verifica se há pedido ativo do localStorage (mostra FAB se sim)
   checkActiveOrder();

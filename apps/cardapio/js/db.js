@@ -124,6 +124,27 @@ export async function syncLoyalty(orders, giftCards) {
   }
 }
 
+// ── Recuperar fidelidade ────────────────────────
+export async function fetchLoyalty(deviceId) {
+  const db = getSupabase();
+  try {
+    const { data, error } = await db
+      .from('loyalty')
+      .select('total_orders, gift_cards')
+      .eq('device_id', deviceId)
+      .maybeSingle();
+
+    if (error) {
+      console.warn('[db] fetchLoyalty:', error.message);
+      return null;
+    }
+    return data;
+  } catch (e) {
+    console.warn('[db] fetchLoyalty offline:', e.message);
+    return null;
+  }
+}
+
 // ── Helper interno ───────────────────────────────
 function _getUserLocal() {
   try { return JSON.parse(localStorage.getItem('fl_user') || 'null'); }

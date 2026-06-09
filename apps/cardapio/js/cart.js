@@ -11,14 +11,11 @@ import { showToast }               from './toast.js';
 
 import {
   recordOrder,
-  renderLoyaltyBadge,
-  getOrders,
-  getGiftCards
+  renderLoyaltyBadge
 } from './loyalty.js';
 
 import {
-  saveOrder,
-  syncLoyalty
+  saveOrder
 } from './db.js';
 
 import { showOrderTracking } from './order-tracking.js';
@@ -277,9 +274,6 @@ export async function sendOrderWhatsApp() {
   /* ── 3. Fidelidade ── */
   const gift = recordOrder(total);
   renderLoyaltyBadge();
-  syncLoyalty(getOrders(), getGiftCards()).catch(err =>
-    console.warn('[cart] syncLoyalty:', err.message)
-  );
 
   /* ── 4. Limpa carrinho ── */
   state.cart = [];
