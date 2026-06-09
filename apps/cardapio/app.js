@@ -24,7 +24,17 @@ import { checkActiveOrder, reopenTracking, closeOrderTracking, cancelOrder } fro
 async function init() {
   loadPersistedData();
 
-  await fetchMenu();
+  // Busca menu e status da loja em paralelo
+  const [menuRes, store] = await Promise.all([
+    fetchMenu(),
+    checkStoreStatus()
+  ]);
+
+  if (!store.is_open) {
+    import('./js/toast.js').then(m => {
+      m.showToast(`🌙 No momento estamos fechados. ${store.reason || ''}`, 'warning', 6000);
+    });
+  }
 
   renderFilterBar();
   renderContent();
