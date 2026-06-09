@@ -5,7 +5,7 @@
 ════════════════════════════════════════════════════ */
 
 import { loadPersistedData }              from './js/state.js';
-import { fetchMenu }                      from './js/api.js';
+import { fetchMenu, checkStoreStatus }    from './js/api.js';
 import { renderFilterBar, renderContent } from './js/render.js';
 import { bindGlobalEvents }               from './js/events.js';
 import { registerSW }                     from './js/sw.js';
