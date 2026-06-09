@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Admin — Flor de Lótus</title>
 
-  <!-- PWA Manifest corrigido -->
   <link rel="manifest" href="./admin-manifest.json" />
   <meta name="theme-color" content="#d98f7a" />
   <meta name="description" content="Painel de pedidos — Flor de Lótus Delivery" />
@@ -14,11 +13,9 @@
   <meta name="apple-mobile-web-app-title" content="Admin Lótus" />
   <meta name="mobile-web-app-capable" content="yes" />
 
-  <!-- Icons -->
   <link rel="icon" type="image/jpeg" href="./mascot-icon.jpg" />
   <link rel="apple-touch-icon" href="./mascot-icon.jpg" />
 
-  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -41,6 +38,8 @@
       --text-dim:    #555550;
       --shadow:      rgba(0,0,0,0.6);
       --glow:        rgba(217,143,122,0.18);
+      --green:       #4caf50;
+      --red:         #ff6b6b;
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -149,6 +148,7 @@
     .header-subtitle {
       font-size: 0.75rem; color: var(--text-muted);
       margin-top: -2px;
+      display: flex; align-items: center; gap: 6px;
     }
 
     .header-actions { display: flex; gap: 0.5rem; align-items: center; }
@@ -158,8 +158,15 @@
       background: #3c3c3c; transition: background 0.3s;
       flex-shrink: 0;
     }
-    .realtime-dot.connected { background: #4caf50; box-shadow: 0 0 6px #4caf5088; }
-    .realtime-dot.error     { background: #ff6b6b; }
+    .realtime-dot.connected { background: var(--green); box-shadow: 0 0 6px #4caf5088; }
+    .realtime-dot.error     { background: var(--red); }
+
+    .store-badge {
+      font-size: 0.65rem; padding: 2px 6px; border-radius: 4px;
+      font-weight: 700; text-transform: uppercase;
+    }
+    .store-badge.open { background: #1a3320; color: var(--green); }
+    .store-badge.closed { background: #3d1a14; color: #ff9f8a; }
 
     /* ═══════════════════════ LAYOUT ═══════════════════════ */
     #dashboard { display: none; }
@@ -228,14 +235,17 @@
       font-size: 0.7rem; font-weight: 700; margin-left: 6px;
     }
 
-    /* ═══════════════════════ ORDERS GRID ═══════════════════════ */
+    /* ═══════════════════════ SECTIONS ═══════════════════════ */
+    .section-content { display: none; }
+    .section-content.active { display: block; }
+
+    /* ═══════════════════════ ORDERS ═══════════════════════ */
     .orders-container {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
       gap: 1rem;
     }
 
-    /* ═══════════════════════ ORDER CARD ═══════════════════════ */
     .order-card {
       background: var(--bg3);
       border: 1px solid var(--border);
@@ -259,221 +269,122 @@
       align-items: flex-start; gap: 1rem;
     }
 
-    .order-summary:hover { background: rgba(255,255,255,0.03); }
-
     .order-summary-left { flex: 1; min-width: 0; }
+    .order-meta { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem; flex-wrap: wrap; }
+    .order-id { font-size: 0.78rem; color: var(--text-muted); font-family: 'Outfit', monospace; letter-spacing: 0.05em; }
+    .order-time { font-size: 0.75rem; color: var(--text-dim); }
+    .order-client-name { font-size: 1rem; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .order-phone { font-size: 0.8rem; color: var(--text-muted); margin-top: 2px; }
 
-    .order-meta {
-      display: flex; align-items: center; gap: 0.5rem;
-      margin-bottom: 0.35rem; flex-wrap: wrap;
-    }
-
-    .order-id {
-      font-size: 0.78rem; color: var(--text-muted);
-      font-family: 'Outfit', monospace; letter-spacing: 0.05em;
-    }
-
-    .order-time {
-      font-size: 0.75rem; color: var(--text-dim);
-    }
-
-    .order-client-name {
-      font-size: 1rem; font-weight: 600; color: var(--text);
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    }
-
-    .order-phone {
-      font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;
-    }
-
-    .order-summary-right {
-      display: flex; flex-direction: column;
-      align-items: flex-end; gap: 0.5rem; flex-shrink: 0;
-    }
-
-    .order-status {
-      padding: 0.3rem 0.75rem; border-radius: 20px;
-      font-size: 0.78rem; font-weight: 700;
-      text-transform: uppercase; letter-spacing: 0.05em;
-      white-space: nowrap;
-    }
+    .order-summary-right { display: flex; flex-direction: column; align-items: flex-end; gap: 0.5rem; flex-shrink: 0; }
+    .order-status { padding: 0.3rem 0.75rem; border-radius: 20px; font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap; }
     .order-status.pendente   { background: #3d1a14; color: #ff9f8a; }
     .order-status.preparando { background: #3a3310; color: #ffdd57; }
     .order-status.pronto     { background: #1a3320; color: #5cb85c; }
     .order-status.entregue   { background: #102535; color: #4dd0e1; }
+    .order-total-preview { font-size: 0.9rem; font-weight: 700; color: var(--pink-dark); }
 
-    .order-total-preview {
-      font-size: 0.9rem; font-weight: 700; color: var(--pink-dark);
-    }
-
-    .chevron-icon {
-      color: var(--text-dim); font-size: 0.8rem;
-      transition: transform 0.25s; margin-top: 2px;
-    }
-
+    .chevron-icon { color: var(--text-dim); font-size: 0.8rem; transition: transform 0.25s; margin-top: 2px; }
     .order-card.open .chevron-icon { transform: rotate(180deg); }
 
-    /* ── Body (collapsible) ── */
-    .order-body {
-      max-height: 0; overflow: hidden;
-      transition: max-height 0.3s ease;
-      border-top: 0 solid var(--border);
-    }
-
-    .order-card.open .order-body {
-      max-height: 800px;
-      border-top-width: 1px;
-    }
-
+    .order-body { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; border-top: 0 solid var(--border); }
+    .order-card.open .order-body { max-height: 800px; border-top-width: 1px; }
     .order-body-inner { padding: 1rem 1.25rem 1.25rem; }
 
-    .order-section {
-      background: var(--bg2); border-radius: 8px;
-      padding: 0.75rem; margin-bottom: 0.75rem; font-size: 0.88rem;
-    }
-
-    .order-section-label {
-      font-size: 0.72rem; text-transform: uppercase;
-      letter-spacing: 0.07em; color: var(--text-muted);
-      margin-bottom: 0.4rem; font-weight: 600;
-    }
-
-    .order-address-text { color: #bbb; word-break: break-word; }
-
-    /* Items list */
-    .item-row {
-      display: flex; align-items: baseline;
-      gap: 0.5rem; padding: 0.4rem 0;
-      border-bottom: 1px solid var(--border);
-    }
+    .order-section { background: var(--bg2); border-radius: 8px; padding: 0.75rem; margin-bottom: 0.75rem; font-size: 0.88rem; }
+    .order-section-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-muted); margin-bottom: 0.4rem; font-weight: 600; }
+    .item-row { display: flex; align-items: baseline; gap: 0.5rem; padding: 0.4rem 0; border-bottom: 1px solid var(--border); }
     .item-row:last-child { border-bottom: none; }
-
     .item-qty { color: var(--pink-dark); font-weight: 700; min-width: 28px; }
     .item-name { flex: 1; }
     .item-sabor { font-size: 0.78rem; color: var(--text-muted); }
     .item-price { color: var(--text-muted); font-size: 0.82rem; white-space: nowrap; }
+    .order-total-row { display: flex; justify-content: space-between; padding-top: 0.6rem; font-weight: 700; font-size: 1rem; color: var(--pink-dark); border-top: 1px solid var(--border2); margin-top: 0.4rem; }
+    .order-notes { font-size: 0.85rem; color: #bbb; border-left: 2px solid var(--pink-dark); padding-left: 0.75rem; }
 
-    .order-total-row {
-      display: flex; justify-content: space-between;
-      padding-top: 0.6rem; font-weight: 700; font-size: 1rem;
-      color: var(--pink-dark); border-top: 1px solid var(--border2);
-      margin-top: 0.4rem;
-    }
-
-    .order-notes {
-      font-size: 0.85rem; color: #bbb;
-      border-left: 2px solid var(--pink-dark);
-      padding-left: 0.75rem;
-    }
-
-    /* Actions */
-    .order-actions {
-      display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.75rem;
-    }
-
-    .order-actions button {
-      flex: 1; min-width: 100px;
-      padding: 0.6rem 0.75rem; border: none;
-      border-radius: 8px; cursor: pointer;
-      font-size: 0.85rem; font-weight: 600;
-      transition: all 0.2s; font-family: 'Outfit', sans-serif;
-    }
-
-    .btn-next-status  { background: var(--bg4); color: var(--text); }
-    .btn-next-status:hover { background: var(--pink-dark); color: var(--bg); }
-
-    .btn-pendente-action  { background: #3d1a14; color: #ff9f8a; }
-    .btn-pendente-action:hover { background: #ff9f8a; color: var(--bg); }
-
+    .order-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.75rem; }
+    .order-actions button { flex: 1; min-width: 100px; padding: 0.6rem 0.75rem; border: none; border-radius: 8px; cursor: pointer; font-size: 0.85rem; font-weight: 600; transition: all 0.2s; font-family: 'Outfit', sans-serif; }
+    .btn-pendente-action   { background: #3d1a14; color: #ff9f8a; }
     .btn-preparando-action { background: #3a3310; color: #ffdd57; }
-    .btn-preparando-action:hover { background: #ffdd57; color: var(--bg); }
-
-    .btn-pronto-action { background: #1a3320; color: #5cb85c; }
-    .btn-pronto-action:hover { background: #5cb85c; color: var(--bg); }
-
+    .btn-pronto-action     { background: #1a3320; color: #5cb85c; }
     .btn-remove { background: #2a1212; color: #ff8070; }
-    .btn-remove:hover { background: #ff8070; color: var(--bg); }
 
-    /* ═══════════════════════ GLOBAL BTNS ═══════════════════════ */
-    .btn {
-      padding: 0.5rem 1rem; background: var(--bg4);
-      color: var(--text); border: 1px solid var(--border2);
-      border-radius: 8px; cursor: pointer; font-weight: 600;
-      transition: all 0.2s; font-size: 0.85rem;
-      font-family: 'Outfit', sans-serif;
+    /* ═══════════════════════ PRODUCTS ═══════════════════════ */
+    .products-container {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem;
     }
+    .product-card {
+      background: var(--bg3); border: 1px solid var(--border); border-radius: 12px; overflow: hidden;
+      display: flex; flex-direction: column;
+    }
+    .product-img { width: 100%; aspect-ratio: 16/9; object-fit: cover; filter: brightness(0.8); }
+    .product-body { padding: 1rem; flex: 1; }
+    .product-name { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.25rem; }
+    .product-price { color: var(--pink-dark); font-weight: 700; margin-bottom: 0.5rem; }
+    .product-category { font-size: 0.7rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.75rem; }
+    .product-actions { display: flex; gap: 0.5rem; border-top: 1px solid var(--border); padding: 0.75rem; }
+    .btn-toggle { flex: 1; padding: 0.5rem; font-size: 0.75rem; border-radius: 6px; font-weight: 600; text-align: center; cursor: pointer; border: 1px solid var(--border); }
+    .btn-toggle.active { background: #1a3320; color: var(--green); border-color: var(--green); }
+    .btn-toggle.inactive { background: #3d1a14; color: #ff9f8a; border-color: #ff9f8a; }
+    .btn-edit-prod { padding: 0.5rem; background: var(--bg4); border-radius: 6px; color: var(--text); }
+
+    /* ═══════════════════════ CONFIG ═══════════════════════ */
+    .config-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 1.5rem;
+    }
+    .config-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 14px; padding: 1.25rem; }
+    .config-title { font-size: 1rem; font-weight: 600; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 10px; }
+    .config-title i { color: var(--pink-dark); }
+    
+    .status-toggle-wrap { display: flex; align-items: center; justify-content: space-between; background: var(--bg2); padding: 1rem; border-radius: 12px; margin-bottom: 1rem; }
+    .panic-btn { padding: 0.75rem 1.5rem; border-radius: 10px; font-weight: 700; cursor: pointer; transition: 0.2s; border: none; }
+    .panic-btn.open { background: var(--green); color: #000; }
+    .panic-btn.closed { background: var(--red); color: #000; }
+
+    .hours-grid { display: flex; flex-direction: column; gap: 0.5rem; }
+    .hour-row { display: grid; grid-template-columns: 100px 1fr 1fr 60px; align-items: center; gap: 10px; font-size: 0.85rem; padding: 6px 0; border-bottom: 1px solid var(--border); }
+    .hour-row:last-child { border-bottom: none; }
+    .hour-day { font-weight: 600; }
+    .hour-input { background: var(--bg2); border: 1px solid var(--border2); color: var(--text); padding: 4px; border-radius: 4px; font-size: 0.8rem; text-align: center; }
+    .hour-closed-check { justify-self: center; }
+
+    /* ═══════════════════════ GLOBAL ═══════════════════════ */
+    .btn { padding: 0.5rem 1rem; background: var(--bg4); color: var(--text); border: 1px solid var(--border2); border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.2s; font-size: 0.85rem; font-family: 'Outfit', sans-serif; }
     .btn:hover { background: var(--bg3); border-color: var(--pink-dark); }
+    .btn-primary { background: var(--pink-dark); color: var(--bg); border: none; }
     .btn-logout { color: var(--text-muted); }
 
-    /* ═══════════════════════ LOADING ═══════════════════════ */
-    .loading {
-      text-align: center; padding: 3rem 1rem; color: var(--text-muted);
-      grid-column: 1 / -1;
-    }
-    .spinner {
-      border: 3px solid var(--border2);
-      border-top: 3px solid var(--pink-dark);
-      border-radius: 50%; width: 32px; height: 32px;
-      animation: spin 0.8s linear infinite; margin: 0 auto 1rem;
-    }
+    .loading { text-align: center; padding: 3rem 1rem; color: var(--text-muted); grid-column: 1 / -1; }
+    .spinner { border: 3px solid var(--border2); border-top: 3px solid var(--pink-dark); border-radius: 50%; width: 32px; height: 32px; animation: spin 0.8s linear infinite; margin: 0 auto 1rem; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ═══════════════════════ EMPTY STATE ═══════════════════════ */
-    .empty-state {
-      grid-column: 1 / -1; text-align: center;
-      padding: 4rem 1rem; color: var(--text-muted);
-    }
+    .empty-state { grid-column: 1 / -1; text-align: center; padding: 4rem 1rem; color: var(--text-muted); }
     .empty-state i { font-size: 2.5rem; color: var(--border2); margin-bottom: 1rem; }
-    .empty-state p { font-size: 0.9rem; }
 
-    /* ═══════════════════════ TOASTS ═══════════════════════ */
-    .toast {
-      position: fixed; bottom: -120px; left: 50%;
-      transform: translateX(-50%);
-      padding: 0.9rem 1.5rem; border-radius: 10px;
-      box-shadow: 0 8px 30px var(--shadow);
-      z-index: 200; transition: bottom 0.3s cubic-bezier(.22,1,.36,1);
-      max-width: min(90vw, 400px); width: max-content;
-      font-size: 0.9rem; font-weight: 500;
-      display: flex; align-items: center; gap: 0.75rem;
-    }
+    .toast { position: fixed; bottom: -120px; left: 50%; transform: translateX(-50%); padding: 0.9rem 1.5rem; border-radius: 10px; box-shadow: 0 8px 30px var(--shadow); z-index: 200; transition: bottom 0.3s cubic-bezier(.22,1,.36,1); max-width: min(90vw, 400px); width: max-content; font-size: 0.9rem; font-weight: 500; display: flex; align-items: center; gap: 0.75rem; }
     .toast.show { bottom: 1.5rem; }
-
     .toast-new    { background: #1e1512; border: 1px solid var(--pink-dark); color: var(--pink-light); }
     .toast-error  { background: #2a1212; border: 1px solid #ff6b6b; color: #ffaaaa; }
     .toast-success { background: #122212; border: 1px solid #4caf50; color: #a5d6a7; }
 
-    /* ═══════════════════════ ALARM OVERLAY ═══════════════════════ */
-    .alarm-overlay {
-      position: fixed; inset: 0;
-      background: rgba(217,143,122,0.08);
-      pointer-events: none; z-index: 90;
-      animation: alarm-flash 0.8s ease infinite;
-      display: none;
-    }
+    .alarm-overlay { position: fixed; inset: 0; background: rgba(217,143,122,0.08); pointer-events: none; z-index: 90; animation: alarm-flash 0.8s ease infinite; display: none; }
     .alarm-overlay.active { display: block; }
+    @keyframes alarm-flash { 0%,100% { opacity: 0; } 50% { opacity: 1; } }
 
-    @keyframes alarm-flash {
-      0%,100% { opacity: 0; }
-      50%      { opacity: 1; }
-    }
-
-    /* ═══════════════════════ RESPONSIVE ═══════════════════════ */
     @media (max-width: 640px) {
       .stats { grid-template-columns: repeat(2, 1fr); }
-      .orders-container { grid-template-columns: 1fr; }
+      .orders-container, .products-container { grid-template-columns: 1fr; }
       .header-title { font-size: 1.1rem; }
       .tab { padding: 0.6rem 0.9rem; font-size: 0.82rem; }
       .stat-number { font-size: 1.5rem; }
+      .hour-row { grid-template-columns: 80px 1fr 1fr 40px; }
     }
   </style>
 </head>
 <body>
 
-<!-- Alarm overlay (flash visual) -->
 <div id="alarmOverlay" class="alarm-overlay"></div>
 
-<!-- ═══════════════ PIN SCREEN ═══════════════ -->
 <div id="pinScreen" class="pin-screen">
   <img src="./mascot-icon.jpg" alt="Mascote" class="pin-logo" />
   <h1>Admin Lótus</h1>
@@ -490,27 +401,20 @@
   <p class="pin-error" id="pinError"></p>
 </div>
 
-<!-- ═══════════════ DASHBOARD ═══════════════ -->
 <div id="dashboard">
-
-  <!-- Header fixo -->
   <header class="app-header">
     <div class="header-brand">
       <img src="./mascot-icon.jpg" alt="Mascote" class="header-mascot" />
       <div>
         <div class="header-title">Admin Lótus</div>
         <div class="header-subtitle">
-          <span id="realtimeDot" class="realtime-dot" title="Status realtime"></span>
-          <span id="realtimeLabel" style="font-size:0.7rem;color:#555;margin-left:4px;">Conectando…</span>
+          <span id="realtimeDot" class="realtime-dot"></span>
+          <span id="storeStatusBadge" class="store-badge">...</span>
         </div>
       </div>
     </div>
     <div class="header-actions">
-      <button class="btn" id="btnInstall" title="Instalar App" style="display:none"
-              onclick="window._installPWA && window._installPWA()">
-        <i class="fas fa-download"></i>
-      </button>
-      <button class="btn" onclick="refreshOrders()" title="Atualizar">
+      <button class="btn" onclick="refreshData()" title="Atualizar">
         <i class="fas fa-rotate-right"></i>
       </button>
       <button class="btn btn-logout" onclick="logout()">Sair</button>
@@ -518,43 +422,104 @@
   </header>
 
   <div class="dashboard-inner">
-
-    <!-- Stats -->
-    <div class="stats">
-      <div class="stat-card stat-pendente" onclick="switchTabByName('pendente')" title="Pendentes">
-        <div class="stat-label">📋 Pendentes</div>
-        <div class="stat-number" id="statPendente">0</div>
-      </div>
-      <div class="stat-card stat-preparando" onclick="switchTabByName('preparando')" title="Preparando">
-        <div class="stat-label">👨‍🍳 Preparando</div>
-        <div class="stat-number" id="statPreparando">0</div>
-      </div>
-      <div class="stat-card stat-pronto" onclick="switchTabByName('pronto')" title="Pronto">
-        <div class="stat-label">✅ Pronto</div>
-        <div class="stat-number" id="statPronto">0</div>
-      </div>
-      <div class="stat-card stat-entregue" onclick="switchTabByName('historico')" title="Entregues">
-        <div class="stat-label">🚚 Entregues</div>
-        <div class="stat-number" id="statEntregue">0</div>
-      </div>
-    </div>
-
-    <!-- Tabs -->
     <div class="tabs" id="tabBar">
-      <button class="tab active" data-tab="pendente"   onclick="switchTabByName('pendente')">Pendentes <span class="tab-badge" id="badge-pendente">0</span></button>
-      <button class="tab"        data-tab="preparando" onclick="switchTabByName('preparando')">Preparando <span class="tab-badge" id="badge-preparando">0</span></button>
-      <button class="tab"        data-tab="pronto"     onclick="switchTabByName('pronto')">Pronto <span class="tab-badge" id="badge-pronto">0</span></button>
-      <button class="tab"        data-tab="historico"  onclick="switchTabByName('historico')">Histórico</button>
-      <button class="tab"        data-tab="todos"      onclick="switchTabByName('todos')">Todos</button>
+      <button class="tab active" data-tab="pedidos" onclick="switchMainTab('pedidos')">Pedidos <span class="tab-badge" id="total-pendentes">0</span></button>
+      <button class="tab"        data-tab="produtos" onclick="switchMainTab('produtos')">Produtos</button>
+      <button class="tab"        data-tab="config"   onclick="switchMainTab('config')">Ajustes</button>
     </div>
 
-    <!-- Orders -->
-    <div id="ordersContainer" class="orders-container"></div>
+    <!-- ══ SEÇÃO PEDIDOS ══ -->
+    <div id="section-pedidos" class="section-content active">
+      <div class="stats">
+        <div class="stat-card stat-pendente" onclick="switchOrderTab('pendente')">
+          <div class="stat-label">📋 Pendentes</div>
+          <div class="stat-number" id="statPendente">0</div>
+        </div>
+        <div class="stat-card stat-preparando" onclick="switchOrderTab('preparando')">
+          <div class="stat-label">👨‍🍳 Preparando</div>
+          <div class="stat-number" id="statPreparando">0</div>
+        </div>
+        <div class="stat-card stat-pronto" onclick="switchOrderTab('pronto')">
+          <div class="stat-label">✅ Pronto</div>
+          <div class="stat-number" id="statPronto">0</div>
+        </div>
+        <div class="stat-card stat-entregue" onclick="switchOrderTab('entregue')">
+          <div class="stat-label">🚚 Entregues</div>
+          <div class="stat-number" id="statEntregue">0</div>
+        </div>
+      </div>
+      <div class="tabs" style="border-bottom:none; margin-bottom:1rem;">
+        <button class="tab order-tab active" data-otab="pendente" onclick="switchOrderTab('pendente')">Pendentes</button>
+        <button class="tab order-tab" data-otab="preparando" onclick="switchOrderTab('preparando')">Cozinha</button>
+        <button class="tab order-tab" data-otab="pronto" onclick="switchOrderTab('pronto')">Para Entrega</button>
+        <button class="tab order-tab" data-otab="entregue" onclick="switchOrderTab('entregue')">Histórico</button>
+      </div>
+      <div id="ordersContainer" class="orders-container"></div>
+    </div>
+
+    <!-- ══ SEÇÃO PRODUTOS ══ -->
+    <div id="section-produtos" class="section-content">
+      <div style="margin-bottom:1rem; display:flex; gap:10px; overflow-x:auto;" id="categoryFilter">
+        <!-- preenchido via JS -->
+      </div>
+      <div id="productsContainer" class="products-container"></div>
+    </div>
+
+    <!-- ══ SEÇÃO CONFIG ══ -->
+    <div id="section-config" class="section-content">
+      <div class="config-grid">
+        <div class="config-card">
+          <h3 class="config-title"><i class="fas fa-store"></i> Status da Loja</h3>
+          <div class="status-toggle-wrap">
+            <div>
+              <p style="font-weight:600" id="panicStatusText">Loja Aberta</p>
+              <p style="font-size:0.75rem; color:var(--text-muted)">Clique para fechar manualmente</p>
+            </div>
+            <button id="btnPanic" class="panic-btn" onclick="togglePanic()">FECHAR LOJA</button>
+          </div>
+          <div class="field" style="margin-top:1.5rem">
+            <label style="font-size:0.75rem; color:var(--text-muted); display:block; margin-bottom:8px">MENSAGEM DE ALERTA (BANNER)</label>
+            <textarea id="configBannerMsg" style="width:100%; background:var(--bg2); border:1px solid var(--border); border-radius:8px; padding:10px; color:var(--text); resize:none; height:80px" placeholder="Ex: Hoje entregas grátis!"></textarea>
+            <button class="btn btn-primary" style="margin-top:10px; width:100%" onclick="saveBannerMsg()">Salvar Mensagem</button>
+          </div>
+        </div>
+
+        <div class="config-card">
+          <h3 class="config-title"><i class="fas fa-clock"></i> Horários de Funcionamento</h3>
+          <div id="hoursList" class="hours-grid">
+            <!-- preenchido via JS -->
+          </div>
+          <button class="btn btn-primary" style="margin-top:1.5rem; width:100%" onclick="saveHours()">Salvar Horários</button>
+        </div>
+      </div>
+    </div>
 
   </div>
 </div>
 
-<!-- Toasts -->
+<!-- Modal Edição de Produto -->
+<div id="modalEditProduct" class="pin-screen" style="display:none; background:rgba(0,0,0,0.8); z-index:600">
+  <div class="config-card" style="width:min(90vw, 400px)">
+    <h3 class="config-title">Editar Produto</h3>
+    <div class="field" style="margin-bottom:12px">
+      <label style="font-size:0.7rem; color:var(--text-muted)">NOME</label>
+      <input type="text" id="editProdName" style="width:100%; background:var(--bg2); border:1px solid var(--border); padding:8px; color:var(--text); border-radius:6px">
+    </div>
+    <div class="field" style="margin-bottom:12px">
+      <label style="font-size:0.7rem; color:var(--text-muted)">PREÇO (R$)</label>
+      <input type="number" step="0.01" id="editProdPrice" style="width:100%; background:var(--bg2); border:1px solid var(--border); padding:8px; color:var(--text); border-radius:6px">
+    </div>
+    <div class="field" style="margin-bottom:1.5rem">
+      <label style="font-size:0.7rem; color:var(--text-muted)">DESCRIÇÃO</label>
+      <textarea id="editProdDesc" style="width:100%; background:var(--bg2); border:1px solid var(--border); padding:8px; color:var(--text); border-radius:6px; resize:none; height:60px"></textarea>
+    </div>
+    <div style="display:flex; gap:10px">
+      <button class="btn" onclick="$('modalEditProduct').style.display='none'" style="flex:1">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveProductEdit()" style="flex:1">Salvar</button>
+    </div>
+  </div>
+</div>
+
 <div id="toastNew"     class="toast toast-new"></div>
 <div id="toastError"   class="toast toast-error"></div>
 <div id="toastSuccess" class="toast toast-success"></div>
@@ -562,550 +527,332 @@
 <script type="module">
   import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
-  /* ═══════════════ CONFIG ═══════════════ */
   const SUPABASE_URL  = 'https://aflglnnruovheztrqneg.supabase.co';
   const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFmbGdsbm5ydW92aGV6dHJxbmVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMDAwNjUsImV4cCI6MjA5Mzg3NjA2NX0.2LOqKN-SX52PbhBtLZA4cHpmjnj3hnOb9qz2N1ROYdU';
   const ADMIN_EMAIL   = 'admin@flordelotus.com';
 
   const supabase = createClient(SUPABASE_URL, SUPABASE_ANON, {
-    auth: { 
-      persistSession: true,
-      autoRefreshToken: true,
-      storageKey: 'fl_admin_session'
-    },
+    auth: { persistSession: true, autoRefreshToken: true, storageKey: 'fl_admin_session' },
   });
 
-  /* ═══════════════ STATE ═══════════════ */
-  let orders    = [];
-  let activeTab = 'pendente';
-  let rtChannel = null;
-  let pollTimer = null;
-  let alarmTimer = null;
-  let knownIds  = new Set();
-  let _audioCtx = null;
+  let orders = [], products = [], categories = [], storeConfig = {};
+  let activeMainTab = 'pedidos', activeOrderTab = 'pendente', activeCatFilter = 'todas';
+  let rtChannel = null, rtConfigChannel = null, alarmTimer = null, knownIds = new Set(), _audioCtx = null;
+  let editingProdId = null;
 
   const $ = id => document.getElementById(id);
 
-  /* ═══════════════ AUTH CHECK ═══════════════ */
   async function checkSession() {
     const { data: { session } } = await supabase.auth.getSession();
-    if (session) {
-      enterDashboard();
-    }
+    if (session) enterDashboard();
   }
 
-  /* ═══════════════ PIN ═══════════════ */
   window.verifyPin = async function() {
-    const pin = ['pin1','pin2','pin3','pin4','pin5','pin6'].map(id => $(id).value).join('');
+    const pin = [1,2,3,4,5,6].map(i => $('pin'+i).value).join('');
     if (pin.length < 6) return;
-
-    const btn = $('btnVerify');
-    const err = $('pinError');
-    
-    btn.disabled = true;
-    btn.textContent = 'Verificando...';
-    err.textContent = '';
-
-    try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: ADMIN_EMAIL,
-        password: pin
-      });
-
-      if (error) {
-        err.textContent = 'PIN incorreto ou erro de acesso.';
-        ['pin1','pin2','pin3','pin4','pin5','pin6'].forEach(id => { $(id).value = ''; });
-        $('pin1').focus();
-      } else {
-        enterDashboard();
-      }
-    } catch (e) {
-      err.textContent = 'Erro de conexão.';
-    } finally {
-      btn.disabled = false;
-      btn.textContent = 'Entrar';
-    }
+    const btn = $('btnVerify'), err = $('pinError');
+    btn.disabled = true; btn.textContent = '...'; err.textContent = '';
+    const { error } = await supabase.auth.signInWithPassword({ email: ADMIN_EMAIL, password: pin });
+    if (error) {
+      err.textContent = 'PIN incorreto.'; [1,2,3,4,5,6].forEach(i => $('pin'+i).value = ''); $('pin1').focus();
+    } else enterDashboard();
+    btn.disabled = false; btn.textContent = 'Entrar';
   };
 
-  /* Auto-advance PIN inputs */
-  ['pin1','pin2','pin3','pin4','pin5','pin6'].forEach((id, i, arr) => {
-    const el = $(id);
-    if (!el) return;
+  [1,2,3,4,5,6].forEach((i, idx, arr) => {
+    const el = $('pin'+i);
+    if(!el) return;
     el.addEventListener('keyup', e => {
-      if (e.key === 'Backspace') {
-        el.value = '';
-        if (i > 0) $(arr[i-1]).focus();
-      } else if (el.value && i < 5) {
-        $(arr[i+1]).focus();
-      } else if (el.value && i === 5) {
-        window.verifyPin();
-      }
+      if (e.key === 'Backspace' && idx > 0) $('pin'+arr[idx-1]).focus();
+      else if (el.value && idx < 5) $('pin'+arr[idx+1]).focus();
+      else if (el.value && idx === 5) window.verifyPin();
     });
   });
 
-  /* ═══════════════ DASHBOARD INIT ═══════════════ */
   async function enterDashboard() {
     $('pinScreen').style.display = 'none';
     $('dashboard').style.display = 'block';
-    await loadOrders();
+    await refreshData();
     subscribeRealtime();
-    startPolling();
-    requestNotificationPermission();
-    registerServiceWorker();
+    subscribeConfigRealtime();
   }
 
-  /* ═══════════════ LOAD ORDERS ═══════════════ */
-  async function loadOrders() {
+  async function refreshData() {
     showLoading(true);
-    try {
-      const { data, error } = await supabase
-        .from('orders')
-        .select('*')
-        .order('created_at', { ascending: false });
+    await Promise.all([loadOrders(), loadProducts(), loadConfig()]);
+    showLoading(false);
+  }
+  window.refreshData = refreshData;
 
-      if (error) {
-        showError(`Erro ao carregar: ${error.message}`);
-        return;
-      }
+  async function loadOrders() {
+    const { data } = await supabase.from('orders').select('*').order('created_at', { ascending: false });
+    orders = data || [];
+    orders.forEach(o => knownIds.add(o.id));
+    updateOrderStats();
+    if (activeMainTab === 'pedidos') renderOrders();
+  }
 
-      orders = data || [];
-      orders.forEach(o => knownIds.add(o.id));
-      updateStats();
-      renderOrders();
-    } catch (err) {
-      showError(`Erro de conexão: ${err.message}`);
-    } finally {
-      showLoading(false);
+  async function loadProducts() {
+    const [pRes, cRes] = await Promise.all([
+      supabase.from('products').select('*').order('name'),
+      supabase.from('categories').select('*').order('sort_order')
+    ]);
+    products = pRes.data || [];
+    categories = cRes.data || [];
+    renderCategoryFilters();
+    if (activeMainTab === 'produtos') renderProducts();
+  }
+
+  async function loadConfig() {
+    const { data } = await supabase.from('store_config').select('*');
+    if (data) {
+      data.forEach(c => storeConfig[c.key] = c.value);
+      renderConfig();
+      updateHeaderStatus();
     }
   }
 
-  /* ═══════════════ REALTIME ═══════════════ */
   function subscribeRealtime() {
     if (rtChannel) supabase.removeChannel(rtChannel);
-
-    rtChannel = supabase
-      .channel('admin-orders')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'orders' },
-        payload => {
-          handleRealtimeEvent(payload);
-        }
-      )
-      .subscribe((status, err) => {
-        const dot   = $('realtimeDot');
-        const label = $('realtimeLabel');
-        if (status === 'SUBSCRIBED') {
-          dot.className   = 'realtime-dot connected';
-          label.textContent = 'Ao vivo';
-        } else if (status === 'CHANNEL_ERROR' || status === 'CLOSED') {
-          dot.className   = 'realtime-dot error';
-          label.textContent = 'Reconectando…';
-          setTimeout(subscribeRealtime, 5000);
-        } else {
-          dot.className   = 'realtime-dot';
-          label.textContent = 'Conectando…';
-        }
-      });
-  }
-
-  function handleRealtimeEvent(payload) {
-    const { eventType, new: newRow, old: oldRow } = payload;
-
-    if (eventType === 'INSERT') {
-      if (!knownIds.has(newRow.id)) {
-        knownIds.add(newRow.id);
-        orders.unshift(newRow);
-        updateStats();
-        renderOrders();
-        triggerNewOrderAlert(newRow);
+    rtChannel = supabase.channel('admin-orders').on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, payload => {
+      const { eventType, new: newRow, old: oldRow } = payload;
+      if (eventType === 'INSERT') {
+        if (!knownIds.has(newRow.id)) { knownIds.add(newRow.id); orders.unshift(newRow); triggerNewOrderAlert(newRow); }
+      } else if (eventType === 'UPDATE') {
+        const idx = orders.findIndex(o => o.id === newRow.id);
+        if (idx !== -1) orders[idx] = newRow; else orders.unshift(newRow);
+      } else if (eventType === 'DELETE') {
+        orders = orders.filter(o => o.id !== oldRow.id);
       }
-    } else if (eventType === 'UPDATE') {
-      const idx = orders.findIndex(o => o.id === newRow.id);
-      if (idx !== -1) {
-        orders[idx] = newRow;
-      } else {
-        orders.unshift(newRow);
-        knownIds.add(newRow.id);
-      }
-      updateStats();
-      renderOrders();
-    } else if (eventType === 'DELETE') {
-      orders = orders.filter(o => o.id !== oldRow.id);
-      knownIds.delete(oldRow.id);
-      updateStats();
-      renderOrders();
-    }
+      updateOrderStats(); renderOrders();
+    }).subscribe(s => {
+      $('realtimeDot').className = s === 'SUBSCRIBED' ? 'realtime-dot connected' : 'realtime-dot error';
+    });
   }
 
-  /* ═══════════════ POLLING FALLBACK ═══════════════ */
-  function startPolling() {
-    clearInterval(pollTimer);
-    pollTimer = setInterval(async () => {
-      const { data } = await supabase
-        .from('orders')
-        .select('id,status,client_name,total,created_at')
-        .eq('status', 'pendente')
-        .order('created_at', { ascending: false })
-        .limit(5);
-
-      if (!Array.isArray(data)) return;
-      let hasNew = false;
-      data.forEach(o => {
-        if (!knownIds.has(o.id)) {
-          knownIds.add(o.id);
-          hasNew = true;
-        }
-      });
-      if (hasNew) loadOrders();
-    }, 15000);
+  function subscribeConfigRealtime() {
+    if (rtConfigChannel) supabase.removeChannel(rtConfigChannel);
+    rtConfigChannel = supabase.channel('admin-config').on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'store_config' }, payload => {
+      storeConfig[payload.new.key] = payload.new.value;
+      renderConfig(); updateHeaderStatus();
+    }).subscribe();
   }
 
-  /* ═══════════════ STATUS UPDATE ═══════════════ */
-  window.updateStatus = async function(orderId, newStatus) {
-    const order = orders.find(o => o.id === orderId);
-    if (!order) return;
-
-    const oldStatus = order.status;
-    order.status = newStatus;
-    updateStats();   /* ← atualiza contadores imediatamente */
-    renderOrders();
-
-    const { error } = await supabase
-      .from('orders')
-      .update({ status: newStatus })
-      .eq('id', orderId);
-
-    if (error) {
-      order.status = oldStatus;
-      updateStats();
-      renderOrders();
-      showError(`Erro ao atualizar: ${error.message}`);
-    } else {
-      showSuccess(`✅ Pedido ${String(orderId).slice(-6).toUpperCase()} → ${newStatus}`);
-    }
+  window.switchMainTab = function(tab) {
+    activeMainTab = tab;
+    document.querySelectorAll('.tab').forEach(el => el.classList.toggle('active', el.dataset.tab === tab));
+    document.querySelectorAll('.section-content').forEach(el => el.classList.toggle('active', el.id === 'section-'+tab));
+    if (tab === 'pedidos') renderOrders();
+    if (tab === 'produtos') renderProducts();
+    if (tab === 'config') renderConfig();
   };
 
-  /* ═══════════════ RENDER ═══════════════ */
-  function updateStats() {
+  window.switchOrderTab = function(tab) {
+    activeOrderTab = tab;
+    document.querySelectorAll('.order-tab').forEach(el => el.classList.toggle('active', el.dataset.otab === tab));
+    renderOrders();
+  };
+
+  function updateOrderStats() {
     const cnt = s => orders.filter(o => o.status === s).length;
-    $('statPendente').textContent   = cnt('pendente');
+    $('statPendente').textContent = cnt('pendente');
     $('statPreparando').textContent = cnt('preparando');
-    $('statPronto').textContent     = cnt('pronto');
-    $('statEntregue').textContent   = cnt('entregue');
-
-    ['pendente','preparando','pronto'].forEach(s => {
-      const b = $(`badge-${s}`);
-      if (b) { b.textContent = cnt(s); b.style.display = cnt(s) ? '' : 'none'; }
-    });
-  }
-
-  window.switchTabByName = function(tab) {
-    activeTab = tab;
-    document.querySelectorAll('.tab').forEach(el => {
-      el.classList.toggle('active', el.dataset.tab === tab);
-    });
-    renderOrders();
-  };
-
-  function fmtDate(iso) {
-    if (!iso) return '—';
-    const d = new Date(iso);
-    return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-  }
-
-  function fmtPrice(v) {
-    return Number(v || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
-  }
-
-  /* ── Parse items: suporta {nome,qty,preco} e {name,quantity,price} ── */
-  function parseItems(raw) {
-    let arr = raw;
-    if (typeof raw === 'string') { try { arr = JSON.parse(raw); } catch { return []; } }
-    if (!Array.isArray(arr)) return [];
-    return arr;
-  }
-
-  function renderItem(it) {
-    const qty   = it.qty   ?? it.quantity ?? '?';
-    const nome  = it.nome  || it.name     || 'Item sem nome';
-    const preco = it.preco ?? it.price    ?? 0;
-    const sabor = it.sabor || it.flavor   || '';
-    const subtotal = fmtPrice(Number(preco) * Number(qty));
-    return `
-      <div class="item-row">
-        <span class="item-qty">${qty}×</span>
-        <span class="item-name">
-          ${nome}${sabor ? `<span class="item-sabor"> (${sabor})</span>` : ''}
-        </span>
-        <span class="item-price">R$ ${subtotal}</span>
-      </div>`;
+    $('statPronto').textContent = cnt('pronto');
+    $('statEntregue').textContent = cnt('entregue');
+    $('total-pendentes').textContent = cnt('pendente');
+    $('total-pendentes').style.display = cnt('pendente') ? 'inline-flex' : 'none';
   }
 
   function renderOrders() {
-    const map = {
-      pendente:   o => o.status === 'pendente',
-      preparando: o => o.status === 'preparando',
-      pronto:     o => o.status === 'pronto',
-      historico:  o => o.status === 'entregue',
-      todos:      ()  => true,
-    };
-    const filtered = orders.filter(map[activeTab] || map.todos);
     const container = $('ordersContainer');
-
-    if (filtered.length === 0) {
-      container.innerHTML = `
-        <div class="empty-state">
-          <i class="fas fa-bowl-rice"></i>
-          <p>Nenhum pedido nesta categoria.</p>
-        </div>`;
-      return;
-    }
-
+    const filtered = orders.filter(o => activeOrderTab === 'todos' ? true : o.status === activeOrderTab);
+    if (!filtered.length) { container.innerHTML = '<div class="empty-state"><i class="fas fa-box-open"></i><p>Nenhum pedido.</p></div>'; return; }
+    
     container.innerHTML = filtered.map(o => {
-      const items    = parseItems(o.items);
-      const isOpen   = false;
-      const statusActions = {
-        pendente:   `<button class="btn-pendente-action" onclick="updateStatus('${o.id}','preparando')"><i class="fas fa-fire-burner"></i> Preparar</button>`,
-        preparando: `<button class="btn-preparando-action" onclick="updateStatus('${o.id}','pronto')"><i class="fas fa-bell"></i> Marcar Pronto</button>`,
-        pronto:     `<button class="btn-pronto-action" onclick="updateStatus('${o.id}','entregue')"><i class="fas fa-motorcycle"></i> Entregue</button>`,
-      };
-      const mainAction  = statusActions[o.status] || '';
-      const removeBtn   = o.status !== 'entregue'
-        ? `<button class="btn-remove" onclick="removeOrder('${o.id}')"><i class="fas fa-trash"></i></button>`
-        : '';
-
-      const itemsHTML = items.length
-        ? items.map(renderItem).join('')
-        : '<div class="item-row"><span class="item-name" style="color:var(--text-muted)">Sem itens</span></div>';
+      const items = typeof o.items === 'string' ? JSON.parse(o.items) : o.items;
+      const statusBtn = {
+        pendente: `<button class="btn-pendente-action" onclick="updateStatus('${o.id}','preparando')"><i class="fas fa-fire"></i> Preparar</button>`,
+        preparando: `<button class="btn-preparando-action" onclick="updateStatus('${o.id}','pronto')"><i class="fas fa-bell"></i> Pronto</button>`,
+        pronto: `<button class="btn-pronto-action" onclick="updateStatus('${o.id}','entregue')"><i class="fas fa-motorcycle"></i> Entregue</button>`
+      }[o.status] || '';
 
       return `
-      <div class="order-card" id="card-${o.id}">
-        <div class="order-summary" onclick="toggleCard('${o.id}')">
-          <div class="order-summary-left">
-            <div class="order-meta">
-              <span class="order-id">#${String(o.id).slice(-6).toUpperCase()}</span>
-              <span class="order-time">${fmtDate(o.created_at)}</span>
+        <div class="order-card" id="card-${o.id}">
+          <div class="order-summary" onclick="toggleCard('${o.id}')">
+            <div class="order-summary-left">
+              <div class="order-meta"><span class="order-id">#${o.id.slice(-6).toUpperCase()}</span> <span class="order-time">${new Date(o.created_at).toLocaleTimeString()}</span></div>
+              <div class="order-client-name">${o.client_name || 'Cliente'}</div>
+              ${o.client_phone ? `<div class="order-phone">${o.client_phone}</div>` : ''}
             </div>
-            <div class="order-client-name">${o.client_name || 'Cliente'}</div>
-            ${o.client_phone ? `<div class="order-phone">${o.client_phone}</div>` : ''}
-          </div>
-          <div class="order-summary-right">
-            <span class="order-status ${o.status}">${o.status}</span>
-            <span class="order-total-preview">R$ ${fmtPrice(o.total)}</span>
-            <i class="fas fa-chevron-down chevron-icon"></i>
-          </div>
-        </div>
-
-        <div class="order-body">
-          <div class="order-body-inner">
-            ${o.client_address ? `
-              <div class="order-section">
-                <div class="order-section-label"><i class="fas fa-location-dot"></i> Endereço</div>
-                <div class="order-address-text">${o.client_address}</div>
-              </div>` : ''}
-
-            <div class="order-section">
-              <div class="order-section-label"><i class="fas fa-bowl-rice"></i> Itens do pedido</div>
-              ${itemsHTML}
-              <div class="order-total-row">
-                <span>Total</span>
-                <span>R$ ${fmtPrice(o.total)}</span>
-              </div>
-            </div>
-
-            ${o.special_notes ? `
-              <div class="order-section">
-                <div class="order-section-label"><i class="fas fa-note-sticky"></i> Observações</div>
-                <div class="order-notes">${o.special_notes}</div>
-              </div>` : ''}
-
-            <div class="order-actions">
-              ${mainAction}
-              ${removeBtn}
+            <div class="order-summary-right">
+              <span class="order-status ${o.status}">${o.status}</span>
+              <span class="order-total-preview">R$ ${Number(o.total).toFixed(2)}</span>
             </div>
           </div>
-        </div>
-      </div>`;
+          <div class="order-body"><div class="order-body-inner">
+            ${o.client_address ? `<div class="order-section"><div class="order-section-label">Endereço</div><div class="order-address-text">${o.client_address}</div></div>` : ''}
+            <div class="order-section"><div class="order-section-label">Itens</div>
+              ${items.map(it => `<div class="item-row"><span class="item-qty">${it.qty}x</span><span class="item-name">${it.nome}</span><span class="item-price">R$ ${Number(it.preco * it.qty).toFixed(2)}</span></div>`).join('')}
+            </div>
+            ${o.special_notes ? `<div class="order-section"><div class="order-section-label">Observações</div><div class="order-notes">${o.special_notes}</div></div>` : ''}
+            <div class="order-actions">${statusBtn}<button class="btn-remove" onclick="removeOrder('${o.id}')"><i class="fas fa-trash"></i></button></div>
+          </div></div>
+        </div>`;
     }).join('');
-
-    /* Reabre cards que estavam abertos */
-    openCards.forEach(id => {
-      const card = document.getElementById(`card-${id}`);
-      if (card) card.classList.add('open');
-    });
   }
 
-  /* Track open cards across re-renders */
-  const openCards = new Set();
-
-  window.toggleCard = function(id) {
-    const card = document.getElementById(`card-${id}`);
-    if (!card) return;
-    const isOpen = card.classList.toggle('open');
-    if (isOpen) openCards.add(id); else openCards.delete(id);
+  window.updateStatus = async (id, status) => {
+    const { error } = await supabase.from('orders').update({ status }).eq('id', id);
+    if (!error) showSuccess('Status atualizado!');
   };
 
-  /* ═══════════════ ALARM (10 segundos) ═══════════════ */
+  function renderCategoryFilters() {
+    const container = $('categoryFilter');
+    const cats = [{id:'todas', name:'Todas'}, ...categories];
+    container.innerHTML = cats.map(c => `
+      <button class="btn ${activeCatFilter === c.id ? 'btn-primary' : ''}" onclick="filterByCat('${c.id}')">${c.name}</button>
+    `).join('');
+  }
+
+  window.filterByCat = (id) => { activeCatFilter = id; renderCategoryFilters(); renderProducts(); };
+
+  function renderProducts() {
+    const container = $('productsContainer');
+    const filtered = activeCatFilter === 'todas' ? products : products.filter(p => p.category_id === activeCatFilter);
+    container.innerHTML = filtered.map(p => `
+      <div class="product-card">
+        <img src="${p.image_url}" class="product-img" onerror="this.src='/flor-de-lotus/public/assets/images/placeholder.jpg'">
+        <div class="product-body">
+          <div class="product-name">${p.name}</div>
+          <div class="product-price">R$ ${Number(p.price).toFixed(2)}</div>
+          <div class="product-category">${categories.find(c => c.id === p.category_id)?.name || ''}</div>
+        </div>
+        <div class="product-actions">
+          <button class="btn-toggle ${p.is_active ? 'active' : 'inactive'}" onclick="toggleProduct('${p.id}', ${p.is_active})">
+            ${p.is_active ? 'DISPONÍVEL' : 'ESGOTADO'}
+          </button>
+          <button class="btn" onclick="openEditProduct('${p.id}')"><i class="fas fa-pen"></i></button>
+          <button class="btn-toggle ${p.is_featured ? 'active' : ''}" onclick="toggleFeatured('${p.id}', ${p.is_featured})">
+            <i class="fas fa-star"></i>
+          </button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  window.toggleProduct = async (id, current) => {
+    await supabase.from('products').update({ is_active: !current }).eq('id', id);
+    loadProducts();
+  };
+  window.toggleFeatured = async (id, current) => {
+    await supabase.from('products').update({ is_featured: !current }).eq('id', id);
+    loadProducts();
+  };
+
+  window.openEditProduct = (id) => {
+    const p = products.find(x => x.id === id);
+    if(!p) return;
+    editingProdId = id;
+    $('editProdName').value = p.name;
+    $('editProdPrice').value = p.price;
+    $('editProdDesc').value = p.description || '';
+    $('modalEditProduct').style.display = 'flex';
+  };
+
+  window.saveProductEdit = async () => {
+    const p = {
+      name: $('editProdName').value,
+      price: parseFloat($('editProdPrice').value),
+      description: $('editProdDesc').value
+    };
+    const { error } = await supabase.from('products').update(p).eq('id', editingProdId);
+    if(!error) {
+      showSuccess('Produto atualizado!');
+      $('modalEditProduct').style.display = 'none';
+      loadProducts();
+    } else showError('Erro ao salvar.');
+  };
+
+  function renderConfig() {
+    const status = storeConfig.status || {};
+    const hours  = storeConfig.hours  || [];
+    const isManualClosed = status.manual_closed;
+    const btn = $('btnPanic'), txt = $('panicStatusText');
+    btn.textContent = isManualClosed ? 'ABRIR LOJA' : 'FECHAR LOJA';
+    btn.className = 'panic-btn ' + (isManualClosed ? 'open' : 'closed');
+    txt.textContent = isManualClosed ? 'Loja Fechada Manualmente' : 'Loja Aberta';
+    $('configBannerMsg').value = status.banner_msg || '';
+    const days = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+    $('hoursList').innerHTML = days.map((day, i) => {
+      const h = hours.find(x => x.day === i) || { open: '18:00', close: '23:00', closed: false };
+      return `<div class="hour-row"><span class="hour-day">${day}</span><input type="time" class="hour-input h-open" value="${h.open}"><input type="time" class="hour-input h-close" value="${h.close}"><input type="checkbox" class="h-closed" ${h.closed ? 'checked' : ''}></div>`;
+    }).join('');
+  }
+
+  window.togglePanic = async () => {
+    const current = storeConfig.status || {};
+    const newValue = { ...current, manual_closed: !current.manual_closed };
+    await supabase.from('store_config').update({ value: newValue }).eq('key', 'status');
+    showSuccess('Status alterado!');
+  };
+
+  window.saveBannerMsg = async () => {
+    const msg = $('configBannerMsg').value;
+    const current = storeConfig.status || {};
+    const newValue = { ...current, banner_msg: msg };
+    await supabase.from('store_config').update({ value: newValue }).eq('key', 'status');
+    showSuccess('Mensagem salva!');
+  };
+
+  window.saveHours = async () => {
+    const rows = document.querySelectorAll('.hour-row');
+    const newHours = Array.from(rows).map((row, i) => ({
+      day: i,
+      open: row.querySelector('.h-open').value,
+      close: row.querySelector('.h-close').value,
+      closed: row.querySelector('.h-closed').checked
+    }));
+    await supabase.from('store_config').update({ value: newHours }).eq('key', 'hours');
+    showSuccess('Horários salvos!');
+  };
+
+  function updateHeaderStatus() {
+    const status = storeConfig.status || {};
+    const badge = $('storeStatusBadge');
+    if (status.manual_closed) { badge.textContent = 'Fechado'; badge.className = 'store-badge closed'; }
+    else { badge.textContent = 'Aberto'; badge.className = 'store-badge open'; }
+  }
+
   function triggerNewOrderAlert(order) {
-    startAlarm();
-    showNewToast(`🔔 Novo pedido de ${order.client_name || 'Cliente'} — R$ ${fmtPrice(order.total)}`);
-    showBrowserNotification(order);
-    if (navigator.vibrate) navigator.vibrate([400, 100, 400, 100, 400]);
+    startAlarm(); showNewToast(`🔔 Novo pedido de ${order.client_name}`);
   }
-
   function startAlarm() {
-    stopAlarm();
-    $('alarmOverlay').classList.add('active');
-    let count = 0;
-    playChime();
-    alarmTimer = setInterval(() => {
-      count++;
-      playChime();
-      if (count >= 9) stopAlarm();
-    }, 1000);
+    stopAlarm(); $('alarmOverlay').classList.add('active'); playChime();
+    let c = 0; alarmTimer = setInterval(() => { c++; playChime(); if (c>=5) stopAlarm(); }, 1500);
   }
-
-  function stopAlarm() {
-    clearInterval(alarmTimer);
-    alarmTimer = null;
-    $('alarmOverlay').classList.remove('active');
-  }
-
+  function stopAlarm() { clearInterval(alarmTimer); $('alarmOverlay').classList.remove('active'); }
   function playChime() {
     try {
-      const ctx = _audioCtx || new (window.AudioContext || window.webkitAudioContext)();
-      if (!_audioCtx) _audioCtx = ctx;
-
-      /* Se ainda suspenso (ex: iOS antes de gesto) tenta desbloquear e agenda */
-      if (ctx.state === 'suspended') {
-        ctx.resume().then(() => playChime());
-        return;
-      }
-
+      const ctx = _audioCtx || new AudioContext(); _audioCtx = ctx;
+      if (ctx.state==='suspended') { ctx.resume(); return; }
       const t = ctx.currentTime;
-
-      function note(freq, start, dur, gain = 0.5) {
-        const osc = ctx.createOscillator();
-        const env = ctx.createGain();
-        osc.connect(env); env.connect(ctx.destination);
-        osc.type = 'square';
-        osc.frequency.value = freq;
-        env.gain.setValueAtTime(0, start);
-        env.gain.linearRampToValueAtTime(gain, start + 0.02);
-        env.gain.exponentialRampToValueAtTime(0.001, start + dur);
-        osc.start(start); osc.stop(start + dur + 0.05);
-      }
-
-      note(880,  t,       0.15, 0.55);
-      note(880,  t + 0.2, 0.15, 0.55);
-      note(1175, t + 0.4, 0.3,  0.55);
-    } catch (e) { /* silencia */ }
+      const note = (f,s,d) => {
+        const o=ctx.createOscillator(), g=ctx.createGain(); o.connect(g); g.connect(ctx.destination);
+        o.frequency.value=f; g.gain.setValueAtTime(0,s); g.gain.linearRampToValueAtTime(0.3,s+0.05); g.gain.exponentialRampToValueAtTime(0.01,s+d);
+        o.start(s); o.stop(s+d);
+      };
+      note(880,t,0.3); note(1100,t+0.2,0.4);
+    } catch(e){}
   }
 
-  /* Toque no overlay para silenciar */
-  $('alarmOverlay').addEventListener('click', stopAlarm);
+  window.toggleCard = (id) => $('card-'+id).classList.toggle('open');
+  window.removeOrder = (id) => { if(confirm('Remover?')) supabase.from('orders').delete().eq('id', id); };
+  window.logout = () => { supabase.auth.signOut(); location.reload(); };
+  function showLoading(s) { if(s) $('ordersContainer').innerHTML = '<div class="loading"><div class="spinner"></div>Carregando...</div>'; }
+  function showSuccess(m) { const t=$('toastSuccess'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000); }
+  function showError(m) { const t=$('toastError'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000); }
+  function showNewToast(m) { const t=$('toastNew'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),5000); }
 
-  /* ═══════════════ BROWSER NOTIFICATION ═══════════════ */
-  function requestNotificationPermission() {
-    if ('Notification' in window && Notification.permission === 'default') {
-      Notification.requestPermission().then(p => {
-        if (p === 'granted') showSuccess('✅ Notificações ativadas!');
-      });
-    }
-  }
-
-  function showBrowserNotification(order) {
-    if (Notification.permission !== 'granted') return;
-    try {
-      new Notification('🍣 Novo Pedido — Flor de Lótus!', {
-        body: `${order.client_name || 'Cliente'} · R$ ${fmtPrice(order.total)}`,
-        icon: './mascot-icon.jpg',
-        badge: './mascot-icon.jpg',
-        tag: `order-${order.id}`,
-        requireInteraction: true,
-        vibrate: [400, 100, 400, 100, 400],
-      });
-    } catch (e) { /* silencia */ }
-  }
-
-  /* ═══════════════ SERVICE WORKER + PWA INSTALL ═══════════════ */
-  function registerServiceWorker() {
-    if (!('serviceWorker' in navigator)) return;
-    navigator.serviceWorker.register('./admin-sw.js')
-      .catch(err => console.warn('[SW]', err));
-  }
-
-  /* Captura prompt de instalação PWA */
-  let _installPrompt = null;
-  window.addEventListener('beforeinstallprompt', e => {
-    e.preventDefault();
-    _installPrompt = e;
-    const btn = $('btnInstall');
-    if (btn) btn.style.display = '';
-  });
-  window._installPWA = async function() {
-    if (!_installPrompt) return;
-    const result = await _installPrompt.prompt();
-    if (result.outcome === 'accepted') {
-      const btn = $('btnInstall');
-      if (btn) btn.style.display = 'none';
-      _installPrompt = null;
-    }
-  };
-  window.addEventListener('appinstalled', () => {
-    const btn = $('btnInstall');
-    if (btn) btn.style.display = 'none';
-    _installPrompt = null;
-  });
-
-  /* ═══════════════ UTILS ═══════════════ */
-  window.removeOrder = function(id) {
-    if (!confirm('Remover este pedido da lista local?')) return;
-    orders = orders.filter(o => o.id !== id);
-    openCards.delete(id);
-    updateStats();
-    renderOrders();
-    showSuccess('Pedido removido da lista.');
-  };
-
-  window.refreshOrders = loadOrders;
-  window.logout = async function() {
-    if (!confirm('Sair do painel?')) return;
-    clearInterval(pollTimer);
-    if (rtChannel) supabase.removeChannel(rtChannel);
-    await supabase.auth.signOut();
-    $('dashboard').style.display = 'none';
-    $('pinScreen').style.display = 'flex';
-    ['pin1','pin2','pin3','pin4','pin5','pin6'].forEach(id => { $(id).value = ''; });
-    $('pin1').focus();
-  };
-
-  function showLoading(show) {
-    if (show) {
-      $('ordersContainer').innerHTML = `
-        <div class="loading"><div class="spinner"></div>Carregando pedidos…</div>`;
-    }
-  }
-
-  let toastTimers = {};
-  function _toast(id, msg, dur = 4000) {
-    const el = $(id);
-    if (!el) return;
-    el.innerHTML = msg;
-    el.classList.add('show');
-    clearTimeout(toastTimers[id]);
-    toastTimers[id] = setTimeout(() => el.classList.remove('show'), dur);
-  }
-
-  function showNewToast(msg)     { _toast('toastNew',     msg, 6000); }
-  function showError(msg)        { _toast('toastError',   msg, 6000); }
-  function showSuccess(msg)      { _toast('toastSuccess', msg, 3500); }
-
-  /* Expõe para uso global em onclick */
-  window.switchTabByName = window.switchTabByName;
-
-  /* Init */
   checkSession();
   $('pin1').focus();
 </script>
