@@ -29,35 +29,67 @@ export async function fetchMenu() {
       return await fetchMenuFallback();
     }
 
-    // 2. Organizar produtos dentro de suas categorias (formato esperado pelo app)
-    const menuOrganizado = catRes.data.map(cat => ({
-      id: cat.id,
-      nome: cat.name,
-      icone: cat.icon,
-      descricao: cat.description,
-      itens: prodRes.data
-        .filter(p => p.category_id === cat.id)
-        .map(p => ({
-          id: p.id,
-          nome: p.name,
-          preco: p.price,
-          descricao: p.description,
-          porcao: p.portion,
-          imagem: p.image_url,
-          sabores: p.flavors || [],
-          tags: p.tags || [],
-          destaque: p.is_featured,
-          is_promo: p.is_promo
-        }))
-    }));
-
-    state.menu = menuOrganizado;
+    // 2. Organizar produtos dentro de suas categorias
+    state.menu = organizeMenu(catRes.data, prodRes.data);
     console.log('[api] menu carregado do Supabase ✓');
-
+    return state.menu;
   } catch (err) {
-    console.error('[api] fetchMenu falhou, tentando fallback:', err);
-    await fetchMenuFallback();
+    console.error('[api] Erro ao buscar menu:', err);
+    return await fetchMenuFallback();
   }
+}
+
+/**
+ * Organiza produtos dentro de suas categorias (formato esperado pelo app)
+ */
+function organizeMenu(categories, products) {
+  return categories.map(cat => ({
+    id: cat.id,
+    nome: cat.name,
+    icone: cat.icon,
+    descricao: cat.description,
+    itens: products
+      .filter(p => p.category_id === cat.id)
+      .map(p => ({
+        id: p.id,
+        nome: p.name,
+        preco: p.price,
+        descricao: p.description,
+        porcao: p.portion,
+        imagem: p.image_url,
+        sabores: p.flavors || [],
+        tags: p.tags || [],
+        destaque: p.is_featured,
+        is_promo: p.is_promo,
+        is_active: p.is_active
+      }))
+  })).filter(cat => cat.itens.length > 0);
+}
+
+/**
+ * Ativa ouvintes em tempo real para o cardápio e status da loja
+ */
+export function subscribeToRealtimeUpdates(onUpdate) {
+  const supabase = getSupabase();
+
+  // 1. Ouvir mudanças em produtos
+  supabase
+    .channel('public:products')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, async () => {
+      console.log('[api] Mudança detectada nos produtos, atualizando...');
+      await fetchMenu();
+      if (onUpdate) onUpdate('menu');
+    })
+    .subscribe();
+
+  // 2. Ouvir mudanças no status da loja
+  supabase
+    .channel('public:store_config')
+    .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'store_config' }, async (payload) => {
+      console.log('[api] Mudança detectada na configuração:', payload.new.key);
+      if (onUpdate) onUpdate('config', payload.new);
+    })
+    .subscribe();
 }
 
 async function fetchMenuFallback() {
@@ -67,9 +99,11 @@ async function fetchMenuFallback() {
     const data = await res.json();
     state.menu = data.categorias || [];
     console.log('[api] menu carregado do JSON fallback');
+    return state.menu;
   } catch (err) {
     console.error('[api] fallback falhou:', err);
     renderErrorUI(err.message);
+    return [];
   }
 }
 
@@ -117,7 +151,7 @@ export async function checkStoreStatus() {
     }
 
     return { 
-      is_open: isOpen && status.is_open, 
+      is_open: isOpen, 
       reason: isOpen ? '' : `Abrimos às ${todayRule.open}` 
     };
 

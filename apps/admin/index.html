@@ -327,6 +327,12 @@
     .btn-toggle.active { background: #1a3320; color: var(--green); border-color: var(--green); }
     .btn-toggle.inactive { background: #3d1a14; color: #ff9f8a; border-color: #ff9f8a; }
     .btn-edit-prod { padding: 0.5rem; background: var(--bg4); border-radius: 6px; color: var(--text); }
+    .btn-add-prod { background: var(--pink-dark); color: var(--bg); border: none; padding: 0.6rem 1.25rem; border-radius: 10px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; margin-bottom: 1.5rem; }
+
+    /* ═══════════════════════ REJECTION MODAL ═══════════════════════ */
+    .rejection-wrap { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border); display: none; }
+    .rejection-wrap.active { display: block; }
+    .rejection-input { width: 100%; background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 10px; color: var(--text); margin-bottom: 8px; font-size: 0.85rem; }
 
     /* ═══════════════════════ CONFIG ═══════════════════════ */
     .config-grid {
@@ -459,8 +465,9 @@
 
     <!-- ══ SEÇÃO PRODUTOS ══ -->
     <div id="section-produtos" class="section-content">
-      <div style="margin-bottom:1rem; display:flex; gap:10px; overflow-x:auto;" id="categoryFilter">
-        <!-- preenchido via JS -->
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:1.5rem">
+        <div style="display:flex; gap:10px; overflow-x:auto; padding-bottom:5px" id="categoryFilter"></div>
+        <button class="btn-add-prod" onclick="openAddProduct()"><i class="fas fa-plus"></i> Novo Produto</button>
       </div>
       <div id="productsContainer" class="products-container"></div>
     </div>
@@ -497,25 +504,45 @@
   </div>
 </div>
 
-<!-- Modal Edição de Produto -->
+<!-- Modal Edição/Adição de Produto -->
 <div id="modalEditProduct" class="pin-screen" style="display:none; background:rgba(0,0,0,0.8); z-index:600">
-  <div class="config-card" style="width:min(90vw, 400px)">
-    <h3 class="config-title">Editar Produto</h3>
+  <div class="config-card" style="width:min(90vw, 450px); max-height:90vh; overflow-y:auto;">
+    <h3 class="config-title" id="modalProductTitle">Editar Produto</h3>
+    
     <div class="field" style="margin-bottom:12px">
-      <label style="font-size:0.7rem; color:var(--text-muted)">NOME</label>
+      <label style="font-size:0.7rem; color:var(--text-muted)">NOME DO PRODUTO</label>
       <input type="text" id="editProdName" style="width:100%; background:var(--bg2); border:1px solid var(--border); padding:8px; color:var(--text); border-radius:6px">
     </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px">
+      <div class="field">
+        <label style="font-size:0.7rem; color:var(--text-muted)">PREÇO (R$)</label>
+        <input type="number" step="0.01" id="editProdPrice" style="width:100%; background:var(--bg2); border:1px solid var(--border); padding:8px; color:var(--text); border-radius:6px">
+      </div>
+      <div class="field">
+        <label style="font-size:0.7rem; color:var(--text-muted)">CATEGORIA</label>
+        <select id="editProdCategory" style="width:100%; background:var(--bg2); border:1px solid var(--border); padding:8px; color:var(--text); border-radius:6px"></select>
+      </div>
+    </div>
+
     <div class="field" style="margin-bottom:12px">
-      <label style="font-size:0.7rem; color:var(--text-muted)">PREÇO (R$)</label>
-      <input type="number" step="0.01" id="editProdPrice" style="width:100%; background:var(--bg2); border:1px solid var(--border); padding:8px; color:var(--text); border-radius:6px">
+      <label style="font-size:0.7rem; color:var(--text-muted)">URL DA IMAGEM</label>
+      <input type="text" id="editProdImage" style="width:100%; background:var(--bg2); border:1px solid var(--border); padding:8px; color:var(--text); border-radius:6px" placeholder="/public/assets/images/...">
     </div>
+
+    <div class="field" style="margin-bottom:12px">
+      <label style="font-size:0.7rem; color:var(--text-muted)">PORÇÃO / DESC. CURTA</label>
+      <input type="text" id="editProdPortion" style="width:100%; background:var(--bg2); border:1px solid var(--border); padding:8px; color:var(--text); border-radius:6px" placeholder="Ex: 5 unidades">
+    </div>
+
     <div class="field" style="margin-bottom:1.5rem">
-      <label style="font-size:0.7rem; color:var(--text-muted)">DESCRIÇÃO</label>
-      <textarea id="editProdDesc" style="width:100%; background:var(--bg2); border:1px solid var(--border); padding:8px; color:var(--text); border-radius:6px; resize:none; height:60px"></textarea>
+      <label style="font-size:0.7rem; color:var(--text-muted)">DESCRIÇÃO COMPLETA</label>
+      <textarea id="editProdDesc" style="width:100%; background:var(--bg2); border:1px solid var(--border); padding:8px; color:var(--text); border-radius:6px; resize:none; height:80px"></textarea>
     </div>
+
     <div style="display:flex; gap:10px">
-      <button class="btn" onclick="$('modalEditProduct').style.display='none'" style="flex:1">Cancelar</button>
-      <button class="btn btn-primary" onclick="saveProductEdit()" style="flex:1">Salvar</button>
+      <button class="btn" onclick="closeProductModal()" style="flex:1">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveProductEdit()" style="flex:1">Salvar Produto</button>
     </div>
   </div>
 </div>
@@ -695,7 +722,20 @@
               ${items.map(it => `<div class="item-row"><span class="item-qty">${it.qty}x</span><span class="item-name">${it.nome}</span><span class="item-price">R$ ${Number(it.preco * it.qty).toFixed(2)}</span></div>`).join('')}
             </div>
             ${o.special_notes ? `<div class="order-section"><div class="order-section-label">Observações</div><div class="order-notes">${o.special_notes}</div></div>` : ''}
-            <div class="order-actions">${statusBtn}<button class="btn-remove" onclick="removeOrder('${o.id}')"><i class="fas fa-trash"></i></button></div>
+            
+            <div id="rejection-${o.id}" class="rejection-wrap">
+              <textarea id="reason-${o.id}" class="rejection-input" placeholder="Motivo do cancelamento (aparecerá para o cliente)..."></textarea>
+              <div style="display:flex; gap:8px">
+                <button class="btn" onclick="toggleRejection('${o.id}', false)">Voltar</button>
+                <button class="btn btn-remove" style="flex:1" onclick="confirmRejection('${o.id}')">Confirmar Cancelamento</button>
+              </div>
+            </div>
+
+            <div class="order-actions" id="actions-${o.id}">
+              ${statusBtn}
+              ${o.status === 'pendente' ? `<button class="btn-remove" onclick="toggleRejection('${o.id}', true)"><i class="fas fa-times"></i> Recusar</button>` : ''}
+              <button class="btn-remove" onclick="removeOrder('${o.id}')"><i class="fas fa-trash"></i></button>
+            </div>
           </div></div>
         </div>`;
     }).join('');
@@ -704,6 +744,22 @@
   window.updateStatus = async (id, status) => {
     const { error } = await supabase.from('orders').update({ status }).eq('id', id);
     if (!error) showSuccess('Status atualizado!');
+  };
+
+  window.toggleRejection = (id, show) => {
+    $(`rejection-${id}`).classList.toggle('active', show);
+    $(`actions-${id}`).style.display = show ? 'none' : 'flex';
+  };
+
+  window.confirmRejection = async (id) => {
+    const reason = $(`reason-${id}`).value || 'Pedido cancelado pelo restaurante.';
+    const { error } = await supabase.from('orders').update({ 
+      status: 'cancelado',
+      rejection_reason: reason 
+    }).eq('id', id);
+    
+    if (!error) showSuccess('Pedido cancelado!');
+    else showError('Erro ao cancelar.');
   };
 
   function renderCategoryFilters() {
@@ -726,6 +782,7 @@
           <div class="product-name">${p.name}</div>
           <div class="product-price">R$ ${Number(p.price).toFixed(2)}</div>
           <div class="product-category">${categories.find(c => c.id === p.category_id)?.name || ''}</div>
+          <div style="font-size:0.75rem; color:var(--text-muted); margin-top:4px">${p.portion || ''}</div>
         </div>
         <div class="product-actions">
           <button class="btn-toggle ${p.is_active ? 'active' : 'inactive'}" onclick="toggleProduct('${p.id}', ${p.is_active})">
@@ -741,36 +798,83 @@
   }
 
   window.toggleProduct = async (id, current) => {
-    await supabase.from('products').update({ is_active: !current }).eq('id', id);
-    loadProducts();
+    const { error } = await supabase.from('products').update({ is_active: !current }).eq('id', id);
+    if (!error) {
+      showSuccess(!current ? 'Produto disponível!' : 'Produto esgotado!');
+      await loadProducts();
+    } else showError('Erro ao atualizar status.');
   };
+
   window.toggleFeatured = async (id, current) => {
-    await supabase.from('products').update({ is_featured: !current }).eq('id', id);
-    loadProducts();
+    const { error } = await supabase.from('products').update({ is_featured: !current }).eq('id', id);
+    if (!error) {
+      showSuccess('Destaque atualizado!');
+      await loadProducts();
+    } else showError('Erro ao atualizar destaque.');
+  };
+
+  window.openAddProduct = () => {
+    editingProdId = null;
+    $('modalProductTitle').textContent = 'Novo Produto';
+    $('editProdName').value = '';
+    $('editProdPrice').value = '';
+    $('editProdDesc').value = '';
+    $('editProdImage').value = '';
+    $('editProdPortion').value = '';
+    renderCategorySelect();
+    $('modalEditProduct').style.display = 'flex';
   };
 
   window.openEditProduct = (id) => {
     const p = products.find(x => x.id === id);
     if(!p) return;
     editingProdId = id;
+    $('modalProductTitle').textContent = 'Editar Produto';
     $('editProdName').value = p.name;
     $('editProdPrice').value = p.price;
     $('editProdDesc').value = p.description || '';
+    $('editProdImage').value = p.image_url || '';
+    $('editProdPortion').value = p.portion || '';
+    renderCategorySelect(p.category_id);
     $('modalEditProduct').style.display = 'flex';
+  };
+
+  function renderCategorySelect(selectedId) {
+    const select = $('editProdCategory');
+    select.innerHTML = categories.map(c => `<option value="${c.id}" ${c.id === selectedId ? 'selected' : ''}>${c.name}</option>`).join('');
+  }
+
+  window.closeProductModal = () => {
+    $('modalEditProduct').style.display = 'none';
+    editingProdId = null;
   };
 
   window.saveProductEdit = async () => {
     const p = {
       name: $('editProdName').value,
       price: parseFloat($('editProdPrice').value),
-      description: $('editProdDesc').value
+      description: $('editProdDesc').value,
+      image_url: $('editProdImage').value,
+      portion: $('editProdPortion').value,
+      category_id: $('editProdCategory').value,
+      is_active: true
     };
-    const { error } = await supabase.from('products').update(p).eq('id', editingProdId);
+
+    let error;
+    if (editingProdId) {
+      ({ error } = await supabase.from('products').update(p).eq('id', editingProdId));
+    } else {
+      ({ error } = await supabase.from('products').insert([p]));
+    }
+
     if(!error) {
-      showSuccess('Produto atualizado!');
-      $('modalEditProduct').style.display = 'none';
-      loadProducts();
-    } else showError('Erro ao salvar.');
+      showSuccess(editingProdId ? 'Produto atualizado!' : 'Produto adicionado!');
+      closeProductModal();
+      await loadProducts();
+    } else {
+      console.error(error);
+      showError('Erro ao salvar produto.');
+    }
   };
 
   function renderConfig() {

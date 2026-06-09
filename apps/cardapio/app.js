@@ -39,6 +39,20 @@ async function init() {
   renderFilterBar();
   renderContent();
 
+  // Ativa Realtime para atualizações dinâmicas
+  subscribeToRealtimeUpdates((type, data) => {
+    if (type === 'menu') {
+      renderContent();
+    } else if (type === 'config') {
+      // Se mudar o status de abertura, podemos mostrar toast ou atualizar UI
+      checkStoreStatus().then(store => {
+        if (!store.is_open) {
+          import('./js/toast.js').then(m => m.showToast(`🌙 Loja fechada: ${store.reason || ''}`, 'warning'));
+        }
+      });
+    }
+  });
+
   bindGlobalEvents();
 
   registerSW();
