@@ -40,6 +40,8 @@
       --glow:        rgba(217,143,122,0.18);
       --green:       #4caf50;
       --red:         #ff6b6b;
+      --yellow:      #ffdd57;
+      --blue:        #4dd0e1;
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -50,6 +52,7 @@
       color: var(--text);
       line-height: 1.5;
       min-height: 100dvh;
+      overflow-x: hidden;
     }
 
     /* ═══════════════════════ PIN SCREEN ═══════════════════════ */
@@ -60,330 +63,176 @@
       background: radial-gradient(ellipse at 50% 30%, #1e1210 0%, var(--bg) 70%);
       z-index: 1000; gap: 0.5rem;
     }
+    .pin-logo { width: 80px; height: 80px; border-radius: 20px; object-fit: cover; border: 2px solid var(--pink-dark); box-shadow: 0 0 30px var(--glow); margin-bottom: 0.75rem; }
+    .pin-screen h1 { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 600; color: var(--pink-dark); letter-spacing: 0.03em; }
+    .pin-screen p { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem; }
+    .pin-input { display: flex; gap: 0.75rem; margin-bottom: 1.5rem; }
+    .pin-input input { width: 50px; height: 60px; font-size: 1.5rem; text-align: center; border: 2px solid var(--border2); border-radius: 12px; background: var(--bg3); color: var(--text); transition: all 0.2s; }
+    .pin-input input:focus { outline: none; border-color: var(--pink-dark); box-shadow: 0 0 0 3px var(--glow); }
+    .pin-btn { padding: 0.8rem 3rem; font-size: 1rem; background: linear-gradient(135deg, var(--pink-dark), var(--pink-hot)); color: var(--bg); border: none; border-radius: 12px; cursor: pointer; font-weight: 700; transition: all 0.25s; font-family: 'Outfit', sans-serif; box-shadow: 0 4px 16px rgba(217,143,122,0.3); }
+    .pin-btn:active { transform: translateY(1px); }
+    .pin-error { font-size: 0.85rem; color: #ff8070; min-height: 1.2rem; margin-top: 0.5rem; }
 
-    .pin-logo {
-      width: 80px; height: 80px;
-      border-radius: 20px;
-      object-fit: cover;
-      border: 2px solid var(--pink-dark);
-      box-shadow: 0 0 30px var(--glow);
-      margin-bottom: 0.75rem;
-    }
-
-    .pin-screen h1 {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 2rem; font-weight: 600;
-      color: var(--pink-dark);
-      letter-spacing: 0.03em;
-    }
-
-    .pin-screen p {
-      font-size: 0.85rem; color: var(--text-muted);
-      margin-bottom: 1.5rem;
-    }
-
-    .pin-input {
-      display: flex; gap: 0.75rem; margin-bottom: 1.5rem;
-    }
-
-    .pin-input input {
-      width: 56px; height: 56px;
-      font-size: 1.5rem; text-align: center;
-      border: 2px solid var(--border2);
-      border-radius: 12px;
-      background: var(--bg3); color: var(--text);
-      transition: all 0.2s;
-    }
-
-    .pin-input input:focus {
-      outline: none;
-      border-color: var(--pink-dark);
-      box-shadow: 0 0 0 3px var(--glow);
-    }
-
-    .pin-btn {
-      padding: 0.8rem 3rem; font-size: 1rem;
-      background: linear-gradient(135deg, var(--pink-dark), var(--pink-hot));
-      color: var(--bg); border: none; border-radius: 12px;
-      cursor: pointer; font-weight: 700;
-      transition: all 0.25s; font-family: 'Outfit', sans-serif;
-      box-shadow: 0 4px 16px rgba(217,143,122,0.3);
-    }
-
-    .pin-btn:hover  { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(217,143,122,0.4); }
-    .pin-btn:active { transform: translateY(0); }
-
-    .pin-error {
-      font-size: 0.85rem; color: #ff8070;
-      min-height: 1.2rem; margin-top: 0.5rem;
-    }
-
-    /* ═══════════════════════ HEADER ═══════════════════════ */
+    /* ═══════════════════════ NAV & SIDEBAR ═══════════════════════ */
     .app-header {
-      position: sticky; top: 0; z-index: 50;
-      background: rgba(11,11,11,0.92);
-      backdrop-filter: blur(12px);
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(11,11,11,0.92); backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--border);
       padding: 0.75rem 1.25rem;
-      display: flex; align-items: center;
-      justify-content: space-between; gap: 1rem;
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
     }
-
-    .header-brand {
-      display: flex; align-items: center; gap: 0.75rem;
+    .header-left { display: flex; align-items: center; gap: 12px; }
+    .btn-menu {
+      background: none; border: none; color: var(--pink-dark); font-size: 1.4rem;
+      cursor: pointer; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
+      border-radius: 10px; transition: 0.2s;
     }
+    .btn-menu:active { background: var(--bg2); }
 
-    .header-mascot {
-      width: 38px; height: 38px;
-      border-radius: 10px; object-fit: cover;
-      border: 1px solid var(--pink-dark);
+    .side-menu {
+      position: fixed; top: 0; left: -280px; width: 280px; height: 100%;
+      background: var(--bg2); z-index: 200; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 10px 0 40px rgba(0,0,0,0.8);
+      display: flex; flex-direction: column;
+      border-right: 1px solid var(--border);
     }
-
-    .header-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.4rem; font-weight: 600;
-      color: var(--pink-dark);
+    .side-menu.open { left: 0; }
+    .side-menu-header {
+      padding: 2.5rem 1.5rem; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 12px;
     }
-
-    .header-subtitle {
-      font-size: 0.75rem; color: var(--text-muted);
-      margin-top: -2px;
-      display: flex; align-items: center; gap: 6px;
+    .side-menu-content { flex: 1; padding: 1rem 0; }
+    .nav-item {
+      display: flex; align-items: center; gap: 12px; padding: 1rem 1.5rem;
+      color: var(--text-muted); text-decoration: none; transition: 0.2s;
+      border-left: 3px solid transparent; cursor: pointer; font-weight: 500;
     }
-
-    .header-actions { display: flex; gap: 0.5rem; align-items: center; }
-
-    .realtime-dot {
-      width: 8px; height: 8px; border-radius: 50%;
-      background: #3c3c3c; transition: background 0.3s;
-      flex-shrink: 0;
+    .nav-item i { width: 20px; text-align: center; font-size: 1.1rem; }
+    .nav-item.active {
+      color: var(--pink-dark); background: rgba(217, 143, 122, 0.05);
+      border-left-color: var(--pink-dark); font-weight: 600;
     }
-    .realtime-dot.connected { background: var(--green); box-shadow: 0 0 6px #4caf5088; }
-    .realtime-dot.error     { background: var(--red); }
-
-    .store-badge {
-      font-size: 0.65rem; padding: 2px 6px; border-radius: 4px;
-      font-weight: 700; text-transform: uppercase;
+    .nav-item-badge {
+      background: var(--pink-hot); color: var(--bg); font-size: 0.7rem; font-weight: 800;
+      padding: 2px 7px; border-radius: 10px; margin-left: auto;
     }
+    .side-menu-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 190;
+      opacity: 0; pointer-events: none; transition: 0.3s;
+    }
+    .side-menu-overlay.open { opacity: 1; pointer-events: auto; }
+
+    /* ═══════════════════════ DASHBOARD ═══════════════════════ */
+    .dashboard-inner { max-width: 1100px; margin: 0 auto; padding: 1.25rem 1rem 4rem; }
+    .section-content { display: none; }
+    .section-content.active { display: block; animation: fadeIn 0.3s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; }
+    .section-title { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; font-weight: 600; color: var(--pink-dark); }
+
+    /* ═══════════════════════ STATS ═══════════════════════ */
+    .stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; margin-bottom: 1.5rem; }
+    .stat-card {
+      background: var(--bg3); border: 1px solid var(--border); border-radius: 14px;
+      padding: 1.25rem 1rem; text-align: center; cursor: pointer; transition: all 0.2s;
+    }
+    .stat-card:active { transform: scale(0.96); }
+    .stat-label { font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.4rem; }
+    .stat-number { font-size: 1.8rem; font-weight: 700; line-height: 1; }
+    
+    .stat-pendente { border-bottom: 3px solid var(--pink-hot); }
+    .stat-pendente .stat-number { color: #ff9f8a; }
+    .stat-preparando { border-bottom: 3px solid var(--yellow); }
+    .stat-preparando .stat-number { color: var(--yellow); }
+    .stat-pronto { border-bottom: 3px solid var(--green); }
+    .stat-pronto .stat-number { color: var(--green); }
+    .stat-entregue { border-bottom: 3px solid var(--blue); }
+    .stat-entregue .stat-number { color: var(--blue); }
+
+    /* ═══════════════════════ REPORTS ═══════════════════════ */
+    .report-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+    .report-card { background: var(--bg3); border-radius: 16px; padding: 1.5rem; border: 1px solid var(--border); }
+    .report-card-title { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 1.25rem; display: flex; align-items: center; gap: 8px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .report-card-title i { color: var(--pink-dark); }
+    .report-value { font-size: 2.2rem; font-weight: 700; color: var(--pink-dark); font-family: 'Outfit', sans-serif; }
+    .report-sub { font-size: 0.85rem; color: var(--green); margin-top: 4px; font-weight: 500; }
+    
+    .top-items-list { display: flex; flex-direction: column; gap: 12px; }
+    .top-item-row { display: flex; align-items: center; justify-content: space-between; font-size: 0.9rem; padding: 8px 0; border-bottom: 1px solid var(--border); }
+    .top-item-row:last-child { border-bottom: none; }
+    .top-item-name { flex: 1; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 12px; }
+    .top-item-qty { font-weight: 700; color: var(--pink-dark); background: rgba(217,143,122,0.1); padding: 2px 8px; border-radius: 6px; }
+
+    /* ═══════════════════════ ORDERS ═══════════════════════ */
+    .orders-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 1rem; }
+    .order-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; transition: 0.25s; }
+    .order-card.new-card { border-color: var(--pink-dark); box-shadow: 0 0 20px var(--glow); }
+    .order-summary { padding: 1rem 1.25rem; cursor: pointer; display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; }
+    .order-client-name { font-size: 1rem; font-weight: 600; color: var(--text); }
+    .order-meta { font-size: 0.75rem; color: var(--text-muted); display: flex; gap: 8px; margin-bottom: 4px; }
+    .order-status { padding: 0.3rem 0.75rem; border-radius: 20px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+    .order-status.pendente { background: #3d1a14; color: #ff9f8a; }
+    .order-status.preparando { background: #3a3310; color: var(--yellow); }
+    .order-status.pronto { background: #1a3320; color: var(--green); }
+    .order-status.entregue { background: #102535; color: var(--blue); }
+    .order-total-preview { font-size: 1rem; font-weight: 700; color: var(--pink-dark); margin-top: 4px; display: block; text-align: right; }
+    
+    .order-body { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; border-top: 0 solid var(--border); }
+    .order-card.open .order-body { max-height: 1000px; border-top-width: 1px; }
+    .order-body-inner { padding: 1.25rem; }
+    .order-section { background: var(--bg2); border-radius: 10px; padding: 0.8rem; margin-bottom: 0.75rem; }
+    .order-section-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-muted); margin-bottom: 0.5rem; font-weight: 600; }
+    .item-row { display: flex; justify-content: space-between; font-size: 0.9rem; padding: 6px 0; border-bottom: 1px solid var(--border); }
+    .item-qty { color: var(--pink-dark); font-weight: 700; margin-right: 8px; }
+    .order-actions { display: flex; gap: 8px; margin-top: 1rem; flex-wrap: wrap; }
+
+    /* ═══════════════════════ PRODUCTS ═══════════════════════ */
+    .products-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
+    .product-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; }
+    .product-img { width: 100%; aspect-ratio: 1; object-fit: cover; filter: brightness(0.85); }
+    .product-body { padding: 10px; flex: 1; }
+    .product-name { font-weight: 600; font-size: 0.85rem; margin-bottom: 4px; height: 2.4em; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+    .product-price { color: var(--pink-dark); font-weight: 700; font-size: 0.9rem; }
+    .product-actions { display: grid; grid-template-columns: 1fr 36px 36px; gap: 4px; padding: 8px; border-top: 1px solid var(--border); }
+    
+    .btn-toggle { font-size: 0.65rem; font-weight: 800; border-radius: 6px; border: 1px solid var(--border); cursor: pointer; height: 32px; transition: 0.2s; background: var(--bg4); color: var(--text-muted); }
+    .btn-toggle.active { background: #1a3320; color: var(--green); border-color: var(--green); }
+    .btn-toggle.inactive { background: #3d1a14; color: #ff9f8a; border-color: #ff9f8a; }
+    .btn-toggle.featured-btn.active { background: #3a3310; color: var(--yellow); border-color: var(--yellow); }
+
+    /* ═══════════════════════ BUTTONS & MISC ═══════════════════════ */
+    .btn { padding: 0.6rem 1rem; border-radius: 8px; background: var(--bg4); color: var(--text); border: 1px solid var(--border2); cursor: pointer; font-weight: 600; font-size: 0.85rem; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px; }
+    .btn:active { transform: scale(0.96); }
+    .btn-primary { background: var(--pink-dark); color: var(--bg); border: none; }
+    .btn-remove { background: #2a1212; color: #ff8070; border-color: #4a1a1a; }
+    .btn-logout { background: none; border: none; color: #ff8070; font-weight: 600; }
+
+    .realtime-dot { width: 8px; height: 8px; border-radius: 50%; background: #3c3c3c; margin-right: 6px; transition: 0.3s; }
+    .realtime-dot.connected { background: var(--green); box-shadow: 0 0 8px var(--green); }
+    .realtime-dot.error { background: var(--red); }
+    
+    .store-badge { font-size: 0.65rem; font-weight: 800; padding: 2px 6px; border-radius: 4px; margin-left: 6px; }
     .store-badge.open { background: #1a3320; color: var(--green); }
     .store-badge.closed { background: #3d1a14; color: #ff9f8a; }
 
-    /* ═══════════════════════ LAYOUT ═══════════════════════ */
-    #dashboard { display: none; }
+    .toast { position: fixed; bottom: -100px; left: 50%; transform: translateX(-50%); padding: 1rem 1.5rem; border-radius: 12px; z-index: 1000; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); font-weight: 600; text-align: center; width: min(90%, 350px); box-shadow: 0 10px 40px rgba(0,0,0,0.6); }
+    .toast.show { bottom: 2rem; }
+    .toast-success { background: #122212; border: 1px solid var(--green); color: #a5d6a7; }
+    .toast-error { background: #2a1212; border: 1px solid var(--red); color: #ffaaaa; }
+    .toast-new { background: #1e1512; border: 1px solid var(--pink-dark); color: var(--pink-light); }
 
-    .dashboard-inner {
-      max-width: 1100px; margin: 0 auto;
-      padding: 1.25rem 1rem 4rem;
-    }
-
-    /* ═══════════════════════ STATS ═══════════════════════ */
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 0.75rem; margin-bottom: 1.5rem;
-    }
-
-    .stat-card {
-      background: var(--bg3);
-      border: 1px solid var(--border);
-      border-radius: 12px; padding: 1rem;
-      cursor: pointer; transition: all 0.2s;
-    }
-
-    .stat-card:hover { border-color: var(--pink-dark); transform: translateY(-2px); }
-    .stat-card.active-stat { border-color: var(--pink-dark); background: #1e1512; }
-
-    .stat-label {
-      font-size: 0.75rem; color: var(--text-muted);
-      text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.4rem;
-    }
-
-    .stat-number {
-      font-size: 2rem; font-weight: 700; color: var(--pink-dark);
-      font-family: 'Outfit', sans-serif; line-height: 1;
-    }
-
-    .stat-card.stat-pendente   .stat-number { color: #ff9f8a; }
-    .stat-card.stat-preparando .stat-number { color: #ffdd57; }
-    .stat-card.stat-pronto     .stat-number { color: #4caf50; }
-    .stat-card.stat-entregue   .stat-number { color: #00bcd4; }
-
-    /* ═══════════════════════ TABS ═══════════════════════ */
-    .tabs {
-      display: flex; gap: 0; margin-bottom: 1.25rem;
-      border-bottom: 2px solid var(--border);
-      overflow-x: auto; scrollbar-width: none;
-    }
-    .tabs::-webkit-scrollbar { display: none; }
-
-    .tab {
-      padding: 0.7rem 1.25rem;
-      background: transparent; border: none; border-bottom: 3px solid transparent;
-      color: var(--text-muted); cursor: pointer;
-      font-weight: 500; white-space: nowrap;
-      transition: all 0.2s; font-family: 'Outfit', sans-serif;
-      font-size: 0.9rem;
-    }
-
-    .tab:hover { color: var(--text); }
-    .tab.active { color: var(--pink-dark); border-bottom-color: var(--pink-dark); font-weight: 600; }
-
-    .tab .tab-badge {
-      display: inline-flex; align-items: center; justify-content: center;
-      width: 18px; height: 18px; border-radius: 50%;
-      background: var(--pink-dark); color: var(--bg);
-      font-size: 0.7rem; font-weight: 700; margin-left: 6px;
-    }
-
-    /* ═══════════════════════ SECTIONS ═══════════════════════ */
-    .section-content { display: none; }
-    .section-content.active { display: block; }
-
-    /* ═══════════════════════ ORDERS ═══════════════════════ */
-    .orders-container {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-      gap: 1rem;
-    }
-
-    .order-card {
-      background: var(--bg3);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      overflow: hidden;
-      transition: all 0.25s;
-    }
-
-    .order-card:hover { border-color: var(--border2); }
-    .order-card.new-card { border-color: var(--pink-dark); animation: pulse-border 2s ease 3; }
-
-    @keyframes pulse-border {
-      0%,100% { box-shadow: 0 0 0 0 var(--glow); }
-      50%      { box-shadow: 0 0 0 6px var(--glow); }
-    }
-
-    .order-summary {
-      padding: 1rem 1.25rem;
-      cursor: pointer; user-select: none;
-      display: flex; justify-content: space-between;
-      align-items: flex-start; gap: 1rem;
-    }
-
-    .order-summary-left { flex: 1; min-width: 0; }
-    .order-meta { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem; flex-wrap: wrap; }
-    .order-id { font-size: 0.78rem; color: var(--text-muted); font-family: 'Outfit', monospace; letter-spacing: 0.05em; }
-    .order-time { font-size: 0.75rem; color: var(--text-dim); }
-    .order-client-name { font-size: 1rem; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .order-phone { font-size: 0.8rem; color: var(--text-muted); margin-top: 2px; }
-
-    .order-summary-right { display: flex; flex-direction: column; align-items: flex-end; gap: 0.5rem; flex-shrink: 0; }
-    .order-status { padding: 0.3rem 0.75rem; border-radius: 20px; font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap; }
-    .order-status.pendente   { background: #3d1a14; color: #ff9f8a; }
-    .order-status.preparando { background: #3a3310; color: #ffdd57; }
-    .order-status.pronto     { background: #1a3320; color: #5cb85c; }
-    .order-status.entregue   { background: #102535; color: #4dd0e1; }
-    .order-total-preview { font-size: 0.9rem; font-weight: 700; color: var(--pink-dark); }
-
-    .chevron-icon { color: var(--text-dim); font-size: 0.8rem; transition: transform 0.25s; margin-top: 2px; }
-    .order-card.open .chevron-icon { transform: rotate(180deg); }
-
-    .order-body { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; border-top: 0 solid var(--border); }
-    .order-card.open .order-body { max-height: 800px; border-top-width: 1px; }
-    .order-body-inner { padding: 1rem 1.25rem 1.25rem; }
-
-    .order-section { background: var(--bg2); border-radius: 8px; padding: 0.75rem; margin-bottom: 0.75rem; font-size: 0.88rem; }
-    .order-section-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-muted); margin-bottom: 0.4rem; font-weight: 600; }
-    .item-row { display: flex; align-items: baseline; gap: 0.5rem; padding: 0.4rem 0; border-bottom: 1px solid var(--border); }
-    .item-row:last-child { border-bottom: none; }
-    .item-qty { color: var(--pink-dark); font-weight: 700; min-width: 28px; }
-    .item-name { flex: 1; }
-    .item-sabor { font-size: 0.78rem; color: var(--text-muted); }
-    .item-price { color: var(--text-muted); font-size: 0.82rem; white-space: nowrap; }
-    .order-total-row { display: flex; justify-content: space-between; padding-top: 0.6rem; font-weight: 700; font-size: 1rem; color: var(--pink-dark); border-top: 1px solid var(--border2); margin-top: 0.4rem; }
-    .order-notes { font-size: 0.85rem; color: #bbb; border-left: 2px solid var(--pink-dark); padding-left: 0.75rem; }
-
-    .order-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.75rem; }
-    .order-actions button { flex: 1; min-width: 100px; padding: 0.6rem 0.75rem; border: none; border-radius: 8px; cursor: pointer; font-size: 0.85rem; font-weight: 600; transition: all 0.2s; font-family: 'Outfit', sans-serif; }
-    .btn-pendente-action   { background: #3d1a14; color: #ff9f8a; }
-    .btn-preparando-action { background: #3a3310; color: #ffdd57; }
-    .btn-pronto-action     { background: #1a3320; color: #5cb85c; }
-    .btn-remove { background: #2a1212; color: #ff8070; }
-
-    /* ═══════════════════════ PRODUCTS ═══════════════════════ */
-    .products-container {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem;
-    }
-    .product-card {
-      background: var(--bg3); border: 1px solid var(--border); border-radius: 12px; overflow: hidden;
-      display: flex; flex-direction: column;
-    }
-    .product-img { width: 100%; aspect-ratio: 16/9; object-fit: cover; filter: brightness(0.8); }
-    .product-body { padding: 1rem; flex: 1; }
-    .product-name { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.25rem; }
-    .product-price { color: var(--pink-dark); font-weight: 700; margin-bottom: 0.5rem; }
-    .product-category { font-size: 0.7rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.75rem; }
-    .product-actions { display: flex; gap: 0.5rem; border-top: 1px solid var(--border); padding: 0.75rem; }
-    .btn-toggle { flex: 1; padding: 0.5rem; font-size: 0.75rem; border-radius: 6px; font-weight: 600; text-align: center; cursor: pointer; border: 1px solid var(--border); }
-    .btn-toggle.active { background: #1a3320; color: var(--green); border-color: var(--green); }
-    .btn-toggle.inactive { background: #3d1a14; color: #ff9f8a; border-color: #ff9f8a; }
-    .btn-edit-prod { padding: 0.5rem; background: var(--bg4); border-radius: 6px; color: var(--text); }
-    .btn-add-prod { background: var(--pink-dark); color: var(--bg); border: none; padding: 0.6rem 1.25rem; border-radius: 10px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; margin-bottom: 1.5rem; }
-
-    /* ═══════════════════════ REJECTION MODAL ═══════════════════════ */
-    .rejection-wrap { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border); display: none; }
-    .rejection-wrap.active { display: block; }
-    .rejection-input { width: 100%; background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 10px; color: var(--text); margin-bottom: 8px; font-size: 0.85rem; }
-
-    /* ═══════════════════════ CONFIG ═══════════════════════ */
-    .config-grid {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 1.5rem;
-    }
-    .config-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 14px; padding: 1.25rem; }
-    .config-title { font-size: 1rem; font-weight: 600; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 10px; }
-    .config-title i { color: var(--pink-dark); }
-    
-    .status-toggle-wrap { display: flex; align-items: center; justify-content: space-between; background: var(--bg2); padding: 1rem; border-radius: 12px; margin-bottom: 1rem; }
-    .panic-btn { padding: 0.75rem 1.5rem; border-radius: 10px; font-weight: 700; cursor: pointer; transition: 0.2s; border: none; }
-    .panic-btn.open { background: var(--green); color: #000; }
-    .panic-btn.closed { background: var(--red); color: #000; }
-
-    .hours-grid { display: flex; flex-direction: column; gap: 0.5rem; }
-    .hour-row { display: grid; grid-template-columns: 100px 1fr 1fr 60px; align-items: center; gap: 10px; font-size: 0.85rem; padding: 6px 0; border-bottom: 1px solid var(--border); }
-    .hour-row:last-child { border-bottom: none; }
-    .hour-day { font-weight: 600; }
-    .hour-input { background: var(--bg2); border: 1px solid var(--border2); color: var(--text); padding: 4px; border-radius: 4px; font-size: 0.8rem; text-align: center; }
-    .hour-closed-check { justify-self: center; }
-
-    /* ═══════════════════════ GLOBAL ═══════════════════════ */
-    .btn { padding: 0.5rem 1rem; background: var(--bg4); color: var(--text); border: 1px solid var(--border2); border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.2s; font-size: 0.85rem; font-family: 'Outfit', sans-serif; }
-    .btn:hover { background: var(--bg3); border-color: var(--pink-dark); }
-    .btn-primary { background: var(--pink-dark); color: var(--bg); border: none; }
-    .btn-logout { color: var(--text-muted); }
-
-    .loading { text-align: center; padding: 3rem 1rem; color: var(--text-muted); grid-column: 1 / -1; }
-    .spinner { border: 3px solid var(--border2); border-top: 3px solid var(--pink-dark); border-radius: 50%; width: 32px; height: 32px; animation: spin 0.8s linear infinite; margin: 0 auto 1rem; }
+    .loading { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 4rem; color: var(--text-muted); }
+    .spinner { width: 32px; height: 32px; border: 3px solid var(--border2); border-top-color: var(--pink-dark); border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 1rem; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    .empty-state { grid-column: 1 / -1; text-align: center; padding: 4rem 1rem; color: var(--text-muted); }
-    .empty-state i { font-size: 2.5rem; color: var(--border2); margin-bottom: 1rem; }
-
-    .toast { position: fixed; bottom: -120px; left: 50%; transform: translateX(-50%); padding: 0.9rem 1.5rem; border-radius: 10px; box-shadow: 0 8px 30px var(--shadow); z-index: 200; transition: bottom 0.3s cubic-bezier(.22,1,.36,1); max-width: min(90vw, 400px); width: max-content; font-size: 0.9rem; font-weight: 500; display: flex; align-items: center; gap: 0.75rem; }
-    .toast.show { bottom: 1.5rem; }
-    .toast-new    { background: #1e1512; border: 1px solid var(--pink-dark); color: var(--pink-light); }
-    .toast-error  { background: #2a1212; border: 1px solid #ff6b6b; color: #ffaaaa; }
-    .toast-success { background: #122212; border: 1px solid #4caf50; color: #a5d6a7; }
-
     .alarm-overlay { position: fixed; inset: 0; background: rgba(217,143,122,0.08); pointer-events: none; z-index: 90; animation: alarm-flash 0.8s ease infinite; display: none; }
-    .alarm-overlay.active { display: block; }
+    .alarm-overlay.active { display: flex; }
     @keyframes alarm-flash { 0%,100% { opacity: 0; } 50% { opacity: 1; } }
 
     @media (max-width: 640px) {
       .stats { grid-template-columns: repeat(2, 1fr); }
       .orders-container, .products-container { grid-template-columns: 1fr; }
-      .header-title { font-size: 1.1rem; }
-      .tab { padding: 0.6rem 0.9rem; font-size: 0.82rem; }
-      .stat-number { font-size: 1.5rem; }
-      .hour-row { grid-template-columns: 80px 1fr 1fr 40px; }
     }
   </style>
 </head>
@@ -407,13 +256,46 @@
   <p class="pin-error" id="pinError"></p>
 </div>
 
-<div id="dashboard">
+<!-- Menu Lateral -->
+<div class="side-menu-overlay" id="menuOverlay" onclick="toggleMenu(false)"></div>
+<div class="side-menu" id="sideMenu">
+  <div class="side-menu-header">
+    <img src="./mascot-icon.jpg" style="width:48px; border-radius:12px; border:1px solid var(--pink-dark)">
+    <div>
+      <div style="font-family:'Cormorant Garamond', serif; font-weight:600; font-size:1.4rem; color:var(--pink-dark); line-height:1">Flor de Lótus</div>
+      <div style="font-size:0.7rem; color:var(--text-muted); margin-top:4px" id="adminEmailText">Painel Administrativo</div>
+    </div>
+  </div>
+  <div class="side-menu-content">
+    <div class="nav-item active" data-tab="pedidos" onclick="switchMainTab('pedidos')">
+      <i class="fas fa-shopping-basket"></i> Pedidos <span class="nav-item-badge" id="badge-pedidos" style="display:none">0</span>
+    </div>
+    <div class="nav-item" data-tab="produtos" onclick="switchMainTab('produtos')">
+      <i class="fas fa-utensils"></i> Produtos
+    </div>
+    <div class="nav-item" data-tab="reports" onclick="switchMainTab('reports')">
+      <i class="fas fa-chart-line"></i> Relatórios
+    </div>
+    <div class="nav-item" data-tab="config" onclick="switchMainTab('config')">
+      <i class="fas fa-cog"></i> Ajustes
+    </div>
+  </div>
+  <div style="padding: 1.5rem; border-top: 1px solid var(--border)">
+    <button class="btn-logout" onclick="logout()" style="width:100%; display:flex; align-items:center; gap:10px; cursor:pointer; background:none; border:none; color:var(--red); font-weight:600">
+      <i class="fas fa-sign-out-alt"></i> Sair do Painel
+    </button>
+  </div>
+</div>
+
+<div id="dashboard" style="display:none">
   <header class="app-header">
-    <div class="header-brand">
-      <img src="./mascot-icon.jpg" alt="Mascote" class="header-mascot" />
+    <div class="header-left">
+      <button class="btn-menu" onclick="toggleMenu(true)">
+        <i class="fas fa-bars"></i>
+      </button>
       <div>
-        <div class="header-title">Admin Lótus</div>
-        <div class="header-subtitle">
+        <div class="header-title" id="currentTabTitle" style="font-family:'Cormorant Garamond', serif; font-size:1.4rem; font-weight:600; color:var(--pink-dark)">Pedidos</div>
+        <div class="header-subtitle" style="font-size:0.75rem; color:var(--text-muted); display:flex; align-items:center">
           <span id="realtimeDot" class="realtime-dot"></span>
           <span id="storeStatusBadge" class="store-badge">...</span>
         </div>
@@ -423,17 +305,10 @@
       <button class="btn" onclick="refreshData()" title="Atualizar">
         <i class="fas fa-rotate-right"></i>
       </button>
-      <button class="btn btn-logout" onclick="logout()">Sair</button>
     </div>
   </header>
 
   <div class="dashboard-inner">
-    <div class="tabs" id="tabBar">
-      <button class="tab active" data-tab="pedidos" onclick="switchMainTab('pedidos')">Pedidos <span class="tab-badge" id="total-pendentes">0</span></button>
-      <button class="tab"        data-tab="produtos" onclick="switchMainTab('produtos')">Produtos</button>
-      <button class="tab"        data-tab="config"   onclick="switchMainTab('config')">Ajustes</button>
-    </div>
-
     <!-- ══ SEÇÃO PEDIDOS ══ -->
     <div id="section-pedidos" class="section-content active">
       <div class="stats">
@@ -454,46 +329,83 @@
           <div class="stat-number" id="statEntregue">0</div>
         </div>
       </div>
-      <div class="tabs" style="border-bottom:none; margin-bottom:1rem;">
+      
+      <div class="tabs" style="margin-bottom:1rem; border-bottom: 2px solid var(--border)">
         <button class="tab order-tab active" data-otab="pendente" onclick="switchOrderTab('pendente')">Pendentes</button>
         <button class="tab order-tab" data-otab="preparando" onclick="switchOrderTab('preparando')">Cozinha</button>
         <button class="tab order-tab" data-otab="pronto" onclick="switchOrderTab('pronto')">Para Entrega</button>
         <button class="tab order-tab" data-otab="entregue" onclick="switchOrderTab('entregue')">Histórico</button>
       </div>
+
       <div id="ordersContainer" class="orders-container"></div>
     </div>
 
     <!-- ══ SEÇÃO PRODUTOS ══ -->
     <div id="section-produtos" class="section-content">
-      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:1.5rem">
-        <div style="display:flex; gap:10px; overflow-x:auto; padding-bottom:5px" id="categoryFilter"></div>
-        <button class="btn-add-prod" onclick="openAddProduct()"><i class="fas fa-plus"></i> Novo Produto</button>
+      <div class="section-header">
+        <h2 class="section-title">Produtos</h2>
+        <button class="btn btn-primary" onclick="openAddProduct()"><i class="fas fa-plus"></i> Novo</button>
       </div>
+      <div style="display:flex; gap:10px; overflow-x:auto; padding-bottom:12px; margin-bottom:1rem" id="categoryFilter"></div>
       <div id="productsContainer" class="products-container"></div>
+    </div>
+
+    <!-- ══ SEÇÃO RELATÓRIOS ══ -->
+    <div id="section-reports" class="section-content">
+      <div class="section-header">
+        <h2 class="section-title">Relatórios</h2>
+        <div style="font-size:0.8rem; color:var(--text-muted)">Hoje, <span id="reportDateText">...</span></div>
+      </div>
+
+      <div class="report-grid">
+        <div class="report-card">
+          <div class="report-card-title"><i class="fas fa-money-bill-wave"></i> Faturamento Hoje</div>
+          <div class="report-value" id="reportRevenue">R$ 0,00</div>
+          <div class="report-sub" id="reportOrderCount">0 pedidos concluídos</div>
+        </div>
+
+        <div class="report-card">
+          <div class="report-card-title"><i class="fas fa-star"></i> Produtos Mais Vendidos</div>
+          <div id="topItemsList" class="top-items-list">
+            <div style="text-align:center; padding:1rem; color:var(--text-muted); font-size:0.85rem">Aguardando dados...</div>
+          </div>
+        </div>
+
+        <div class="report-card">
+          <div class="report-card-title"><i class="fas fa-users"></i> Clientes Recorrentes</div>
+          <div id="topClientsList" class="top-items-list">
+             <div style="text-align:center; padding:1rem; color:var(--text-muted); font-size:0.85rem">Aguardando dados...</div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- ══ SEÇÃO CONFIG ══ -->
     <div id="section-config" class="section-content">
-      <div class="config-grid">
-        <div class="config-card">
-          <h3 class="config-title"><i class="fas fa-store"></i> Status da Loja</h3>
-          <div class="status-toggle-wrap">
+      <div class="section-header">
+        <h2 class="section-title">Ajustes</h2>
+      </div>
+      
+      <div class="report-grid">
+        <div class="report-card">
+          <h3 class="config-title" style="margin-bottom:1rem; font-size:1rem; font-weight:600"><i class="fas fa-store"></i> Status da Loja</h3>
+          <div class="status-toggle-wrap" style="display:flex; align-items:center; justify-content:space-between; background:var(--bg2); padding:1rem; border-radius:12px; margin-bottom:1rem">
             <div>
               <p style="font-weight:600" id="panicStatusText">Loja Aberta</p>
-              <p style="font-size:0.75rem; color:var(--text-muted)">Clique para fechar manualmente</p>
+              <p style="font-size:0.7rem; color:var(--text-muted)">Controle manual da loja</p>
             </div>
             <button id="btnPanic" class="panic-btn" onclick="togglePanic()">FECHAR LOJA</button>
           </div>
-          <div class="field" style="margin-top:1.5rem">
-            <label style="font-size:0.75rem; color:var(--text-muted); display:block; margin-bottom:8px">MENSAGEM DE ALERTA (BANNER)</label>
-            <textarea id="configBannerMsg" style="width:100%; background:var(--bg2); border:1px solid var(--border); border-radius:8px; padding:10px; color:var(--text); resize:none; height:80px" placeholder="Ex: Hoje entregas grátis!"></textarea>
+          <div style="margin-top:1.5rem">
+            <label style="font-size:0.7rem; color:var(--text-muted); display:block; margin-bottom:8px; text-transform:uppercase; font-weight:600">Mensagem de Alerta (Banner)</label>
+            <textarea id="configBannerMsg" style="width:100%; background:var(--bg2); border:1px solid var(--border); border-radius:10px; padding:10px; color:var(--text); resize:none; height:80px; font-family:inherit" placeholder="Ex: Hoje entregas grátis!"></textarea>
             <button class="btn btn-primary" style="margin-top:10px; width:100%" onclick="saveBannerMsg()">Salvar Mensagem</button>
           </div>
         </div>
 
-        <div class="config-card">
-          <h3 class="config-title"><i class="fas fa-clock"></i> Horários de Funcionamento</h3>
-          <div id="hoursList" class="hours-grid">
+        <div class="report-card">
+          <h3 class="config-title" style="margin-bottom:1rem; font-size:1rem; font-weight:600"><i class="fas fa-clock"></i> Horários de Funcionamento</h3>
+          <div id="hoursList" style="display:flex; flex-direction:column; gap:6px">
             <!-- preenchido via JS -->
           </div>
           <button class="btn btn-primary" style="margin-top:1.5rem; width:100%" onclick="saveHours()">Salvar Horários</button>
@@ -504,40 +416,41 @@
   </div>
 </div>
 
-<!-- Modal Edição/Adição de Produto -->
-<div id="modalEditProduct" class="pin-screen" style="display:none; background:rgba(0,0,0,0.8); z-index:600">
-  <div class="config-card" style="width:min(90vw, 450px); max-height:90vh; overflow-y:auto;">
-    <h3 class="config-title" id="modalProductTitle">Editar Produto</h3>
+<!-- Modal Edição de Produto -->
+<div id="modalEditProduct" class="pin-screen" style="display:none; background:rgba(0,0,0,0.85); z-index:600; padding:1rem">
+  <div class="report-card" style="width:min(100%, 450px); max-height:90vh; overflow-y:auto; position:relative">
+    <button onclick="closeProductModal()" style="position:absolute; top:15px; right:15px; background:none; border:none; color:var(--text-muted); font-size:1.2rem"><i class="fas fa-times"></i></button>
+    <h3 class="config-title" id="modalProductTitle" style="margin-bottom:1.5rem">Editar Produto</h3>
     
-    <div class="field" style="margin-bottom:12px">
-      <label style="font-size:0.7rem; color:var(--text-muted)">NOME DO PRODUTO</label>
-      <input type="text" id="editProdName" style="width:100%; background:var(--bg2); border:1px solid var(--border); padding:8px; color:var(--text); border-radius:6px">
+    <div style="margin-bottom:12px">
+      <label style="font-size:0.7rem; color:var(--text-muted); display:block; margin-bottom:4px">NOME DO PRODUTO</label>
+      <input type="text" id="editProdName" style="width:100%; background:var(--bg2); border:1px solid var(--border); padding:10px; color:var(--text); border-radius:8px; font-family:inherit">
     </div>
 
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px">
-      <div class="field">
-        <label style="font-size:0.7rem; color:var(--text-muted)">PREÇO (R$)</label>
-        <input type="number" step="0.01" id="editProdPrice" style="width:100%; background:var(--bg2); border:1px solid var(--border); padding:8px; color:var(--text); border-radius:6px">
+      <div>
+        <label style="font-size:0.7rem; color:var(--text-muted); display:block; margin-bottom:4px">PREÇO (R$)</label>
+        <input type="number" step="0.01" id="editProdPrice" style="width:100%; background:var(--bg2); border:1px solid var(--border); padding:10px; color:var(--text); border-radius:8px; font-family:inherit">
       </div>
-      <div class="field">
-        <label style="font-size:0.7rem; color:var(--text-muted)">CATEGORIA</label>
-        <select id="editProdCategory" style="width:100%; background:var(--bg2); border:1px solid var(--border); padding:8px; color:var(--text); border-radius:6px"></select>
+      <div>
+        <label style="font-size:0.7rem; color:var(--text-muted); display:block; margin-bottom:4px">CATEGORIA</label>
+        <select id="editProdCategory" style="width:100%; background:var(--bg2); border:1px solid var(--border); padding:10px; color:var(--text); border-radius:8px; font-family:inherit"></select>
       </div>
     </div>
 
-    <div class="field" style="margin-bottom:12px">
-      <label style="font-size:0.7rem; color:var(--text-muted)">URL DA IMAGEM</label>
-      <input type="text" id="editProdImage" style="width:100%; background:var(--bg2); border:1px solid var(--border); padding:8px; color:var(--text); border-radius:6px" placeholder="/public/assets/images/...">
+    <div style="margin-bottom:12px">
+      <label style="font-size:0.7rem; color:var(--text-muted); display:block; margin-bottom:4px">URL DA IMAGEM</label>
+      <input type="text" id="editProdImage" style="width:100%; background:var(--bg2); border:1px solid var(--border); padding:10px; color:var(--text); border-radius:8px; font-family:inherit">
     </div>
 
-    <div class="field" style="margin-bottom:12px">
-      <label style="font-size:0.7rem; color:var(--text-muted)">PORÇÃO / DESC. CURTA</label>
-      <input type="text" id="editProdPortion" style="width:100%; background:var(--bg2); border:1px solid var(--border); padding:8px; color:var(--text); border-radius:6px" placeholder="Ex: 5 unidades">
+    <div style="margin-bottom:12px">
+      <label style="font-size:0.7rem; color:var(--text-muted); display:block; margin-bottom:4px">PORÇÃO / DESC. CURTA</label>
+      <input type="text" id="editProdPortion" style="width:100%; background:var(--bg2); border:1px solid var(--border); padding:10px; color:var(--text); border-radius:8px; font-family:inherit">
     </div>
 
-    <div class="field" style="margin-bottom:1.5rem">
-      <label style="font-size:0.7rem; color:var(--text-muted)">DESCRIÇÃO COMPLETA</label>
-      <textarea id="editProdDesc" style="width:100%; background:var(--bg2); border:1px solid var(--border); padding:8px; color:var(--text); border-radius:6px; resize:none; height:80px"></textarea>
+    <div style="margin-bottom:1.5rem">
+      <label style="font-size:0.7rem; color:var(--text-muted); display:block; margin-bottom:4px">DESCRIÇÃO COMPLETA</label>
+      <textarea id="editProdDesc" style="width:100%; background:var(--bg2); border:1px solid var(--border); padding:10px; color:var(--text); border-radius:8px; resize:none; height:80px; font-family:inherit"></textarea>
     </div>
 
     <div style="display:flex; gap:10px">
@@ -569,6 +482,7 @@
 
   const $ = id => document.getElementById(id);
 
+  /* ═══════════════════════ SESSÃO & LOGIN ═══════════════════════ */
   async function checkSession() {
     const { data: { session } } = await supabase.auth.getSession();
     if (session) enterDashboard();
@@ -596,6 +510,35 @@
     });
   });
 
+  /* ═══════════════════════ NAVEGAÇÃO ═══════════════════════ */
+  window.toggleMenu = function(show) {
+    $('sideMenu').classList.toggle('open', show);
+    $('menuOverlay').classList.toggle('open', show);
+  };
+
+  window.switchMainTab = function(tab) {
+    activeMainTab = tab;
+    toggleMenu(false);
+    
+    document.querySelectorAll('.nav-item').forEach(el => el.classList.toggle('active', el.dataset.tab === tab));
+    document.querySelectorAll('.section-content').forEach(el => el.classList.toggle('active', el.id === 'section-'+tab));
+    
+    const titles = { pedidos: 'Pedidos', produtos: 'Produtos', reports: 'Relatórios', config: 'Ajustes' };
+    $('currentTabTitle').textContent = titles[tab] || 'Painel';
+
+    if (tab === 'pedidos') renderOrders();
+    if (tab === 'produtos') renderProducts();
+    if (tab === 'reports') renderReports();
+    if (tab === 'config') renderConfig();
+  };
+
+  window.switchOrderTab = function(tab) {
+    activeOrderTab = tab;
+    document.querySelectorAll('.order-tab').forEach(el => el.classList.toggle('active', el.dataset.otab === tab));
+    renderOrders();
+  };
+
+  /* ═══════════════════════ DADOS ═══════════════════════ */
   async function enterDashboard() {
     $('pinScreen').style.display = 'none';
     $('dashboard').style.display = 'block';
@@ -608,6 +551,7 @@
     showLoading(true);
     await Promise.all([loadOrders(), loadProducts(), loadConfig()]);
     showLoading(false);
+    if (activeMainTab === 'reports') renderReports();
   }
   window.refreshData = refreshData;
 
@@ -639,21 +583,29 @@
     }
   }
 
+  /* ═══════════════════════ REALTIME ═══════════════════════ */
   function subscribeRealtime() {
     if (rtChannel) supabase.removeChannel(rtChannel);
     rtChannel = supabase.channel('admin-orders').on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, payload => {
       const { eventType, new: newRow, old: oldRow } = payload;
       if (eventType === 'INSERT') {
-        if (!knownIds.has(newRow.id)) { knownIds.add(newRow.id); orders.unshift(newRow); triggerNewOrderAlert(newRow); }
+        if (!knownIds.has(newRow.id)) { 
+          knownIds.add(newRow.id); 
+          orders.unshift(newRow); 
+          triggerNewOrderAlert(newRow); 
+        }
       } else if (eventType === 'UPDATE') {
         const idx = orders.findIndex(o => o.id === newRow.id);
         if (idx !== -1) orders[idx] = newRow; else orders.unshift(newRow);
       } else if (eventType === 'DELETE') {
         orders = orders.filter(o => o.id !== oldRow.id);
       }
-      updateOrderStats(); renderOrders();
+      updateOrderStats(); 
+      if (activeMainTab === 'pedidos') renderOrders();
+      if (activeMainTab === 'reports') renderReports();
     }).subscribe(s => {
-      $('realtimeDot').className = s === 'SUBSCRIBED' ? 'realtime-dot connected' : 'realtime-dot error';
+      $('realtimeDot').className = 'realtime-dot ' + (s === 'SUBSCRIBED' ? 'connected' : 'error');
+      if (s === 'CLOSED' || s === 'CHANNEL_ERROR') setTimeout(subscribeRealtime, 5000);
     });
   }
 
@@ -662,45 +614,33 @@
     rtConfigChannel = supabase.channel('admin-config').on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'store_config' }, payload => {
       storeConfig[payload.new.key] = payload.new.value;
       renderConfig(); updateHeaderStatus();
-    }).subscribe();
+    }).subscribe(s => {
+       if (s === 'CLOSED' || s === 'CHANNEL_ERROR') setTimeout(subscribeConfigRealtime, 5000);
+    });
   }
 
-  window.switchMainTab = function(tab) {
-    activeMainTab = tab;
-    document.querySelectorAll('.tab').forEach(el => el.classList.toggle('active', el.dataset.tab === tab));
-    document.querySelectorAll('.section-content').forEach(el => el.classList.toggle('active', el.id === 'section-'+tab));
-    if (tab === 'pedidos') renderOrders();
-    if (tab === 'produtos') renderProducts();
-    if (tab === 'config') renderConfig();
-  };
-
-  window.switchOrderTab = function(tab) {
-    activeOrderTab = tab;
-    document.querySelectorAll('.order-tab').forEach(el => el.classList.toggle('active', el.dataset.otab === tab));
-    renderOrders();
-  };
-
+  /* ═══════════════════════ RENDER PEDIDOS ═══════════════════════ */
   function updateOrderStats() {
     const cnt = s => orders.filter(o => o.status === s).length;
     $('statPendente').textContent = cnt('pendente');
     $('statPreparando').textContent = cnt('preparando');
     $('statPronto').textContent = cnt('pronto');
     $('statEntregue').textContent = cnt('entregue');
-    $('total-pendentes').textContent = cnt('pendente');
-    $('total-pendentes').style.display = cnt('pendente') ? 'inline-flex' : 'none';
+    $('badge-pedidos').textContent = cnt('pendente');
+    $('badge-pedidos').style.display = cnt('pendente') ? 'inline-flex' : 'none';
   }
 
   function renderOrders() {
     const container = $('ordersContainer');
     const filtered = orders.filter(o => activeOrderTab === 'todos' ? true : o.status === activeOrderTab);
-    if (!filtered.length) { container.innerHTML = '<div class="empty-state"><i class="fas fa-box-open"></i><p>Nenhum pedido.</p></div>'; return; }
+    if (!filtered.length) { container.innerHTML = '<div class="empty-state"><i class="fas fa-box-open"></i><p>Nenhum pedido aqui.</p></div>'; return; }
     
     container.innerHTML = filtered.map(o => {
       const items = typeof o.items === 'string' ? JSON.parse(o.items) : o.items;
       const statusBtn = {
-        pendente: `<button class="btn-pendente-action" onclick="updateStatus('${o.id}','preparando')"><i class="fas fa-fire"></i> Preparar</button>`,
-        preparando: `<button class="btn-preparando-action" onclick="updateStatus('${o.id}','pronto')"><i class="fas fa-bell"></i> Pronto</button>`,
-        pronto: `<button class="btn-pronto-action" onclick="updateStatus('${o.id}','entregue')"><i class="fas fa-motorcycle"></i> Entregue</button>`
+        pendente: `<button class="btn btn-primary" style="background:#3d1a14; color:#ff9f8a" onclick="updateStatus('${o.id}','preparando')"><i class="fas fa-fire"></i> Preparar</button>`,
+        preparando: `<button class="btn btn-primary" style="background:#3a3310; color:var(--yellow)" onclick="updateStatus('${o.id}','pronto')"><i class="fas fa-bell"></i> Pronto</button>`,
+        pronto: `<button class="btn btn-primary" style="background:#1a3320; color:var(--green)" onclick="updateStatus('${o.id}','entregue')"><i class="fas fa-motorcycle"></i> Entregue</button>`
       }[o.status] || '';
 
       return `
@@ -709,7 +649,6 @@
             <div class="order-summary-left">
               <div class="order-meta"><span class="order-id">#${o.id.slice(-6).toUpperCase()}</span> <span class="order-time">${new Date(o.created_at).toLocaleTimeString()}</span></div>
               <div class="order-client-name">${o.client_name || 'Cliente'}</div>
-              ${o.client_phone ? `<div class="order-phone">${o.client_phone}</div>` : ''}
             </div>
             <div class="order-summary-right">
               <span class="order-status ${o.status}">${o.status}</span>
@@ -717,24 +656,24 @@
             </div>
           </div>
           <div class="order-body"><div class="order-body-inner">
-            ${o.client_address ? `<div class="order-section"><div class="order-section-label">Endereço</div><div class="order-address-text">${o.client_address}</div></div>` : ''}
+            ${o.client_address ? `<div class="order-section"><div class="order-section-label">Endereço</div><div>${o.client_address}</div></div>` : ''}
             <div class="order-section"><div class="order-section-label">Itens</div>
-              ${items.map(it => `<div class="item-row"><span class="item-qty">${it.qty}x</span><span class="item-name">${it.nome}</span><span class="item-price">R$ ${Number(it.preco * it.qty).toFixed(2)}</span></div>`).join('')}
+              ${items.map(it => `<div class="item-row"><span><span class="item-qty">${it.qty}x</span>${it.nome}</span><span>R$ ${Number(it.preco * it.qty).toFixed(2)}</span></div>`).join('')}
             </div>
-            ${o.special_notes ? `<div class="order-section"><div class="order-section-label">Observações</div><div class="order-notes">${o.special_notes}</div></div>` : ''}
+            ${o.special_notes ? `<div class="order-section"><div class="order-section-label">Observações</div><div style="color:var(--yellow)">${o.special_notes}</div></div>` : ''}
             
-            <div id="rejection-${o.id}" class="rejection-wrap">
-              <textarea id="reason-${o.id}" class="rejection-input" placeholder="Motivo do cancelamento (aparecerá para o cliente)..."></textarea>
+            <div id="rejection-${o.id}" class="rejection-wrap" style="display:none; margin-top:10px; background:rgba(255,0,0,0.05); padding:10px; border-radius:8px">
+              <textarea id="reason-${o.id}" class="rejection-input" style="width:100%; background:var(--bg); border:1px solid var(--border); color:var(--text); padding:8px; border-radius:6px; margin-bottom:8px" placeholder="Motivo do cancelamento..."></textarea>
               <div style="display:flex; gap:8px">
                 <button class="btn" onclick="toggleRejection('${o.id}', false)">Voltar</button>
-                <button class="btn btn-remove" style="flex:1" onclick="confirmRejection('${o.id}')">Confirmar Cancelamento</button>
+                <button class="btn btn-remove" style="flex:1" onclick="confirmRejection('${o.id}')">Confirmar</button>
               </div>
             </div>
 
             <div class="order-actions" id="actions-${o.id}">
               ${statusBtn}
-              ${o.status === 'pendente' ? `<button class="btn-remove" onclick="toggleRejection('${o.id}', true)"><i class="fas fa-times"></i> Recusar</button>` : ''}
-              <button class="btn-remove" onclick="removeOrder('${o.id}')"><i class="fas fa-trash"></i></button>
+              ${o.status === 'pendente' ? `<button class="btn btn-remove" onclick="toggleRejection('${o.id}', true)"><i class="fas fa-times"></i></button>` : ''}
+              <button class="btn" onclick="removeOrder('${o.id}')"><i class="fas fa-trash"></i></button>
             </div>
           </div></div>
         </div>`;
@@ -747,21 +686,17 @@
   };
 
   window.toggleRejection = (id, show) => {
-    $(`rejection-${id}`).classList.toggle('active', show);
+    $(`rejection-${id}`).style.display = show ? 'block' : 'none';
     $(`actions-${id}`).style.display = show ? 'none' : 'flex';
   };
 
   window.confirmRejection = async (id) => {
     const reason = $(`reason-${id}`).value || 'Pedido cancelado pelo restaurante.';
-    const { error } = await supabase.from('orders').update({ 
-      status: 'cancelado',
-      rejection_reason: reason 
-    }).eq('id', id);
-    
+    const { error } = await supabase.from('orders').update({ status: 'cancelado', rejection_reason: reason }).eq('id', id);
     if (!error) showSuccess('Pedido cancelado!');
-    else showError('Erro ao cancelar.');
   };
 
+  /* ═══════════════════════ RENDER PRODUTOS ═══════════════════════ */
   function renderCategoryFilters() {
     const container = $('categoryFilter');
     const cats = [{id:'todas', name:'Todas'}, ...categories];
@@ -781,15 +716,13 @@
         <div class="product-body">
           <div class="product-name">${p.name}</div>
           <div class="product-price">R$ ${Number(p.price).toFixed(2)}</div>
-          <div class="product-category">${categories.find(c => c.id === p.category_id)?.name || ''}</div>
-          <div style="font-size:0.75rem; color:var(--text-muted); margin-top:4px">${p.portion || ''}</div>
         </div>
         <div class="product-actions">
           <button class="btn-toggle ${p.is_active ? 'active' : 'inactive'}" onclick="toggleProduct('${p.id}', ${p.is_active})">
-            ${p.is_active ? 'DISPONÍVEL' : 'ESGOTADO'}
+            ${p.is_active ? 'ATIVO' : 'OFF'}
           </button>
           <button class="btn" onclick="openEditProduct('${p.id}')"><i class="fas fa-pen"></i></button>
-          <button class="btn-toggle ${p.is_featured ? 'active' : ''}" onclick="toggleFeatured('${p.id}', ${p.is_featured})">
+          <button class="btn-toggle featured-btn ${p.is_featured ? 'active' : ''}" onclick="toggleFeatured('${p.id}', ${p.is_featured})">
             <i class="fas fa-star"></i>
           </button>
         </div>
@@ -799,28 +732,129 @@
 
   window.toggleProduct = async (id, current) => {
     const { error } = await supabase.from('products').update({ is_active: !current }).eq('id', id);
-    if (!error) {
-      showSuccess(!current ? 'Produto disponível!' : 'Produto esgotado!');
-      await loadProducts();
-    } else showError('Erro ao atualizar status.');
+    if (!error) { showSuccess(!current ? 'Ativado!' : 'Esgotado!'); await loadProducts(); }
   };
 
   window.toggleFeatured = async (id, current) => {
     const { error } = await supabase.from('products').update({ is_featured: !current }).eq('id', id);
-    if (!error) {
-      showSuccess('Destaque atualizado!');
-      await loadProducts();
-    } else showError('Erro ao atualizar destaque.');
+    if (!error) { showSuccess('Destaque atualizado!'); await loadProducts(); }
   };
 
+  /* ═══════════════════════ RELATÓRIOS (FASE 4) ═══════════════════════ */
+  function renderReports() {
+    const today = new Date().toLocaleDateString('pt-BR');
+    $('reportDateText').textContent = today;
+
+    const todayOrders = orders.filter(o => {
+      const orderDate = new Date(o.created_at).toLocaleDateString('pt-BR');
+      return orderDate === today && o.status === 'entregue';
+    });
+
+    const revenue = todayOrders.reduce((sum, o) => sum + Number(o.total), 0);
+    $('reportRevenue').textContent = `R$ ${revenue.toFixed(2)}`;
+    $('reportOrderCount').textContent = `${todayOrders.length} pedidos concluídos hoje`;
+
+    // Itens mais vendidos
+    const itemMap = {};
+    orders.forEach(o => {
+      if (o.status !== 'entregue' && o.status !== 'cancelado') return;
+      const items = typeof o.items === 'string' ? JSON.parse(o.items) : o.items;
+      items.forEach(it => {
+        itemMap[it.nome] = (itemMap[it.nome] || 0) + Number(it.qty);
+      });
+    });
+
+    const topItems = Object.entries(itemMap).sort((a,b) => b[1] - a[1]).slice(0, 5);
+    $('topItemsList').innerHTML = topItems.length ? topItems.map(([name, qty]) => `
+      <div class="top-item-row">
+        <span class="top-item-name">${name}</span>
+        <span class="top-item-qty">${qty}x</span>
+      </div>
+    `).join('') : '<div style="text-align:center; padding:1rem; color:var(--text-muted)">Sem dados suficientes.</div>';
+
+    // Clientes recorrentes
+    const clientMap = {};
+    orders.forEach(o => {
+      if (o.status !== 'entregue') return;
+      const key = o.client_phone || o.client_name;
+      if (!key) return;
+      clientMap[key] = (clientMap[key] || 0) + 1;
+    });
+
+    const topClients = Object.entries(clientMap).sort((a,b) => b[1] - a[1]).slice(0, 5);
+    $('topClientsList').innerHTML = topClients.length ? topClients.map(([name, count]) => `
+      <div class="top-item-row">
+        <span class="top-item-name">${name}</span>
+        <span class="top-item-qty">${count} ped.</span>
+      </div>
+    `).join('') : '<div style="text-align:center; padding:1rem; color:var(--text-muted)">Sem dados suficientes.</div>';
+  }
+
+  /* ═══════════════════════ CONFIGURAÇÕES ═══════════════════════ */
+  function renderConfig() {
+    const status = storeConfig.status || {};
+    const hours  = storeConfig.hours  || [];
+    const isManualClosed = status.manual_closed;
+    const btn = $('btnPanic'), txt = $('panicStatusText');
+    
+    btn.textContent = isManualClosed ? 'ABRIR LOJA' : 'FECHAR LOJA';
+    btn.className = 'panic-btn ' + (isManualClosed ? 'open' : 'closed');
+    txt.textContent = isManualClosed ? 'Loja Fechada Manualmente' : 'Loja Aberta';
+    $('configBannerMsg').value = status.banner_msg || '';
+
+    const days = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+    $('hoursList').innerHTML = days.map((day, i) => {
+      const h = hours.find(x => x.day === i) || { open: '18:00', close: '23:00', closed: false };
+      return `
+        <div class="hour-row" style="display:grid; grid-template-columns: 50px 1fr 1fr 40px; align-items:center; gap:8px; font-size:0.85rem">
+          <span style="font-weight:600">${day}</span>
+          <input type="time" class="h-open" value="${h.open}" style="background:var(--bg); border:1px solid var(--border); color:#fff; padding:4px; border-radius:4px; text-align:center">
+          <input type="time" class="h-close" value="${h.close}" style="background:var(--bg); border:1px solid var(--border); color:#fff; padding:4px; border-radius:4px; text-align:center">
+          <input type="checkbox" class="h-closed" ${h.closed ? 'checked' : ''} title="Fechado?">
+        </div>`;
+    }).join('');
+  }
+
+  window.togglePanic = async () => {
+    const current = storeConfig.status || {};
+    const newValue = { ...current, manual_closed: !current.manual_closed };
+    const { error } = await supabase.from('store_config').update({ value: newValue }).eq('key', 'status');
+    if (!error) { showSuccess('Status da loja atualizado!'); await loadConfig(); }
+  };
+
+  window.saveBannerMsg = async () => {
+    const msg = $('configBannerMsg').value;
+    const current = storeConfig.status || {};
+    const newValue = { ...current, banner_msg: msg };
+    const { error } = await supabase.from('store_config').update({ value: newValue }).eq('key', 'status');
+    if (!error) showSuccess('Banner atualizado!');
+  };
+
+  window.saveHours = async () => {
+    const rows = document.querySelectorAll('.hour-row');
+    const newHours = Array.from(rows).map((row, i) => ({
+      day: i,
+      open: row.querySelector('.h-open').value,
+      close: row.querySelector('.h-close').value,
+      closed: row.querySelector('.h-closed').checked
+    }));
+    const { error } = await supabase.from('store_config').update({ value: newHours }).eq('key', 'hours');
+    if (!error) { showSuccess('Horários salvos!'); await loadConfig(); }
+    else showError('Erro ao salvar horários.');
+  };
+
+  function updateHeaderStatus() {
+    const status = storeConfig.status || {};
+    const badge = $('storeStatusBadge');
+    if (status.manual_closed) { badge.textContent = 'Fechado'; badge.className = 'store-badge closed'; }
+    else { badge.textContent = 'Aberto'; badge.className = 'store-badge open'; }
+  }
+
+  /* ═══════════════════════ MODAL PRODUTO ═══════════════════════ */
   window.openAddProduct = () => {
     editingProdId = null;
     $('modalProductTitle').textContent = 'Novo Produto';
-    $('editProdName').value = '';
-    $('editProdPrice').value = '';
-    $('editProdDesc').value = '';
-    $('editProdImage').value = '';
-    $('editProdPortion').value = '';
+    ['Name','Price','Desc','Image','Portion'].forEach(f => $('editProd'+f).value = '');
     renderCategorySelect();
     $('modalEditProduct').style.display = 'flex';
   };
@@ -844,10 +878,7 @@
     select.innerHTML = categories.map(c => `<option value="${c.id}" ${c.id === selectedId ? 'selected' : ''}>${c.name}</option>`).join('');
   }
 
-  window.closeProductModal = () => {
-    $('modalEditProduct').style.display = 'none';
-    editingProdId = null;
-  };
+  window.closeProductModal = () => { $('modalEditProduct').style.display = 'none'; editingProdId = null; };
 
   window.saveProductEdit = async () => {
     const p = {
@@ -859,74 +890,15 @@
       category_id: $('editProdCategory').value,
       is_active: true
     };
-
     let error;
-    if (editingProdId) {
-      ({ error } = await supabase.from('products').update(p).eq('id', editingProdId));
-    } else {
-      ({ error } = await supabase.from('products').insert([p]));
-    }
+    if (editingProdId) ({ error } = await supabase.from('products').update(p).eq('id', editingProdId));
+    else ({ error } = await supabase.from('products').insert([p]));
 
-    if(!error) {
-      showSuccess(editingProdId ? 'Produto atualizado!' : 'Produto adicionado!');
-      closeProductModal();
-      await loadProducts();
-    } else {
-      console.error(error);
-      showError('Erro ao salvar produto.');
-    }
+    if(!error) { showSuccess('Produto salvo!'); closeProductModal(); await loadProducts(); }
+    else showError('Erro ao salvar.');
   };
 
-  function renderConfig() {
-    const status = storeConfig.status || {};
-    const hours  = storeConfig.hours  || [];
-    const isManualClosed = status.manual_closed;
-    const btn = $('btnPanic'), txt = $('panicStatusText');
-    btn.textContent = isManualClosed ? 'ABRIR LOJA' : 'FECHAR LOJA';
-    btn.className = 'panic-btn ' + (isManualClosed ? 'open' : 'closed');
-    txt.textContent = isManualClosed ? 'Loja Fechada Manualmente' : 'Loja Aberta';
-    $('configBannerMsg').value = status.banner_msg || '';
-    const days = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
-    $('hoursList').innerHTML = days.map((day, i) => {
-      const h = hours.find(x => x.day === i) || { open: '18:00', close: '23:00', closed: false };
-      return `<div class="hour-row"><span class="hour-day">${day}</span><input type="time" class="hour-input h-open" value="${h.open}"><input type="time" class="hour-input h-close" value="${h.close}"><input type="checkbox" class="h-closed" ${h.closed ? 'checked' : ''}></div>`;
-    }).join('');
-  }
-
-  window.togglePanic = async () => {
-    const current = storeConfig.status || {};
-    const newValue = { ...current, manual_closed: !current.manual_closed };
-    await supabase.from('store_config').update({ value: newValue }).eq('key', 'status');
-    showSuccess('Status alterado!');
-  };
-
-  window.saveBannerMsg = async () => {
-    const msg = $('configBannerMsg').value;
-    const current = storeConfig.status || {};
-    const newValue = { ...current, banner_msg: msg };
-    await supabase.from('store_config').update({ value: newValue }).eq('key', 'status');
-    showSuccess('Mensagem salva!');
-  };
-
-  window.saveHours = async () => {
-    const rows = document.querySelectorAll('.hour-row');
-    const newHours = Array.from(rows).map((row, i) => ({
-      day: i,
-      open: row.querySelector('.h-open').value,
-      close: row.querySelector('.h-close').value,
-      closed: row.querySelector('.h-closed').checked
-    }));
-    await supabase.from('store_config').update({ value: newHours }).eq('key', 'hours');
-    showSuccess('Horários salvos!');
-  };
-
-  function updateHeaderStatus() {
-    const status = storeConfig.status || {};
-    const badge = $('storeStatusBadge');
-    if (status.manual_closed) { badge.textContent = 'Fechado'; badge.className = 'store-badge closed'; }
-    else { badge.textContent = 'Aberto'; badge.className = 'store-badge open'; }
-  }
-
+  /* ═══════════════════════ ALERTAS ═══════════════════════ */
   function triggerNewOrderAlert(order) {
     startAlarm(); showNewToast(`🔔 Novo pedido de ${order.client_name}`);
   }
@@ -949,8 +921,9 @@
     } catch(e){}
   }
 
+  /* ═══════════════════════ UTILS ═══════════════════════ */
   window.toggleCard = (id) => $('card-'+id).classList.toggle('open');
-  window.removeOrder = (id) => { if(confirm('Remover?')) supabase.from('orders').delete().eq('id', id); };
+  window.removeOrder = (id) => { if(confirm('Remover definitivamente?')) supabase.from('orders').delete().eq('id', id); };
   window.logout = () => { supabase.auth.signOut(); location.reload(); };
   function showLoading(s) { if(s) $('ordersContainer').innerHTML = '<div class="loading"><div class="spinner"></div>Carregando...</div>'; }
   function showSuccess(m) { const t=$('toastSuccess'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000); }
