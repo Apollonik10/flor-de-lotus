@@ -344,7 +344,10 @@
     <div id="section-produtos" class="section-content">
       <div class="section-header">
         <h2 class="section-title">Produtos</h2>
-        <button class="btn btn-primary" onclick="openAddProduct()"><i class="fas fa-plus"></i> Novo</button>
+        <div style="display:flex; gap:8px">
+          <button class="btn" onclick="openCategoryManager()" title="Categorias"><i class="fas fa-tags"></i></button>
+          <button class="btn btn-primary" onclick="openAddProduct()"><i class="fas fa-plus"></i> Novo</button>
+        </div>
       </div>
       <div style="display:flex; gap:10px; overflow-x:auto; padding-bottom:12px; margin-bottom:1rem" id="categoryFilter"></div>
       <div id="productsContainer" class="products-container"></div>
@@ -456,6 +459,47 @@
     <div style="display:flex; gap:10px">
       <button class="btn" onclick="closeProductModal()" style="flex:1">Cancelar</button>
       <button class="btn btn-primary" onclick="saveProductEdit()" style="flex:1">Salvar Produto</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Gerenciar Categorias -->
+<div id="modalCategoryManager" class="pin-screen" style="display:none; background:rgba(0,0,0,0.85); z-index:700; padding:1rem">
+  <div class="report-card" style="width:min(100%, 450px); max-height:90vh; overflow-y:auto; position:relative">
+    <button onclick="closeCategoryManager()" style="position:absolute; top:15px; right:15px; background:none; border:none; color:var(--text-muted); font-size:1.2rem"><i class="fas fa-times"></i></button>
+    <h3 class="config-title" style="margin-bottom:1.5rem">Gerenciar Categorias</h3>
+    
+    <button class="btn btn-primary" style="width:100%; margin-bottom:1.2rem" onclick="openEditCategory()">
+      <i class="fas fa-plus"></i> NOVA CATEGORIA
+    </button>
+    
+    <div id="categoryManagerList" style="display:flex; flex-direction:column; gap:10px"></div>
+  </div>
+</div>
+
+<!-- Modal Editar Categoria -->
+<div id="modalEditCategory" class="pin-screen" style="display:none; background:rgba(0,0,0,0.9); z-index:800; padding:1rem">
+  <div class="report-card" style="width:min(100%, 400px); position:relative">
+    <h3 class="config-title" id="modalCategoryTitle" style="margin-bottom:1.5rem">Nova Categoria</h3>
+    
+    <div style="margin-bottom:12px">
+      <label style="font-size:0.7rem; color:var(--text-muted); display:block; margin-bottom:4px">NOME</label>
+      <input type="text" id="editCatName" style="width:100%; background:var(--bg2); border:1px solid var(--border); padding:10px; color:var(--text); border-radius:8px; font-family:inherit">
+    </div>
+
+    <div style="margin-bottom:12px">
+      <label style="font-size:0.7rem; color:var(--text-muted); display:block; margin-bottom:4px">ÍCONE (FONT AWESOME)</label>
+      <input type="text" id="editCatIcon" placeholder="fa-fish" style="width:100%; background:var(--bg2); border:1px solid var(--border); padding:10px; color:var(--text); border-radius:8px; font-family:inherit">
+    </div>
+
+    <div style="margin-bottom:1.5rem">
+      <label style="font-size:0.7rem; color:var(--text-muted); display:block; margin-bottom:4px">ORDEM</label>
+      <input type="number" id="editCatOrder" style="width:100%; background:var(--bg2); border:1px solid var(--border); padding:10px; color:var(--text); border-radius:8px; font-family:inherit">
+    </div>
+
+    <div style="display:flex; gap:10px">
+      <button class="btn" onclick="closeEditCategory()" style="flex:1">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveCategoryEdit()" style="flex:1">Salvar</button>
     </div>
   </div>
 </div>
@@ -707,6 +751,79 @@
 
   window.filterByCat = (id) => { activeCatFilter = id; renderCategoryFilters(); renderProducts(); };
 
+  /* ═══════════════════════ GESTÃO DE CATEGORIAS ═══════════════════════ */
+  let editingCatId = null;
+
+  window.openCategoryManager = () => {
+    renderCategoryManagerList();
+    $('modalCategoryManager').style.display = 'flex';
+  };
+  window.closeCategoryManager = () => $('modalCategoryManager').style.display = 'none';
+
+  function renderCategoryManagerList() {
+    const list = $('categoryManagerList');
+    list.innerHTML = categories.map(c => `
+      <div class="product-card" style="padding:10px; flex-direction:row; align-items:center; justify-content:space-between; gap:10px">
+        <div style="display:flex; align-items:center; gap:12px">
+          <div style="width:32px; height:32px; background:var(--bg3); display:flex; align-items:center; justify-content:center; border-radius:8px; color:var(--pink-dark)">
+            <i class="fas ${c.icon || 'fa-tag'}"></i>
+          </div>
+          <div>
+            <div style="font-weight:600; font-size:0.9rem">${c.name}</div>
+            <div style="font-size:0.7rem; color:var(--text-muted)">Ordem: ${c.sort_order}</div>
+          </div>
+        </div>
+        <div style="display:flex; gap:8px">
+          <button class="btn" onclick="openEditCategory('${c.id}')"><i class="fas fa-pen"></i></button>
+          <button class="btn btn-remove" onclick="deleteCategory('${c.id}')"><i class="fas fa-trash"></i></button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  window.openEditCategory = (id) => {
+    editingCatId = id || null;
+    const cat = categories.find(x => x.id === id) || { name: '', icon: '', sort_order: categories.length + 1 };
+    $('modalCategoryTitle').textContent = id ? 'Editar Categoria' : 'Nova Categoria';
+    $('editCatName').value = cat.name;
+    $('editCatIcon').value = cat.icon || '';
+    $('editCatOrder').value = cat.sort_order;
+    $('modalEditCategory').style.display = 'flex';
+  };
+
+  window.closeEditCategory = () => $('modalEditCategory').style.display = 'none';
+
+  window.saveCategoryEdit = async () => {
+    const cat = {
+      name: $('editCatName').value,
+      icon: $('editCatIcon').value,
+      sort_order: parseInt($('editCatOrder').value) || 0
+    };
+    let error;
+    if (editingCatId) ({ error } = await supabase.from('categories').update(cat).eq('id', editingCatId));
+    else ({ error } = await supabase.from('categories').insert([cat]));
+
+    if (!error) {
+      showSuccess('Categoria salva!');
+      closeEditCategory();
+      await loadProducts();
+      renderCategoryManagerList();
+    } else showError('Erro ao salvar categoria.');
+  };
+
+  window.deleteCategory = async (id) => {
+    const hasProds = products.some(p => p.category_id === id);
+    if (hasProds) return alert('Não é possível excluir uma categoria que possui produtos.');
+    if (!confirm('Excluir esta categoria permanentemente?')) return;
+
+    const { error } = await supabase.from('categories').delete().eq('id', id);
+    if (!error) {
+      showSuccess('Categoria removida!');
+      await loadProducts();
+      renderCategoryManagerList();
+    } else showError('Erro ao remover.');
+  };
+
   function renderProducts() {
     const container = $('productsContainer');
     const filtered = activeCatFilter === 'todas' ? products : products.filter(p => p.category_id === activeCatFilter);
@@ -725,10 +842,18 @@
           <button class="btn-toggle featured-btn ${p.is_featured ? 'active' : ''}" onclick="toggleFeatured('${p.id}', ${p.is_featured})">
             <i class="fas fa-star"></i>
           </button>
+          <button class="btn btn-remove" onclick="deleteProduct('${p.id}')"><i class="fas fa-trash"></i></button>
         </div>
       </div>
     `).join('');
   }
+
+  window.deleteProduct = async (id) => {
+    if (!confirm('Excluir este produto permanentemente?')) return;
+    const { error } = await supabase.from('products').delete().eq('id', id);
+    if (!error) { showSuccess('Produto removido!'); await loadProducts(); }
+    else showError('Erro ao remover.');
+  };
 
   window.toggleProduct = async (id, current) => {
     const { error } = await supabase.from('products').update({ is_active: !current }).eq('id', id);
@@ -932,6 +1057,18 @@
 
   checkSession();
   $('pin1').focus();
+
+  // Registro do Service Worker do Admin
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./admin-sw.js', { scope: './' })
+        .then(reg => {
+          console.log('[Admin] Service Worker registrado:', reg.scope);
+          // Opcional: Solicitar permissão de notificação após login bem-sucedido
+        })
+        .catch(err => console.error('[Admin] Erro ao registrar SW:', err));
+    });
+  }
 </script>
 </body>
 </html>
