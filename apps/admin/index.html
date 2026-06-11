@@ -552,7 +552,10 @@
       
       if (error) {
         console.error('[Admin] Login error:', error);
-        err.textContent = error.message === 'Invalid login credentials' ? 'PIN incorreto.' : error.message;
+        // Mostra detalhe só em ambiente de teste; em produção, mensagem genérica
+        const isDev = location.hostname === 'localhost' || location.hostname.includes('replit');
+        err.textContent = isDev ? (error.message || 'PIN incorreto.') : 'PIN incorreto.';
+        
         [1,2,3,4,5,6].forEach(i => $('pin'+i).value = ''); 
         $('pin1').focus();
       } else {
