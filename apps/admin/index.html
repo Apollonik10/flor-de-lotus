@@ -735,9 +735,18 @@
   };
 
   window.confirmRejection = async (id) => {
-    const reason = $(`reason-${id}`).value || 'Pedido cancelado pelo restaurante.';
-    const { error } = await supabase.from('orders').update({ status: 'cancelado', rejection_reason: reason }).eq('id', id);
-    if (!error) showSuccess('Pedido cancelado!');
+    const reasonEl = $(`reason-${id}`);
+    const reason = reasonEl?.value?.trim() || 'Pedido cancelado pelo restaurante.';
+
+    const { error } = await supabase
+      .from('orders')
+      .update({ status: 'cancelado', rejection_reason: reason })
+      .eq('id', id);
+
+    if (error) { showError('Erro ao cancelar: ' + error.message); return; }
+
+    showSuccess('Pedido cancelado!');
+    toggleRejection(id, false);
   };
 
   /* ═══════════════════════ RENDER PRODUTOS ═══════════════════════ */
@@ -856,13 +865,39 @@
   };
 
   window.toggleProduct = async (id, current) => {
-    const { error } = await supabase.from('products').update({ is_active: !current }).eq('id', id);
-    if (!error) { showSuccess(!current ? 'Ativado!' : 'Esgotado!'); await loadProducts(); }
+    const newValue = !current;
+    const { data, error } = await supabase
+      .from('products')
+      .update({ is_active: newValue })
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) { showError('Erro ao atualizar produto: ' + error.message); return; }
+
+    const idx = products.findIndex(p => p.id === id);
+    if (idx !== -1) products[idx] = data;
+
+    showSuccess(data.is_active ? 'Ativado!' : 'Esgotado!');
+    renderProducts();
   };
 
   window.toggleFeatured = async (id, current) => {
-    const { error } = await supabase.from('products').update({ is_featured: !current }).eq('id', id);
-    if (!error) { showSuccess('Destaque atualizado!'); await loadProducts(); }
+    const newValue = !current;
+    const { data, error } = await supabase
+      .from('products')
+      .update({ is_featured: newValue })
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) { showError('Erro ao atualizar destaque: ' + error.message); return; }
+
+    const idx = products.findIndex(p => p.id === id);
+    if (idx !== -1) products[idx] = data;
+
+    showSuccess('Destaque atualizado!');
+    renderProducts();
   };
 
   /* ═══════════════════════ RELATÓRIOS (FASE 4) ═══════════════════════ */
