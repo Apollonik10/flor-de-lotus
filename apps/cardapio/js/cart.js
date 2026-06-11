@@ -197,10 +197,39 @@ window._selectPayment = function(method, btn) {
   /* Destaca botão ativo */
   document.querySelectorAll('.pay-btn').forEach(b => b.classList.remove('active'));
   if (btn) btn.classList.add('active');
+  
   /* Mostra/oculta campo de troco */
   const wrap = document.getElementById('trocoWrap');
   if (wrap) wrap.style.display = method === 'dinheiro' ? 'block' : 'none';
+
+  /* Se for Pix, mostrar área de preparação do Pix (Mock) */
+  _handlePixSelection(method === 'pix');
 };
+
+function _handlePixSelection(isPix) {
+  let pixArea = document.getElementById('pixPrepArea');
+  if (!isPix) {
+    if (pixArea) pixArea.style.display = 'none';
+    return;
+  }
+
+  if (!pixArea) {
+    pixArea = document.createElement('div');
+    pixArea.id = 'pixPrepArea';
+    pixArea.className = 'pix-prep-area';
+    const summaryEl = dom.cartSummary();
+    const ps = summaryEl.querySelector('.payment-selector');
+    summaryEl.insertBefore(pixArea, ps.nextSibling);
+  }
+
+  pixArea.style.display = 'block';
+  pixArea.innerHTML = `
+    <div class="pix-prep-info">
+      <i class="fas fa-info-circle"></i>
+      <span>O QR Code será gerado após você clicar em "Enviar Pedido".</span>
+    </div>
+  `;
+}
 
 /* ── Enviar pedido WhatsApp ── */
 export async function sendOrderWhatsApp() {
@@ -281,8 +310,21 @@ export async function sendOrderWhatsApp() {
   updateCartUI();
   closeCartDrawer();
 
-  /* ── 5. Mostra tela de acompanhamento ── */
-  showOrderTracking(orderId, cartSnapshot, total);
+  /* ── 5. Dados de Pagamento (Pix Mock) ── */
+  let paymentData = null;
+  if (payMethod === 'pix') {
+    // Simulando retorno da Edge Function (enquanto não integramos com Efí)
+    paymentData = {
+      pix_copy_paste: '00020126580014BR.GOV.BCB.PIX0136flordelotus-demo-key-12345678905204000053039865405' + total.toFixed(2).replace('.', '') + '5802BR5913FLOR DE LOTUS6009CAJAZEIRAS62070503***6304ABCD',
+      qr_code_base64: null, // null ativa o modo visual "MOCK" no tracking
+      amount: total
+    };
+    // Pequeno delay simulado para UX
+    await new Promise(r => setTimeout(r, 600));
+  }
+
+  /* ── 6. Mostra tela de acompanhamento ── */
+  showOrderTracking(orderId, cartSnapshot, total, paymentData);
 
   /* ── 6. Toast gift card (se ganhou) ── */
   if (gift) {

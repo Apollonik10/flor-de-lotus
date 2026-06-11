@@ -35,8 +35,15 @@ const STATUS_STEPS = [
 ════════════════════════════════════════ */
 
 /** Chamado imediatamente após envio do pedido */
-export function showOrderTracking(orderId, cart, total) {
-  _saveActiveOrder({ orderId, cart, total, status: 'pendente' });
+export function showOrderTracking(orderId, cart, total, paymentData = null) {
+  _saveActiveOrder({ 
+    orderId, 
+    cart, 
+    total, 
+    status: 'pendente', 
+    paymentStatus: paymentData ? 'pendente' : null,
+    paymentData 
+  });
   _showFab(true);
   _startBackground(orderId);   // inicia realtime/polling sem precisar abrir modal
   _openModal();
@@ -208,7 +215,7 @@ function _closeModal(restoreScroll = true) {
    HTML do modal
 ════════════════════════════════════════ */
 
-function _buildModal({ orderId, cart, total, status }) {
+function _buildModal({ orderId, cart, total, status, paymentStatus, paymentData }) {
   const el = document.createElement('article');
   el.id        = 'orderTrackingModal';
   el.className = 'order-tracking-modal';
@@ -237,6 +244,41 @@ function _buildModal({ orderId, cart, total, status }) {
       <span class="tracking-item-price">R$ ${formatPrice(c.preco * c.qty)}</span>
     </div>
   `).join('');
+
+  // ── Seção Pix (se aplicável) ──
+  let pixHTML = '';
+  if (paymentStatus === 'pendente' && paymentData) {
+    pixHTML = `
+      <div class="pix-payment-section">
+        <p style="color:var(--yellow); font-size:0.85rem; margin-bottom:1rem">
+          <i class="fas fa-qrcode"></i> Finalize o pagamento via PIX
+        </p>
+        <div class="pix-qr-container">
+          ${paymentData.qr_code_base64 
+            ? `<img src="${paymentData.qr_code_base64}" alt="QR Code PIX" style="width:200px; height:200px">`
+            : `<div class="pix-qr-mock"><span>QR CODE TESTE</span></div>`
+          }
+        </div>
+        <div class="pix-copy-paste-container">
+          <div class="pix-code-text" id="pixCodeText">${paymentData.pix_copy_paste}</div>
+          <button class="btn-copy-pix" onclick="window._copyPixCode('${paymentData.pix_copy_paste}')">
+            Copiar
+          </button>
+        </div>
+        <p style="font-size:0.7rem; color:var(--text-muted); margin-top:1rem">
+          A confirmação é automática e o pedido entrará em produção logo após o pagamento.
+        </p>
+      </div>
+    `;
+  } else if (paymentStatus === 'pago') {
+    pixHTML = `
+      <div class="pix-payment-section" style="border-color:var(--green); background:rgba(76,175,80,0.05)">
+        <p style="color:var(--green); font-weight:bold">
+          <i class="fas fa-check-circle"></i> Pagamento Confirmado!
+        </p>
+      </div>
+    `;
+  }
 
   const statusMessages = {
     pendente:   '⏳ Aguardando o restaurante confirmar...',
@@ -271,6 +313,8 @@ function _buildModal({ orderId, cart, total, status }) {
            role="list" aria-label="Progresso do pedido">
         ${stepsHTML}
       </div>
+
+      ${pixHTML}
 
       <div class="tracking-wa-note">
         <i class="fab fa-whatsapp" aria-hidden="true"></i>
@@ -433,3 +477,19 @@ function _loadActiveOrder() {
 function _clearActiveOrder() {
   localStorage.removeItem(STORAGE_KEY);
 }
+
+// ── Global Helpers ──
+window._copyPixCode = function(text) {
+  if (!navigator.clipboard) {
+    const el = document.createElement('textarea');
+    el.value = text;
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
+  } else {
+    navigator.clipboard.writeText(text);
+  }
+  
+  import('./toast.js').then(m => m.showToast('Código Pix copiado! 📋'));
+};
