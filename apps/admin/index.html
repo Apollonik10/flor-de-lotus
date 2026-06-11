@@ -172,6 +172,7 @@
     .order-client-name { font-size: 1rem; font-weight: 600; color: var(--text); }
     .order-meta { font-size: 0.75rem; color: var(--text-muted); display: flex; gap: 8px; margin-bottom: 4px; }
     .order-status { padding: 0.3rem 0.75rem; border-radius: 20px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+    .order-status.pago { background: #1a2a3a; color: #4dd0e1; }
     .order-status.pendente { background: #3d1a14; color: #ff9f8a; }
     .order-status.preparando { background: #3a3310; color: var(--yellow); }
     .order-status.pronto { background: #1a3320; color: var(--green); }
@@ -316,6 +317,10 @@
           <div class="stat-label">📋 Pendentes</div>
           <div class="stat-number" id="statPendente">0</div>
         </div>
+        <div class="stat-card" style="background:rgba(77,208,225,0.05); border-color:rgba(77,208,225,0.2)" onclick="switchOrderTab('pago')">
+          <div class="stat-label" style="color:#4dd0e1">💰 Pagos (PIX)</div>
+          <div class="stat-number" id="statPago" style="color:#4dd0e1">0</div>
+        </div>
         <div class="stat-card stat-preparando" onclick="switchOrderTab('preparando')">
           <div class="stat-label">👨‍🍳 Preparando</div>
           <div class="stat-number" id="statPreparando">0</div>
@@ -332,6 +337,7 @@
       
       <div class="tabs" style="margin-bottom:1rem; border-bottom: 2px solid var(--border)">
         <button class="tab order-tab active" data-otab="pendente" onclick="switchOrderTab('pendente')">Pendentes</button>
+        <button class="tab order-tab" data-otab="pago" onclick="switchOrderTab('pago')">Pagos</button>
         <button class="tab order-tab" data-otab="preparando" onclick="switchOrderTab('preparando')">Cozinha</button>
         <button class="tab order-tab" data-otab="pronto" onclick="switchOrderTab('pronto')">Para Entrega</button>
         <button class="tab order-tab" data-otab="entregue" onclick="switchOrderTab('entregue')">Histórico</button>
@@ -512,8 +518,7 @@
   import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
   const SUPABASE_URL  = 'https://aflglnnruovheztrqneg.supabase.co';
-  // A chave ANON deve ser configurada no ambiente de hospedagem/build para segurança
-  const SUPABASE_ANON = Deno.env.get('SUPABASE_ANON_KEY') || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFmbGdsbm5ydW92aGV6dHJxbmVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMDAwNjUsImV4cCI6MjA5Mzg3NjA2NX0.2LOqKN-SX52PbhBtLZA4cHpmjnj3hnOb9qz2N1ROYdU';
+  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFmbGdsbm5ydW92aGV6dHJxbmVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMDAwNjUsImV4cCI6MjA5Mzg3NjA2NX0.2LOqKN-SX52PbhBtLZA4cHpmjnj3hnOb9qz2N1ROYdU';
   const ADMIN_EMAIL   = 'admin@flordelotus.com';
 
   const supabase = createClient(SUPABASE_URL, SUPABASE_ANON, {
@@ -538,20 +543,45 @@
     if (pin.length < 6) return;
     const btn = $('btnVerify'), err = $('pinError');
     btn.disabled = true; btn.textContent = '...'; err.textContent = '';
-    const { error } = await supabase.auth.signInWithPassword({ email: ADMIN_EMAIL, password: pin });
-    if (error) {
-      err.textContent = 'PIN incorreto.'; [1,2,3,4,5,6].forEach(i => $('pin'+i).value = ''); $('pin1').focus();
-    } else enterDashboard();
-    btn.disabled = false; btn.textContent = 'Entrar';
+    
+    try {
+      const { error } = await supabase.auth.signInWithPassword({ 
+        email: ADMIN_EMAIL, 
+        password: pin 
+      });
+      
+      if (error) {
+        console.error('[Admin] Login error:', error);
+        err.textContent = error.message === 'Invalid login credentials' ? 'PIN incorreto.' : error.message;
+        [1,2,3,4,5,6].forEach(i => $('pin'+i).value = ''); 
+        $('pin1').focus();
+      } else {
+        enterDashboard();
+      }
+    } catch (e) {
+      err.textContent = 'Erro de conexão: ' + e.message;
+    } finally {
+      btn.disabled = false; btn.textContent = 'Entrar';
+    }
   };
 
   [1,2,3,4,5,6].forEach((i, idx, arr) => {
     const el = $('pin'+i);
     if(!el) return;
-    el.addEventListener('keyup', e => {
-      if (e.key === 'Backspace' && idx > 0) $('pin'+arr[idx-1]).focus();
-      else if (el.value && idx < 5) $('pin'+arr[idx+1]).focus();
-      else if (el.value && idx === 5) window.verifyPin();
+    
+    // Suporte melhorado para mobile (Android/iOS)
+    el.addEventListener('input', e => {
+      if (el.value && idx < 5) {
+        $('pin'+arr[idx+1]).focus();
+      } else if (el.value && idx === 5) {
+        window.verifyPin();
+      }
+    });
+
+    el.addEventListener('keydown', e => {
+      if (e.key === 'Backspace' && !el.value && idx > 0) {
+        $('pin'+arr[idx-1]).focus();
+      }
     });
   });
 
@@ -668,11 +698,12 @@
   function updateOrderStats() {
     const cnt = s => orders.filter(o => o.status === s).length;
     $('statPendente').textContent = cnt('pendente');
+    $('statPago').textContent = cnt('pago');
     $('statPreparando').textContent = cnt('preparando');
     $('statPronto').textContent = cnt('pronto');
     $('statEntregue').textContent = cnt('entregue');
-    $('badge-pedidos').textContent = cnt('pendente');
-    $('badge-pedidos').style.display = cnt('pendente') ? 'inline-flex' : 'none';
+    $('badge-pedidos').textContent = cnt('pendente') + cnt('pago');
+    $('badge-pedidos').style.display = (cnt('pendente') + cnt('pago')) ? 'inline-flex' : 'none';
   }
 
   function renderOrders() {
@@ -684,6 +715,7 @@
       const items = typeof o.items === 'string' ? JSON.parse(o.items) : o.items;
       const statusBtn = {
         pendente: `<button class="btn btn-primary" style="background:#3d1a14; color:#ff9f8a" onclick="updateStatus('${o.id}','preparando')"><i class="fas fa-fire"></i> Preparar</button>`,
+        pago: `<button class="btn btn-primary" style="background:#1a2a3a; color:#4dd0e1" onclick="updateStatus('${o.id}','preparando')"><i class="fas fa-fire"></i> Preparar</button>`,
         preparando: `<button class="btn btn-primary" style="background:#3a3310; color:var(--yellow)" onclick="updateStatus('${o.id}','pronto')"><i class="fas fa-bell"></i> Pronto</button>`,
         pronto: `<button class="btn btn-primary" style="background:#1a3320; color:var(--green)" onclick="updateStatus('${o.id}','entregue')"><i class="fas fa-motorcycle"></i> Entregue</button>`
       }[o.status] || '';

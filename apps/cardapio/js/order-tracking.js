@@ -24,6 +24,7 @@ let _retryTimer   = null;
 
 const STATUS_STEPS = [
   { key: 'pendente',   label: 'Recebido',   icon: 'fa-clock'       },
+  { key: 'pago',       label: 'Pago',       icon: 'fa-circle-check' },
   { key: 'preparando', label: 'Preparando', icon: 'fa-fire-burner'  },
   { key: 'pronto',     label: 'Pronto!',    icon: 'fa-bell'         },
   { key: 'entregue',   label: 'Entregue',   icon: 'fa-motorcycle'   },
@@ -239,6 +240,7 @@ function _buildModal({ orderId, cart, total, status }) {
 
   const statusMessages = {
     pendente:   '⏳ Aguardando o restaurante confirmar...',
+    pago:       '✅ Pagamento PIX confirmado com sucesso!',
     preparando: '🔥 Seu pedido está sendo preparado!',
     pronto:     '🛎️ Pedido pronto! Saindo para entrega.',
     entregue:   '🏍️ Pedido entregue. Bom apetite!',
@@ -398,6 +400,7 @@ function _updateSteps(modal, currentStatus) {
 
 function _updateSubtitle(modal, status) {
   const messages = {
+    pago:       '✅ Pagamento PIX confirmado com sucesso!',
     preparando: '🔥 Seu pedido está sendo preparado!',
     pronto:     '🛎️ Pedido pronto! Saindo para entrega.',
     entregue:   '🏍️ Pedido entregue. Bom apetite!',

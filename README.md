@@ -108,7 +108,7 @@ Um app web que funciona como:
 - Melhorar performance do render  
 - Refinar UI/UX mobile  
 - Integrar backend (Firebase ou API real)  
-- Adicionar pagamento (Stripe/Mercado Pago)
+- Adicionar pagamento (Efí Bank / PIX)
 - integrar deshbord própria
 - integração com n8n
 
