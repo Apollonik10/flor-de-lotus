@@ -4,7 +4,6 @@ const path = require('path');
 
 const PORT = 5000;
 const HOST = '0.0.0.0';
-const BASE_PATH = '';
 const ROOT_DIR = __dirname;
 
 const MIME_TYPES = {
@@ -28,23 +27,18 @@ const server = http.createServer((req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Service-Worker-Allowed', '/');
 
+  // Remove query strings da URL
   let urlPath = req.url.split('?')[0];
 
+  // Se a URL for a raiz, redireciona ou serve index.html
   if (urlPath === '/' || urlPath === '') {
-    res.writeHead(302, { Location: '/index.html' });
-    res.end();
-    return;
-  }
-
-  if (urlPath.startsWith(BASE_PATH)) {
-    urlPath = urlPath.slice(BASE_PATH.length);
-  }
-
-  if (urlPath === '' || urlPath === '/') {
     urlPath = '/index.html';
   }
 
-  const filePath = path.join(ROOT_DIR, urlPath);
+  // Resolve o caminho do arquivo no sistema de arquivos
+  // Remove a barra inicial para o path.join funcionar corretamente com ROOT_DIR
+  const relativePath = urlPath.startsWith('/') ? urlPath.slice(1) : urlPath;
+  const filePath = path.join(ROOT_DIR, relativePath);
 
   fs.stat(filePath, (err, stat) => {
     if (err) {
@@ -53,7 +47,7 @@ const server = http.createServer((req, res) => {
       return;
     }
 
-    /* Diretório → tenta index.html dentro dele */
+    /* Se for um diretório, tenta o index.html dentro dele */
     if (stat.isDirectory()) {
       const indexPath = path.join(filePath, 'index.html');
       fs.stat(indexPath, (e2, s2) => {
@@ -83,5 +77,6 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(PORT, HOST, () => {
-  console.log(`Flor de Lotus server running at http://${HOST}:${PORT}${BASE_PATH}/`);
+  console.log(`Flor de Lotus server running at http://${HOST}:${PORT}/`);
+  console.log(`Acesse http://localhost:${PORT} para testar localmente.`);
 });
