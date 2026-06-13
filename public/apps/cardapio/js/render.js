@@ -167,7 +167,7 @@ function renderCard(item) {
 
       <div class="item-card-img">
         <img src="${item.imagem}" alt="${item.nome}" loading="lazy"
-             onerror="this.src='/assets/assets/images/placeholder.jpg'">
+             onerror="this.src='/assets/images/placeholder.jpg'">
       </div>
 
       <div class="item-card-body">

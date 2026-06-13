@@ -73,7 +73,7 @@ self.addEventListener('fetch', e => {
   if (req.destination === 'image') {
     e.respondWith(
       cacheFirst(req, CACHE_DYN).catch(() =>
-        caches.match('/assets/assets/images/fundo1.png')
+        caches.match('/assets/images/fundo1.png')
       )
     );
     return;
