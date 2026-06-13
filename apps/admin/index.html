@@ -874,7 +874,7 @@
     const filtered = activeCatFilter === 'todas' ? products : products.filter(p => p.category_id === activeCatFilter);
     container.innerHTML = filtered.map(p => `
       <div class="product-card">
-        <img src="${p.image_url}" class="product-img" onerror="this.src='/public/assets/images/placeholder.jpg'">
+        <img src="${p.image_url}" class="product-img" onerror="this.src='/assets/assets/images/placeholder.jpg'">
         <div class="product-body">
           <div class="product-name">${p.name}</div>
           <div class="product-price">R$ ${Number(p.price).toFixed(2)}</div>

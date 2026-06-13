@@ -16,10 +16,5 @@
         { "key": "Cache-Control", "value": "no-cache" }
       ]
     }
-  ],
-  "rewrites": [
-    { "source": "/(index.html)?", "destination": "/index.html" },
-    { "source": "/apps/cardapio/(index.html)?", "destination": "/apps/cardapio/index.html" },
-    { "source": "/apps/admin/(index.html)?", "destination": "/apps/admin/index.html" }
   ]
 }

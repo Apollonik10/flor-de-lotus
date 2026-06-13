@@ -9,7 +9,7 @@ const PRECACHE = [
   '/apps/cardapio/index.html',
   '/apps/cardapio/styles.css',
   '/apps/cardapio/app.js',
-  '/public/menu.json',
+  '/assets/menu.json',
   '/apps/cardapio/manifest.json',
   '/apps/cardapio/icons/icon-192.png',
   '/apps/cardapio/icons/icon-512.png',
@@ -73,7 +73,7 @@ self.addEventListener('fetch', e => {
   if (req.destination === 'image') {
     e.respondWith(
       cacheFirst(req, CACHE_DYN).catch(() =>
-        caches.match('/public/assets/images/fundo1.png')
+        caches.match('/assets/assets/images/fundo1.png')
       )
     );
     return;

@@ -7,7 +7,7 @@ import { state, dom } from './state.js';
 import { getSupabase } from './db.js';
 
 // URL de reserva — se o banco falhar
-const MENU_URL = '/public/menu.json';
+const MENU_URL = '/assets/menu.json';
 
 /**
  * Busca o cardápio do Supabase. 

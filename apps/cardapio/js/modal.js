@@ -90,7 +90,7 @@ function buildModalHTML(item) {
 
     <div class="modal-img">
       <img src="${item.imagem}" alt="${item.nome}" loading="lazy"
-           onerror="this.src='/public/assets/images/placeholder.jpg'">
+           onerror="this.src='/assets/assets/images/placeholder.jpg'">
     </div>
 
     <div class="modal-body">
