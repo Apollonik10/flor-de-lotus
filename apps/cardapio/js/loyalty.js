@@ -6,7 +6,8 @@
    · Tudo em localStorage (com sync Supabase)
 ═══════════════════════════════════════════════════ */
 
-import { getDeviceId, fetchLoyalty, syncLoyalty } from './db.js';
+import { getDeviceId } from './services/profileService.js';
+import { fetchLoyalty, syncLoyalty } from './services/loyaltyService.js';
 
 const ORDERS_KEY      = 'fl_orders';
 const GIFTS_KEY       = 'fl_gift_cards';

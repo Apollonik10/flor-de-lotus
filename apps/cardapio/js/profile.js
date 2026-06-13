@@ -8,7 +8,7 @@
    v2.1 — syncProfile integrado
 ═══════════════════════════════════════════════════ */
 
-import { syncProfile }      from './db.js';
+import { syncProfile }      from './services/profileService.js';
 import { getLoyaltyStatus } from './loyalty.js';
 
 const STORAGE_KEY = 'fl_user';

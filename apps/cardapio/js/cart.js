@@ -14,9 +14,7 @@ import {
   renderLoyaltyBadge
 } from './loyalty.js';
 
-import {
-  saveOrder
-} from './db.js';
+import { saveOrder } from './services/orderService.js';
 
 import { showOrderTracking } from './order-tracking.js';
 import { renderPaymentSelector, getPaymentInfo, resetPayment } from './payment-ui.js';

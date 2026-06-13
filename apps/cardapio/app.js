@@ -5,7 +5,7 @@
 ════════════════════════════════════════════════════ */
 
 import { loadPersistedData }              from './js/state.js';
-import { fetchMenu, checkStoreStatus, subscribeToRealtimeUpdates } from './js/api.js';
+import { fetchMenu, checkStoreStatus, subscribeToRealtimeUpdates } from './js/services/menuService.js';
 import { renderFilterBar, renderContent } from './js/render.js';
 import { bindGlobalEvents }               from './js/events.js';
 import { registerSW }                     from './js/sw.js';
@@ -18,7 +18,7 @@ import {
 } from './js/profile.js';
 
 import { updateFavBadge }                    from './js/favorites.js';
-import { syncProfile }                       from './js/db.js';
+import { syncProfile }                       from './js/services/profileService.js';
 import { checkActiveOrder, reopenTracking, closeOrderTracking, cancelOrder } from './js/order-tracking.js';
 
 async function init() {
