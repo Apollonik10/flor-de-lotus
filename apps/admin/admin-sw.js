@@ -61,8 +61,8 @@ async function checkNewOrders() {
       
       await self.registration.showNotification('🍣 Flor de Lótus — Novo Pedido!', {
         body: `${order.client_name || 'Cliente'} — R$ ${(order.total || 0).toFixed(2)}`,
-        icon: '/flor-de-lotus/apps/cardapio/icons/icon-192.png',
-        badge: '/flor-de-lotus/apps/cardapio/icons/icon-72.png',
+        icon: '/apps/cardapio/icons/icon-192.png',
+        badge: '/apps/cardapio/icons/icon-72.png',
         tag: `order-${order.id}`,
         renotify: true,
         vibrate: [300, 100, 300, 100, 300],
@@ -85,8 +85,8 @@ self.addEventListener('push', e => {
   const title = data.title || '🍣 Flor de Lótus';
   const options = {
     body: data.body || 'Novo pedido recebido',
-    icon: '/flor-de-lotus/apps/cardapio/icons/icon-192.png',
-    badge: '/flor-de-lotus/apps/cardapio/icons/icon-72.png',
+    icon: '/apps/cardapio/icons/icon-192.png',
+    badge: '/apps/cardapio/icons/icon-72.png',
     tag: 'new-order',
     renotify: true,
     vibrate: [300, 100, 300, 100, 300],

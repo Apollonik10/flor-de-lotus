@@ -1,18 +1,18 @@
 'use strict';
 
-const VER          = 'v9';
+const VER          = 'v10';
 const CACHE_STATIC = `fl-static-${VER}`;
 const CACHE_DYN    = `fl-dynamic-${VER}`;
 
 /* Arquivos essenciais — se um falhar, o resto continua */
 const PRECACHE = [
-  '/flor-de-lotus/apps/cardapio/index.html',
-  '/flor-de-lotus/apps/cardapio/styles.css',
-  '/flor-de-lotus/apps/cardapio/app.js',
-  '/flor-de-lotus/public/menu.json',
-  '/flor-de-lotus/apps/cardapio/manifest.json',
-  '/flor-de-lotus/apps/cardapio/icons/icon-192.png',
-  '/flor-de-lotus/apps/cardapio/icons/icon-512.png',
+  '/apps/cardapio/index.html',
+  '/apps/cardapio/styles.css',
+  '/apps/cardapio/app.js',
+  '/public/menu.json',
+  '/apps/cardapio/manifest.json',
+  '/apps/cardapio/icons/icon-192.png',
+  '/apps/cardapio/icons/icon-512.png',
 ];
 
 /* INSTALL — cache individual, nunca falha por causa de 1 arquivo */
@@ -73,7 +73,7 @@ self.addEventListener('fetch', e => {
   if (req.destination === 'image') {
     e.respondWith(
       cacheFirst(req, CACHE_DYN).catch(() =>
-        caches.match('/flor-de-lotus/public/assets/images/fundo1.png')
+        caches.match('/public/assets/images/fundo1.png')
       )
     );
     return;

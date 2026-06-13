@@ -4,7 +4,7 @@ const path = require('path');
 
 const PORT = 5000;
 const HOST = '0.0.0.0';
-const BASE_PATH = '/flor-de-lotus';
+const BASE_PATH = '';
 const ROOT_DIR = __dirname;
 
 const MIME_TYPES = {
@@ -26,12 +26,12 @@ const MIME_TYPES = {
 
 const server = http.createServer((req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Service-Worker-Allowed', '/flor-de-lotus/');
+  res.setHeader('Service-Worker-Allowed', '/');
 
   let urlPath = req.url.split('?')[0];
 
   if (urlPath === '/' || urlPath === '') {
-    res.writeHead(302, { Location: BASE_PATH + '/index.html' });
+    res.writeHead(302, { Location: '/index.html' });
     res.end();
     return;
   }

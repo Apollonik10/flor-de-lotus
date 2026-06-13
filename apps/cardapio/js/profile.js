@@ -121,7 +121,7 @@ function _renderNoUser() {
     <section class="profile-section profile-no-user">
       <i class="fas fa-user-circle" aria-hidden="true"></i>
       <p>Nenhum dado cadastrado ainda.</p>
-      <a href="/flor-de-lotus/apps/cardapio/register.html" class="btn-go-register">
+      <a href="/apps/cardapio/register.html" class="btn-go-register">
         <i class="fas fa-arrow-right" aria-hidden="true"></i> Cadastrar agora
       </a>
     </section>
