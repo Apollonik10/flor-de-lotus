@@ -1,18 +1,12 @@
 {
-  "cleanUrls": true,
+  "cleanUrls": false,
+  "trailingSlash": true,
   "headers": [
     {
       "source": "/service-worker.js",
       "headers": [
-        { "key": "Service-Worker-Allowed", "value": "/" },
-        { "key": "Cache-Control", "value": "no-cache" }
-      ]
-    },
-    {
-      "source": "/apps/admin/admin-sw.js",
-      "headers": [
-        { "key": "Service-Worker-Allowed", "value": "/apps/admin/" },
-        { "key": "Cache-Control", "value": "no-cache" }
+        { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" },
+        { "key": "Service-Worker-Allowed", "value": "/" }
       ]
     }
   ]

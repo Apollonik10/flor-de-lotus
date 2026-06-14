@@ -1,123 +1,77 @@
-# 🌸 Flor de Lotus - PWA
+# 🌸 Flor de Lótus — Cardápio Digital & Delivery
 
-Projeto de app estilo cardápio digital (PWA) feito com foco em organização de código e separação de responsabilidades.
+Sistema de cardápio digital elegante, performante e mobile-first, desenvolvido para o restaurante **Flor de Lótus** em Cajazeiras, PB.
 
----
+## 🚀 Visão Geral
+O projeto foca em uma experiência de usuário premium utilizando a estética **Glassmorphism**, com foco total em dispositivos móveis e integração direta com WhatsApp e Supabase para gestão de pedidos em tempo real.
 
-## 🚀 O que é esse projeto?
+## 🛠️ Stack Tecnológica
+- **Frontend**: HTML5, CSS3 (Vanilla), JavaScript (ES6+ Modules).
+- **Backend/Banco**: [Supabase](https://supabase.com/) (PostgreSQL, Realtime, Auth, Edge Functions).
+- **Hosting/Deploy**: [Vercel](https://vercel.com/).
+- **PWA**: Service Workers para funcionamento offline e instalação como app.
+- **Pagamentos**: Integração com Efí Bank (PIX).
 
-Um app web que funciona como:
-- Cardápio digital
-- Carrinho de compras
-- Sistema de favoritos
-- Perfil de usuário
-- Sistema de pontos (loyalty)
-- Funciona offline (PWA)
+## 📂 Estrutura do Projeto
+```text
+/
+├── public/                 # Arquivos estáticos servidos pela Vercel
+│   ├── assets/             # Menu JSON e Imagens
+│   ├── apps/
+│   │   ├── cardapio/       # PWA do Cliente
+│   │   └── admin/          # Painel do Administrador
+│   └── service-worker.js   # Controle de cache e PWA
+├── supabase/               # Migrations e Edge Functions
+├── vercel.json             # Configurações de deploy e headers
+└── README.md               # Documentação principal
+```
 
----
+## 📦 Instalação e Desenvolvimento (Termux)
 
-## 📂 Estrutura do projeto
+Este projeto foi otimizado para desenvolvimento 100% via Android usando o **Termux**.
 
-### 📄 Páginas
+1.  **Instalar dependências:**
+    ```bash
+    pkg update && pkg upgrade
+    pkg install nodejs git python
+    ```
+2.  **Clonar o repositório:**
+    ```bash
+    git clone https://github.com/seu-usuario/flor-de-lotus.git
+    cd flor-de-lotus
+    ```
+3.  **Servidor Local (opcional):**
+    ```bash
+    npx serve public
+    ```
 
-- `cardapio.html` → tela principal com os produtos  
-- `register.html` → cadastro de usuário  
+## ☁️ Configuração do Supabase
 
----
+### Tabelas Principais
+Execute o SQL em `supabase/migrations/` no editor do Supabase para criar:
+- `profiles`: Dados dos clientes.
+- `orders`: Registro de pedidos.
+- `categories` & `products`: Gestão do cardápio online.
+- `store_config`: Horários e status da loja.
+- `loyalty`: Sistema de pontos/fidelidade.
 
-### ⚙️ JavaScript (arquitetura)
+### Variáveis de Ambiente
+Configure no seu projeto Supabase:
+- `EFI_CLIENT_ID`, `EFI_CLIENT_SECRET`, `EFI_PIX_KEY` (Para a Fase 5).
 
-#### 🧠 Núcleo
-- `app.js` → inicia o app e conecta tudo  
-- `js/state.js` → guarda todos os dados do app  
-- `js/render.js` → atualiza a tela  
-- `js/events.js` → controla cliques/toques  
+## 🗺️ Roadmap de Desenvolvimento
 
----
+- [x] **Fase 1:** Frontend PWA & UI Glassmorphism.
+- [x] **Fase 2:** Integração Supabase (Auth & Database).
+- [x] **Fase 3:** Pedidos em Tempo Real & Dashboard Admin.
+- [x] **Fase 4:** Relatórios e Métricas de Vendas.
+- [ ] **Fase 5:** Pagamentos PIX (Efí Bank) - *Em progresso*.
+- [ ] **Fase 6:** Notificações Push & Cupons de Desconto.
 
-#### 🧩 Funcionalidades
-- `js/api.js` → busca dados (menu.json / API)  
-- `js/cart.js` → lógica do carrinho  
-- `js/favorites.js` → favoritos  
-- `js/loyalty.js` → sistema de pontos  
-- `js/profile.js` → dados do usuário  
-
----
-
-#### 🎨 Interface / suporte
-- `js/modal.js` → popups  
-- `js/toast.js` → mensagens rápidas  
-- `js/utils.js` → funções auxiliares  
-
----
-
-### 📦 Dados
-- `menu.json` → lista de produtos  
-
----
-
-### 🎨 Estilo
-- `styles.css` → visual e responsividade  
-
----
-
-### ⚙️ PWA
-- `service-worker.js` → cache offline  
-- `js/sw.js` → controle/registro do service worker  
-- `manifest.json` → config de instalação  
-
----
-
-### 🔊 Assets
-- `audio/happy.mp3` → som de feedback  
-- `icons/fundo1.png` → imagem/ícone  
-
----
-
-## 🧠 Como o app funciona (fluxo)
-
-1. `app.js` inicia tudo  
-2. `state.js` guarda os dados  
-3. `api.js` carrega produtos  
-4. `render.js` mostra na tela  
-5. `events.js` escuta ações do usuário  
-6. módulos (`cart`, `favorites`, etc.) cuidam das regras  
+## 📜 Regras de Desenvolvimento
+- **Mobile-First**: Design sempre pensado primeiro no celular.
+- **Caminhos Root-Relative**: Use sempre `/assets/...` ou `/apps/...` para garantir compatibilidade com a Vercel.
+- **Service Worker**: Sempre incrementar a versão em `service-worker.js` após alterações críticas em CSS/JS.
 
 ---
-
-## 📱 Foco mobile
-
-- Interface pensada para toque  
-- Sem dependência de hover  
-- Estrutura leve  
-- Funciona offline (PWA)  
-- Separação de código pra manter performance  
-
----
-
-## ⚠️ Observações
-
-- Código separado por responsabilidade (padrão profissional)  
-- Fácil de escalar e adicionar novas features  
-- Ideal pra portfólio front-end  
-
----
-
-## 🔥 Próximos passos (melhoria)
-
-- Melhorar performance do render  
-- Refinar UI/UX mobile  
-- Integrar backend (Firebase ou API real)  
-- Adicionar pagamento (Efí Bank / PIX)
-- integrar deshbord própria
-- integração com n8n
-
----
-
-## 💡 Resumo
-
-Projeto focado em:
-- Organização de código  
-- Arquitetura limpa  
-- Experiência mobile  
-- Evolução para SaaS
+Desenvolvido com ❤️ por Flor de Lótus.

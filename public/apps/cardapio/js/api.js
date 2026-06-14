@@ -14,28 +14,31 @@ const MENU_URL = '/assets/menu.json';
  * Se o banco estiver vazio ou falhar, usa o menu.json como fallback.
  */
 export async function fetchMenu() {
+  // 1. Tenta o fallback JSON primeiro — garante estabilidade imediata
+  const jsonMenu = await fetchMenuFallback();
+  if (jsonMenu && jsonMenu.length > 0) {
+    return jsonMenu;
+  }
+
+  // 2. Se o JSON falhar, tenta o Supabase (Reserva)
   try {
     const supabase = getSupabase();
-    
-    // 1. Buscar Categorias e Produtos em paralelo
     const [catRes, prodRes] = await Promise.all([
       supabase.from('categories').select('*').order('sort_order'),
       supabase.from('products').select('*').eq('is_active', true)
     ]);
 
-    // Se o banco estiver vazio ou der erro, vai para o fallback
     if (catRes.error || prodRes.error || !catRes.data?.length) {
-      console.warn('[api] Banco vazio ou erro, usando fallback JSON');
-      return await fetchMenuFallback();
+      console.warn('[api] Supabase vazio ou erro');
+      return [];
     }
 
-    // 2. Organizar produtos dentro de suas categorias
     state.menu = organizeMenu(catRes.data, prodRes.data);
     console.log('[api] menu carregado do Supabase ✓');
     return state.menu;
   } catch (err) {
     console.error('[api] Erro ao buscar menu:', err);
-    return await fetchMenuFallback();
+    return [];
   }
 }
 
@@ -98,17 +101,16 @@ async function fetchMenuFallback() {
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     state.menu = data.categorias || [];
-    console.log('[api] menu carregado do JSON fallback');
+    console.log('[api] menu carregado do JSON fallback ✓');
     return state.menu;
   } catch (err) {
     console.error('[api] fallback falhou:', err);
-    renderErrorUI(err.message);
     return [];
   }
 }
 
 /**
- * Verifica o status de funcionamento da loja
+ * Verifica o status de funcionamento da loja (Ajustado para GMT-3)
  */
 export async function checkStoreStatus() {
   try {
@@ -117,18 +119,20 @@ export async function checkStoreStatus() {
       .from('store_config')
       .select('*');
 
-    if (error || !data) return { is_open: true }; // Se der erro, assume aberto por padrão
+    if (error || !data) return { is_open: true };
 
     const status = data.find(c => c.key === 'status')?.value || {};
     const hours  = data.find(c => c.key === 'hours')?.value || [];
 
-    // 1. Checagem Manual (Botão de Pânico)
     if (status.manual_closed) return { is_open: false, reason: 'Fechado temporariamente' };
 
-    // 2. Checagem de Horário Automática
+    // Horário Atual Ajustado para GMT-3 (Cajazeiras/PB)
     const now = new Date();
-    const day = now.getDay(); // 0 = Domingo, 1 = Segunda...
-    const currentTime = now.getHours() * 60 + now.getMinutes();
+    const utcTime = now.getTime() + (now.getTimezoneOffset() * 60000);
+    const localDate = new Date(utcTime + (3600000 * -3));
+    
+    const day = localDate.getDay();
+    const currentTime = localDate.getHours() * 60 + localDate.getMinutes();
 
     const todayRule = hours.find(h => h.day === day);
     
@@ -142,7 +146,6 @@ export async function checkStoreStatus() {
     const openMinutes  = hOpen * 60 + mOpen;
     const closeMinutes = hClose * 60 + mClose;
 
-    // Lógica para horários que passam da meia-noite (ex: 18h às 02h)
     let isOpen = false;
     if (closeMinutes < openMinutes) {
       isOpen = currentTime >= openMinutes || currentTime <= closeMinutes;
