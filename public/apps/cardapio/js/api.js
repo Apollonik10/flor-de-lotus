@@ -10,18 +10,41 @@ import { getSupabase } from './db.js';
 const MENU_URL = '/assets/menu.json';
 
 /**
+ * Helper para fetch com timeout
+ */
+async function fetchWithTimeout(url, options = {}, timeout = 6000) {
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), timeout);
+  try {
+    const response = await fetch(url, { ...options, signal: controller.signal });
+    clearTimeout(id);
+    return response;
+  } catch (err) {
+    clearTimeout(id);
+    throw err;
+  }
+}
+
+/**
  * Busca o cardápio do Supabase. 
  * Se o banco estiver vazio ou falhar, usa o menu.json como fallback.
  */
 export async function fetchMenu() {
+  console.log('[api] Iniciando fetchMenu...');
   // 1. Tenta o fallback JSON primeiro — garante estabilidade imediata
-  const jsonMenu = await fetchMenuFallback();
-  if (jsonMenu && jsonMenu.length > 0) {
-    return jsonMenu;
+  try {
+    const jsonMenu = await fetchMenuFallback();
+    if (jsonMenu && jsonMenu.length > 0) {
+      console.log('[api] fetchMenu resolvido via JSON');
+      return jsonMenu;
+    }
+  } catch (e) {
+    console.warn('[api] Falha crítica no fetchMenuFallback:', e);
   }
 
   // 2. Se o JSON falhar, tenta o Supabase (Reserva)
   try {
+    console.log('[api] Tentando Supabase como reserva...');
     const supabase = getSupabase();
     const [catRes, prodRes] = await Promise.all([
       supabase.from('categories').select('*').order('sort_order'),
@@ -30,15 +53,15 @@ export async function fetchMenu() {
 
     if (catRes.error || prodRes.error || !catRes.data?.length) {
       console.warn('[api] Supabase vazio ou erro');
-      return [];
+      return state.menu; // Retorna o que tiver (pode ser o emergência do fallback)
     }
 
     state.menu = organizeMenu(catRes.data, prodRes.data);
     console.log('[api] menu carregado do Supabase ✓');
     return state.menu;
   } catch (err) {
-    console.error('[api] Erro ao buscar menu:', err);
-    return [];
+    console.error('[api] Erro ao buscar menu no Supabase:', err);
+    return state.menu;
   }
 }
 
@@ -96,8 +119,9 @@ export function subscribeToRealtimeUpdates(onUpdate) {
 }
 
 async function fetchMenuFallback() {
+  console.log('[api] Carregando fallback JSON...');
   try {
-    const res = await fetch(MENU_URL);
+    const res = await fetchWithTimeout(MENU_URL);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     state.menu = data.categorias || [];
@@ -122,7 +146,7 @@ function getEmergencyMenu() {
       id: "emergencia",
       nome: "Cardápio Local",
       icone: "fa-alert",
-      descricao: "Carregado via emergência",
+      descricao: "Carregado via emergência (Segurança)",
       itens: [
         {
           id: "emergency-01",
@@ -142,7 +166,11 @@ function getEmergencyMenu() {
  */
 export async function checkStoreStatus() {
   try {
+    console.log('[api] Verificando status da loja...');
     const supabase = getSupabase();
+    
+    // Adiciona timeout na query do Supabase usando abort controller se possível, 
+    // mas por simplicidade vamos apenas deixar rodar em paralelo no init.
     const { data, error } = await supabase
       .from('store_config')
       .select('*');
@@ -187,6 +215,7 @@ export async function checkStoreStatus() {
     };
 
   } catch (e) {
+    console.warn('[api] Falha ao verificar status, assumindo aberto:', e);
     return { is_open: true };
   }
 }

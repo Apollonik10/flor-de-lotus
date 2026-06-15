@@ -22,29 +22,39 @@ import { syncProfile }                       from './js/services/profileService.
 import { checkActiveOrder, reopenTracking, closeOrderTracking, cancelOrder } from './js/order-tracking.js';
 
 async function init() {
+  console.log('[init] Bootstrap iniciado');
   loadPersistedData();
   window.FL_STATE = state; // Depuração global
 
-  // Busca menu e status da loja em paralelo
-  const [menuRes, store] = await Promise.all([
-    fetchMenu(),
-    checkStoreStatus()
-  ]);
+  // 1. Inicia busca do menu imediatamente
+  const menuPromise = fetchMenu();
+  const storePromise = checkStoreStatus();
 
-  console.log('[init] Menu loaded, items:', state.menu.length);
-
-  if (!store.is_open) {
-    import('./js/toast.js').then(m => {
-      m.showToast(`🌙 No momento estamos fechados. ${store.reason || ''}`, 'warning', 6000);
-    });
+  // 2. Aguarda o menu e renderiza assim que possível
+  try {
+    const menuRes = await menuPromise;
+    console.log('[init] Menu resolvido, itens:', state.menu.length);
+    
+    renderFilterBar();
+    renderContent();
+    updateCartUI();
+    renderProfileDrawer();
+    console.log('[init] Renderização inicial concluída');
+  } catch (err) {
+    console.error('[init] Falha ao renderizar menu inicial:', err);
   }
 
-  renderFilterBar();
-  renderContent();
-  updateCartUI();
-  renderProfileDrawer();
+  // 3. Aguarda status da loja em background
+  storePromise.then(store => {
+    console.log('[init] Status da loja recebido:', store.is_open);
+    if (!store.is_open) {
+      import('./js/toast.js').then(m => {
+        m.showToast(`🌙 No momento estamos fechados. ${store.reason || ''}`, 'warning', 6000);
+      });
+    }
+  }).catch(e => console.warn('[init] Erro ao verificar status da loja:', e));
 
-  // Forçar um re-render após 1.5s para garantir visibilidade (Segurança para Cache/Lazy Load)
+  // 4. Forçar um re-render após 1.5s para garantir visibilidade
   setTimeout(() => {
     if (state.menu.length > 0 && !document.querySelector('.item-card')) {
       console.log('[init] Forçando re-render de segurança...');
@@ -52,7 +62,7 @@ async function init() {
     }
   }, 1500);
 
-  // Ativa Realtime para atualizações dinâmicas
+  // 5. Ativa Realtime e outros serviços
   subscribeToRealtimeUpdates((type, data) => {
     if (type === 'menu') {
       renderContent();
