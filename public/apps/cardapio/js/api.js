@@ -53,7 +53,7 @@ export async function fetchMenu() {
 
     if (catRes.error || prodRes.error || !catRes.data?.length) {
       console.warn('[api] Supabase vazio ou erro');
-      return state.menu; // Retorna o que tiver (pode ser o emergência do fallback)
+      return state.menu;
     }
 
     state.menu = organizeMenu(catRes.data, prodRes.data);
@@ -125,40 +125,12 @@ async function fetchMenuFallback() {
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     state.menu = data.categorias || [];
-    
-    if (state.menu.length === 0) {
-      console.warn('[api] JSON veio vazio, usando item de emergência');
-      state.menu = getEmergencyMenu();
-    }
-    
     console.log('[api] menu carregado do JSON fallback ✓');
     return state.menu;
   } catch (err) {
-    console.error('[api] fallback falhou, usando item de emergência:', err);
-    state.menu = getEmergencyMenu();
-    return state.menu;
+    console.error('[api] fallback falhou:', err);
+    return [];
   }
-}
-
-function getEmergencyMenu() {
-  return [
-    {
-      id: "emergencia",
-      nome: "Cardápio Local",
-      icone: "fa-alert",
-      descricao: "Carregado via emergência (Segurança)",
-      itens: [
-        {
-          id: "emergency-01",
-          nome: "Uramaki Tradicional",
-          preco: 10.00,
-          descricao: "O clássico arroz por fora. (Carregamento de segurança)",
-          imagem: "/assets/images/uramaki.jpg",
-          destaque: true
-        }
-      ]
-    }
-  ];
 }
 
 /**
@@ -168,9 +140,6 @@ export async function checkStoreStatus() {
   try {
     console.log('[api] Verificando status da loja...');
     const supabase = getSupabase();
-    
-    // Adiciona timeout na query do Supabase usando abort controller se possível, 
-    // mas por simplicidade vamos apenas deixar rodar em paralelo no init.
     const { data, error } = await supabase
       .from('store_config')
       .select('*');
