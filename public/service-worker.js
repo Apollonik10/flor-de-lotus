@@ -1,6 +1,6 @@
 'use strict';
 
-const VER          = 'v14';
+const VER          = 'v15';
 const CACHE_STATIC = `fl-static-${VER}`;
 const CACHE_DYN    = `fl-dynamic-${VER}`;
 
@@ -79,8 +79,8 @@ self.addEventListener('fetch', e => {
     return;
   }
 
-  /* CSS / JS / outros → cache first */
-  e.respondWith(cacheFirst(req, CACHE_DYN));
+  /* CSS / JS / outros → stale-while-revalidate (atualiza em background) */
+  e.respondWith(staleWhileRevalidate(req));
 });
 
 /* ── Helpers ── */
