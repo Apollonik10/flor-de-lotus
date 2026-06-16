@@ -1,6 +1,6 @@
 'use strict';
 
-const VER          = 'v15';
+const VER          = 'v16';
 const CACHE_STATIC = `fl-static-${VER}`;
 const CACHE_DYN    = `fl-dynamic-${VER}`;
 
@@ -49,6 +49,9 @@ self.addEventListener('fetch', e => {
   if (req.method !== 'GET') return;
 
   const url = new URL(req.url);
+
+  /* ── NÃO interceptar cross-origin (esm.sh, supabase, etc) ── */
+  if (url.origin !== self.location.origin) return;
 
   /* CDN externo (fontes/ícones) → cache first */
   const isExt = url.hostname.includes('fonts.googleapis.com')
