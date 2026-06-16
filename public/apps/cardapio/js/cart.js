@@ -18,6 +18,13 @@ import { saveOrder } from './services/orderService.js';
 
 import { showOrderTracking } from './order-tracking.js';
 import { renderPaymentSelector, getPaymentInfo, resetPayment } from './payment-ui.js';
+import { validateCoupon, useCoupon } from './services/couponService.js';
+
+/* ── Estado do cupom ── */
+let _appliedCoupon = null;
+
+export function getAppliedCoupon() { return _appliedCoupon; }
+export function clearCoupon() { _appliedCoupon = null; }
 
 /* ── Adicionar item ── */
 export function addToCart(item, qty = 1, sabor = null) {
@@ -148,19 +155,99 @@ export function renderCartDrawer() {
 
   /* ── Renderiza seletor de pagamento ── */
   renderPaymentSelector(summaryEl);
+
+  /* ── Renderiza área de cupom ── */
+  renderCouponArea(summaryEl, total);
 }
+
+/* ── Área de Cupom ── */
+function renderCouponArea(summaryEl, total) {
+  if (!summaryEl) return;
+
+  // Evita duplicar
+  if (summaryEl.querySelector('.coupon-area')) return;
+
+  const couponWrap = document.createElement('div');
+  couponWrap.className = 'coupon-area';
+
+  if (_appliedCoupon) {
+    couponWrap.innerHTML = `
+      <div class="coupon-applied">
+        <span class="coupon-badge">🎟️ ${_appliedCoupon.code}</span>
+        <span class="coupon-discount">-${_appliedCoupon.discount_type === 'percent' ? _appliedCoupon.discount_value + '%' : 'R$ ' + _appliedCoupon.discount_value}</span>
+        <button class="coupon-remove" onclick="window._removeCoupon()" aria-label="Remover cupom">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    `;
+  } else {
+    couponWrap.innerHTML = `
+      <div class="coupon-input-wrap">
+        <input type="text" id="couponInput" class="coupon-input" placeholder="Código do cupom" maxlength="20" inputmode="text" />
+        <button id="btnApplyCoupon" class="coupon-btn" onclick="window._applyCoupon()">Aplicar</button>
+      </div>
+      <div id="couponMsg" class="coupon-msg" style="display:none"></div>
+    `;
+  }
+
+  // Insere antes do seletor de pagamento
+  const ps = summaryEl.querySelector('.payment-selector');
+  summaryEl.insertBefore(couponWrap, ps);
+}
+
+/* ── Aplicar cupom ── */
+window._applyCoupon = async function() {
+  const input = document.getElementById('couponInput');
+  const msgEl = document.getElementById('couponMsg');
+  if (!input) return;
+
+  const code = input.value.trim();
+  if (!code) return;
+
+  const total = state.cart.reduce((s, c) => s + c.preco * c.qty, 0);
+
+  input.disabled = true;
+  if (msgEl) { msgEl.style.display = 'block'; msgEl.textContent = 'Validando...'; msgEl.className = 'coupon-msg'; }
+
+  const result = await validateCoupon(code, total);
+
+  input.disabled = false;
+
+  if (result.valid) {
+    _appliedCoupon = result;
+    if (msgEl) { msgEl.textContent = 'Cupom aplicado! ✓'; msgEl.className = 'coupon-msg coupon-msg--success'; }
+    showToast(`🎟️ Cupom ${result.code} aplicado!`);
+    renderCartDrawer();
+  } else {
+    if (msgEl) { msgEl.textContent = result.error || 'Cupom inválido'; msgEl.className = 'coupon-msg coupon-msg--error'; }
+  }
+};
+
+/* ── Remover cupom ── */
+window._removeCoupon = function() {
+  _appliedCoupon = null;
+  renderCartDrawer();
+  showToast('Cupom removido');
+};
 
 /* ── Enviar pedido WhatsApp ── */
 export async function sendOrderWhatsApp() {
   if (!state.cart.length) return;
 
-  const total = state.cart.reduce((s, c) => s + c.preco * c.qty, 0);
+  const subtotal = state.cart.reduce((s, c) => s + c.preco * c.qty, 0);
+  const couponDiscount = _appliedCoupon ? _appliedCoupon.discount : 0;
+  const total = subtotal - couponDiscount;
 
   /* ── Pagamento ── */
   const { method: payMethod, troco: trocoVal } = getPaymentInfo();
   const payLabels  = { cartao: '💳 Cartão', pix: '🟣 Pix', dinheiro: '💵 Dinheiro' };
   const pagamento  = payMethod
     ? `*Pagamento:* ${payLabels[payMethod] || payMethod}${payMethod === 'dinheiro' && trocoVal ? ` (troco para R$ ${trocoVal})` : ''}`
+    : '';
+
+  /* ── Cupom ── */
+  const cupomLinha = _appliedCoupon
+    ? `🎟️ *Cupom ${_appliedCoupon.code}:* -R$ ${formatPrice(couponDiscount)}`
     : '';
 
   /* ── Linhas do pedido ── */
@@ -188,6 +275,7 @@ export async function sendOrderWhatsApp() {
     '',
     ...lines,
     '',
+    cupomLinha,
     `*Total: R$ ${formatPrice(total)}*`,
     '',
     pagamento,
@@ -208,8 +296,15 @@ export async function sendOrderWhatsApp() {
     console.warn('[cart] saveOrder falhou:', err.message);
   }
 
-  /* Reseta pagamento */
+  /* Reseta pagamento e cupom */
   resetPayment();
+  const usedCoupon = _appliedCoupon;
+  _appliedCoupon = null;
+
+  /* Registra uso do cupom no Supabase */
+  if (usedCoupon && usedCoupon.coupon_id && orderId) {
+    useCoupon(usedCoupon.coupon_id, orderId).catch(() => {});
+  }
 
   /* ── 2. Abre WhatsApp ── */
   window.open(

@@ -68,6 +68,40 @@ Configure no seu projeto Supabase:
 - [ ] **Fase 5:** Pagamentos PIX (Efí Bank) - *Em progresso*.
 - [ ] **Fase 6:** Notificações Push & Cupons de Desconto.
 
+## 🤖 Configuração MCP (Model Context Protocol)
+
+Este projeto possui MCPs configurados via **`.mcp.json`** (formato global) para qualquer IA.
+
+### MCPs Disponíveis
+
+1. **Filesystem** — Acesso ao sistema de arquivos do projeto
+2. **GitHub** — API do GitHub (issues, commits, PRs)
+3. **Supabase** — Banco de dados (tabelas, migrations, queries)
+4. **Vercel** — Deploy e gerenciamento na Vercel
+
+### Variáveis de Ambiente
+
+1. Copie o template:
+```bash
+cp .env.example .env
+```
+
+2. Preencha o `.env` com suas credenciais (nunca commite este arquivo)
+
+3. Para carregar automaticamente, adicione ao `~/.bashrc`:
+```bash
+[ -f /data/data/com.termux/files/home/projects/flor-de-lotus/.env ] && source /data/data/com.termux/files/home/projects/flor-de-lotus/.env
+```
+
+### Exemplos de Uso com IA
+
+```
+"Liste todos os arquivos do projeto"
+"Crie uma tabela favorites no Supabase"
+"Quais issues estão abertas no GitHub?"
+"Faça deploy da branch staging"
+```
+
 ## 📜 Regras de Desenvolvimento
 - **Mobile-First**: Design sempre pensado primeiro no celular.
 - **Caminhos Root-Relative**: Use sempre `/assets/...` ou `/apps/...` para garantir compatibilidade com a Vercel.

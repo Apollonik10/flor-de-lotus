@@ -20,6 +20,7 @@ import {
 import { updateFavBadge }                    from './js/favorites.js';
 import { syncProfile }                       from './js/services/profileService.js';
 import { checkActiveOrder, reopenTracking, closeOrderTracking, cancelOrder } from './js/order-tracking.js';
+import { initPush } from './js/services/pushService.js';
 
 async function init() {
   console.log('[init] Bootstrap iniciado');
@@ -88,6 +89,9 @@ async function init() {
 
   // Sync em background
   syncProfile().catch(() => {});
+
+  // Inicializa push notifications (Fase 6)
+  initPush().catch(() => {});
 
   /* Eventos específicos */
   document.getElementById('btnCloseCart')?.addEventListener('click', closeCartDrawer);

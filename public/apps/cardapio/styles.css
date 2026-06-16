@@ -1261,6 +1261,54 @@ body {
 .troco-input:focus { border-color: var(--lotus-pink-dark); }
 .troco-input::placeholder { color: var(--text-faint); }
 
+/* ── Cupom de Desconto (Fase 6) ── */
+.coupon-area { margin-top: .75rem; }
+.coupon-input-wrap {
+  display: flex; gap: .5rem;
+}
+.coupon-input {
+  flex: 1; padding: .55rem .8rem;
+  background: rgba(255,255,255,.06); border: 1.5px solid rgba(232,180,162,.25);
+  border-radius: 8px; color: var(--text-primary);
+  font-size: .85rem; font-family: inherit; text-transform: uppercase;
+  outline: none; transition: border .2s; letter-spacing: .05em;
+}
+.coupon-input:focus { border-color: var(--lotus-pink-dark); }
+.coupon-input::placeholder { color: var(--text-faint); text-transform: none; letter-spacing: 0; }
+.coupon-btn {
+  padding: .55rem 1rem; font-size: .75rem; font-weight: 600;
+  color: var(--lotus-pink-light); background: rgba(217,143,122,.2);
+  border: 1.5px solid var(--lotus-pink-dark); border-radius: 8px;
+  cursor: pointer; transition: all .2s; white-space: nowrap;
+}
+.coupon-btn:hover { background: rgba(217,143,122,.35); }
+.coupon-btn:active { transform: scale(.95); }
+.coupon-msg {
+  margin-top: .4rem; font-size: .72rem; font-weight: 500;
+  color: var(--vermillion);
+}
+.coupon-msg--success { color: var(--green-wa); }
+.coupon-msg--error { color: var(--vermillion); }
+.coupon-applied {
+  display: flex; align-items: center; gap: .5rem;
+  padding: .5rem .75rem;
+  background: rgba(37,211,102,.1); border: 1px solid rgba(37,211,102,.3);
+  border-radius: 8px;
+}
+.coupon-badge {
+  font-size: .75rem; font-weight: 600; color: var(--green-wa);
+}
+.coupon-discount {
+  font-size: .75rem; font-weight: 600; color: var(--green-wa);
+  margin-left: auto;
+}
+.coupon-remove {
+  background: none; border: none; color: var(--text-dim);
+  cursor: pointer; padding: .2rem; font-size: .8rem;
+  transition: color .2s;
+}
+.coupon-remove:hover { color: var(--vermillion); }
+
 /* ── FAB acompanhar pedido (centro, acima do FAB do carrinho) ── */
 .fab-track {
   position: fixed; bottom: 90px; left: 50%; z-index: 300;
