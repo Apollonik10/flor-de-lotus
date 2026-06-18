@@ -1,6 +1,6 @@
 'use strict';
 
-const VER          = 'v16';
+const VER          = 'v17';
 const CACHE_STATIC = `fl-static-${VER}`;
 const CACHE_DYN    = `fl-dynamic-${VER}`;
 

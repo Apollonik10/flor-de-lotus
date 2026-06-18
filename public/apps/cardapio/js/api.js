@@ -82,7 +82,7 @@ function organizeMenu(categories, products) {
         preco: p.price,
         descricao: p.description,
         porcao: p.portion,
-        imagem: p.image_url,
+        imagem: p.image_url && p.image_url.startsWith("/") ? p.image_url : "/" + p.image_url,
         sabores: p.flavors || [],
         tags: p.tags || [],
         destaque: p.is_featured,
@@ -124,7 +124,7 @@ async function fetchMenuFallback() {
     const res = await fetchWithTimeout(MENU_URL);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
-    state.menu = data.categorias || [];
+    state.menu = (data.categorias || []).map(cat => ({...cat, itens: cat.itens.map(it => ({...it, imagem: it.imagem && it.imagem.startsWith("/") ? it.imagem : "/" + it.imagem}))}));
     console.log('[api] menu carregado do JSON fallback ✓');
     return state.menu;
   } catch (err) {
