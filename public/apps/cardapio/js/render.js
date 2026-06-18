@@ -159,6 +159,10 @@ function renderCard(item) {
   const isFav = state.favorites.has(item.id);
   const preco = formatPrice(item.preco);
 
+  // Garante que o caminho da imagem seja relativo à raiz do app se necessário, 
+  // mas mantém a flexibilidade para caminhos absolutos.
+  const imgPath = item.imagem && item.imagem.startsWith('/') ? item.imagem : `/${item.imagem}`;
+
   return `
     <li class="item-card" role="listitem"
         data-id="${item.id}"
@@ -166,10 +170,10 @@ function renderCard(item) {
         aria-label="${item.nome} — R$ ${preco}">
 
       <div class="item-card-img">
-        <img src="${item.imagem}" alt="${item.nome}" loading="lazy"
-             onerror="this.src='/assets/images/placeholder.jpg'">
+        <img src="${imgPath}" alt="${item.nome}" loading="lazy"
+             onerror="console.warn('[render] falha ao carregar imagem:', this.src); this.onerror=null; this.src='/assets/images/placeholder.jpg'">
       </div>
-
+...
       <div class="item-card-body">
         <h3 class="item-card-name">${item.nome}</h3>
         ${item.porcao

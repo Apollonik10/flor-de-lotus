@@ -4,7 +4,7 @@ const path = require('path');
 
 const PORT = 5000;
 const HOST = '0.0.0.0';
-const ROOT_DIR = __dirname;
+const ROOT_DIR = path.join(__dirname, '..', 'public');
 
 const MIME_TYPES = {
   '.html': 'text/html; charset=utf-8',

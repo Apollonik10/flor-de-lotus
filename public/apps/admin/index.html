@@ -872,9 +872,11 @@
   function renderProducts() {
     const container = $('productsContainer');
     const filtered = activeCatFilter === 'todas' ? products : products.filter(p => p.category_id === activeCatFilter);
-    container.innerHTML = filtered.map(p => `
+    container.innerHTML = filtered.map(p => {
+      const imgPath = p.image_url && p.image_url.startsWith('/') ? p.image_url : `/${p.image_url}`;
+      return `
       <div class="product-card">
-        <img src="${p.image_url}" class="product-img" onerror="this.src='/assets/images/placeholder.jpg'">
+        <img src="${imgPath}" class="product-img" onerror="console.warn('[admin] falha imagem:', this.src); this.onerror=null; this.src='/assets/images/placeholder.jpg'">
         <div class="product-body">
           <div class="product-name">${p.name}</div>
           <div class="product-price">R$ ${Number(p.price).toFixed(2)}</div>
@@ -890,7 +892,7 @@
           <button class="btn btn-remove" onclick="deleteProduct('${p.id}')"><i class="fas fa-trash"></i></button>
         </div>
       </div>
-    `).join('');
+    `;}).join('');
   }
 
   window.deleteProduct = async (id) => {
