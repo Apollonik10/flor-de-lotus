@@ -1,6 +1,6 @@
 'use strict';
 
-const VER          = 'v17';
+const VER          = 'v18';
 const CACHE_STATIC = `fl-static-${VER}`;
 const CACHE_DYN    = `fl-dynamic-${VER}`;
 
@@ -73,7 +73,7 @@ self.addEventListener('fetch', e => {
   }
 
   /* Imagens → cache first com fallback */
-  if (req.destination === 'image') {
+  if (false && req.destination === 'image') {
     e.respondWith(
       cacheFirst(req, CACHE_DYN).catch(() =>
         caches.match('/assets/images/fundo1.png')
