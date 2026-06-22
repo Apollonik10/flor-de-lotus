@@ -20,8 +20,9 @@ connect-src *;
   (function () {
     var visited = localStorage.getItem('fl_visited');
     var user    = localStorage.getItem('fl_user');
+    var basePath = window.location.pathname.startsWith('/flor-de-lotus') ? '/flor-de-lotus' : '';
     if (visited || user) {
-      window.location.replace('/apps/cardapio/');
+      window.location.replace(basePath + '/apps/cardapio/');
     }
   })();
 </script>
@@ -31,9 +32,9 @@ connect-src *;
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css">
-  <link rel="icon" type="image/x-icon" href="/favicon.ico">
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-  <link rel="manifest" href="/apps/cardapio/manifest.json">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="manifest" href="apps/cardapio/manifest.json">
 
   <style>
 
@@ -87,7 +88,7 @@ connect-src *;
     body {
       background:
         linear-gradient(rgba(0,0,0,.72), rgba(0,0,0,.72)),
-        url('/assets/images/fundo1.png') center center / cover fixed;
+        url('assets/images/fundo1.png') center center / cover fixed;
       color: var(--white-soft);
       font-family: var(--font-body);
       font-weight: 300;
@@ -147,7 +148,7 @@ connect-src *;
       margin-top: var(--nav-h);
       position: relative;
       height: clamp(560px, 88vh, 820px);
-      background: url("/assets/images/capa.png") center / cover no-repeat;
+      background: url("assets/images/capa.png") center / cover no-repeat;
       isolation: isolate;
       overflow: hidden;
     }
@@ -497,7 +498,7 @@ connect-src *;
         e em uma experiência que vai além do prato.
       </p>
       <div class="hero-actions">
-        <a href="/apps/cardapio/register.html?install=1" class="btn-primary">
+        <a href="apps/cardapio/register.html?install=1" class="btn-primary">
           <i class="fas fa-download" aria-hidden="true"></i> Baixar Cardápio
         </a>
         <p class="delivery-pill">
@@ -523,19 +524,19 @@ connect-src *;
       <div class="splide" id="pratos-carousel" aria-label="Pratos em destaque">
         <div class="splide__track">
           <ul class="splide__list">
-            <li class="splide__slide"><img src="/assets/images/bento.jpg"       alt="Bento Oriental"  loading="lazy"></li>
-            <li class="splide__slide"><img src="/assets/images/trak-dragon.png" alt="Trak Dragon"     loading="lazy"></li>
-            <li class="splide__slide"><img src="/assets/images/kane-shake.png"  alt="Kane Shake"      loading="lazy"></li>
-            <li class="splide__slide"><img src="/assets/images/supremo.png"     alt="Supremo"         loading="lazy"></li>
-            <li class="splide__slide"><img src="/assets/images/carpaccio.png"   alt="Carpaccio"       loading="lazy"></li>
-            <li class="splide__slide"><img src="/assets/images/temaki-hot.jpg"  alt="Temaki Hot"      loading="lazy"></li>
-            <li class="splide__slide"><img src="/assets/images/ceviche.png"     alt="Ceviche"         loading="lazy"></li>
+            <li class="splide__slide"><img src="assets/images/bento.jpg"       alt="Bento Oriental"  loading="lazy"></li>
+            <li class="splide__slide"><img src="assets/images/trak-dragon.png" alt="Trak Dragon"     loading="lazy"></li>
+            <li class="splide__slide"><img src="assets/images/kane-shake.png"  alt="Kane Shake"      loading="lazy"></li>
+            <li class="splide__slide"><img src="assets/images/supremo.png"     alt="Supremo"         loading="lazy"></li>
+            <li class="splide__slide"><img src="assets/images/carpaccio.png"   alt="Carpaccio"       loading="lazy"></li>
+            <li class="splide__slide"><img src="assets/images/temaki-hot.jpg"  alt="Temaki Hot"      loading="lazy"></li>
+            <li class="splide__slide"><img src="assets/images/ceviche.png"     alt="Ceviche"         loading="lazy"></li>
           </ul>
         </div>
       </div>
 
       <div class="dishes-cta">
-        <a href="/apps/cardapio/register.html?install=1" class="btn-primary reveal d1"><i class="fas fa-download" aria-hidden="true"></i> Baixar Cardápio</a>
+        <a href="apps/cardapio/register.html?install=1" class="btn-primary reveal d1"><i class="fas fa-download" aria-hidden="true"></i> Baixar Cardápio</a>
       </div>
     </section>
 
@@ -551,12 +552,12 @@ connect-src *;
         <div class="splide reveal d2" id="combinados-carousel" aria-label="Combinados disponíveis">
           <div class="splide__track">
             <ul class="splide__list">
-              <li class="splide__slide"><img src="/assets/images/combos/40variados.jpg" alt="Combinado 40 Variados" loading="lazy"></li>
-              <li class="splide__slide"><img src="/assets/images/combos/chef.jpg"       alt="Combinado Chef"        loading="lazy"></li>
-              <li class="splide__slide"><img src="/assets/images/combos/delicia.jpg"    alt="Combinado Delícia"     loading="lazy"></li>
-              <li class="splide__slide"><img src="/assets/images/combos/felicidade.png" alt="Combinado Felicidade"  loading="lazy"></li>
-              <li class="splide__slide"><img src="/assets/images/combos/maravilha.png"  alt="Combinado Maravilha"   loading="lazy"></li>
-              <li class="splide__slide"><img src="/assets/images/combos/omega.jpg"      alt="Combinado Ômega"       loading="lazy"></li>
+              <li class="splide__slide"><img src="assets/images/combos/40variados.jpg" alt="Combinado 40 Variados" loading="lazy"></li>
+              <li class="splide__slide"><img src="assets/images/combos/chef.jpg"       alt="Combinado Chef"        loading="lazy"></li>
+              <li class="splide__slide"><img src="assets/images/combos/delicia.jpg"    alt="Combinado Delícia"     loading="lazy"></li>
+              <li class="splide__slide"><img src="assets/images/combos/felicidade.png" alt="Combinado Felicidade"  loading="lazy"></li>
+              <li class="splide__slide"><img src="assets/images/combos/maravilha.png"  alt="Combinado Maravilha"   loading="lazy"></li>
+              <li class="splide__slide"><img src="assets/images/combos/omega.jpg"      alt="Combinado Ômega"       loading="lazy"></li>
             </ul>
           </div>
         </div>
@@ -598,7 +599,7 @@ connect-src *;
     <section class="about-section" id="nossa-historia" aria-labelledby="about-title">
       <div class="about-inner wrap">
         <figure class="about-photo reveal-left">
-          <img src="/assets/images/minha-foto.jpg" alt="Sushi Man e Proprietário Flor de Lótus" loading="lazy">
+          <img src="assets/images/minha-foto.jpg" alt="Sushi Man e Proprietário Flor de Lótus" loading="lazy">
         </figure>
 
         <div class="reveal-right">
@@ -711,7 +712,7 @@ Nós amamos, vcs ganharam novos clientes.</blockquote>
         <nav aria-label="Links rápidos do rodapé">
           <h3 class="footer-col-title">Links Rápidos</h3>
           <ul class="footer-list">
-            <li><a href="/apps/cardapio/">Cardápio Completo</a></li>
+            <li><a href="apps/cardapio/">Cardápio Completo</a></li>
             <li><a href="#">Área de Entrega</a></li>
             <li><a href="#">Política de Privacidade</a></li>
             <li><a href="#nossa-historia">Sobre Nós</a></li>

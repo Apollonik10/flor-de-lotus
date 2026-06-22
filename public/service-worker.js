@@ -1,11 +1,13 @@
 'use strict';
 
-const VER          = 'v19';
+const VER          = 'v20';
 const CACHE_STATIC = `fl-static-${VER}`;
 const CACHE_DYN    = `fl-dynamic-${VER}`;
 
+const basePath = self.location.pathname.startsWith('/flor-de-lotus') ? '/flor-de-lotus' : '';
+
 /* Arquivos essenciais — se um falhar, o resto continua */
-const PRECACHE = [
+const PRECACHE_PATHS = [
   '/apps/cardapio/index.html',
   '/apps/cardapio/styles.css',
   '/apps/cardapio/app.js',
@@ -14,6 +16,8 @@ const PRECACHE = [
   '/apps/cardapio/icons/icon-192.png',
   '/apps/cardapio/icons/icon-512.png',
 ];
+
+const PRECACHE = PRECACHE_PATHS.map(path => basePath + path);
 
 /* INSTALL — cache individual, nunca falha por causa de 1 arquivo */
 self.addEventListener('install', e => {
@@ -76,7 +80,7 @@ self.addEventListener('fetch', e => {
   if (false && req.destination === 'image') {
     e.respondWith(
       cacheFirst(req, CACHE_DYN).catch(() =>
-        caches.match('/assets/images/fundo1.png')
+        caches.match(basePath + '/assets/images/fundo1.png')
       )
     );
     return;

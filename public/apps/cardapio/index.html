@@ -2,6 +2,10 @@
 <html lang="pt-BR">
 <head>
 <script>
+  // Garante trailing slash para evitar quebra de imports relativos
+  if (window.location.pathname.endsWith('/cardapio')) {
+    window.location.replace(window.location.pathname + '/' + window.location.search + window.location.hash);
+  }
   window.__pwaPrompt = null;
   window.addEventListener('beforeinstallprompt', function(e) {
     e.preventDefault();

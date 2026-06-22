@@ -7,7 +7,8 @@ import { state, dom } from './state.js';
 import { getSupabase } from './db.js';
 
 // URL de reserva — se o banco falhar
-const MENU_URL = '/assets/menu.json';
+const basePath = window.location.pathname.startsWith('/flor-de-lotus') ? '/flor-de-lotus' : '';
+const MENU_URL = `${basePath}/assets/menu.json`;
 
 /**
  * Helper para fetch com timeout
@@ -69,6 +70,7 @@ export async function fetchMenu() {
  * Organiza produtos dentro de suas categorias (formato esperado pelo app)
  */
 function organizeMenu(categories, products) {
+  const basePath = window.location.pathname.startsWith('/flor-de-lotus') ? '/flor-de-lotus' : '';
   return categories.map(cat => ({
     id: cat.id,
     nome: cat.name,
@@ -76,19 +78,27 @@ function organizeMenu(categories, products) {
     descricao: cat.description,
     itens: products
       .filter(p => p.category_id === cat.id)
-      .map(p => ({
-        id: p.id,
-        nome: p.name,
-        preco: p.price,
-        descricao: p.description,
-        porcao: p.portion,
-        imagem: p.image_url && p.image_url.startsWith("/") ? p.image_url : "/" + p.image_url,
-        sabores: p.flavors || [],
-        tags: p.tags || [],
-        destaque: p.is_featured,
-        is_promo: p.is_promo,
-        is_active: p.is_active
-      }))
+      .map(p => {
+        let img = p.image_url || '';
+        if (img) {
+          if (!img.startsWith(basePath)) {
+            img = basePath + (img.startsWith('/') ? img : '/' + img);
+          }
+        }
+        return {
+          id: p.id,
+          nome: p.name,
+          preco: p.price,
+          descricao: p.description,
+          porcao: p.portion,
+          imagem: img,
+          sabores: p.flavors || [],
+          tags: p.tags || [],
+          destaque: p.is_featured,
+          is_promo: p.is_promo,
+          is_active: p.is_active
+        };
+      })
   })).filter(cat => cat.itens.length > 0);
 }
 
@@ -120,11 +130,23 @@ export function subscribeToRealtimeUpdates(onUpdate) {
 
 async function fetchMenuFallback() {
   console.log('[api] Carregando fallback JSON...');
+  const basePath = window.location.pathname.startsWith('/flor-de-lotus') ? '/flor-de-lotus' : '';
   try {
     const res = await fetchWithTimeout(MENU_URL);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
-    state.menu = (data.categorias || []).map(cat => ({...cat, itens: cat.itens.map(it => ({...it, imagem: it.imagem && it.imagem.startsWith("/") ? it.imagem : "/" + it.imagem}))}));
+    state.menu = (data.categorias || []).map(cat => ({
+      ...cat,
+      itens: cat.itens.map(it => {
+        let img = it.imagem || '';
+        if (img) {
+          if (!img.startsWith(basePath)) {
+            img = basePath + (img.startsWith('/') ? img : '/' + img);
+          }
+        }
+        return { ...it, imagem: img };
+      })
+    }));
     console.log('[api] menu carregado do JSON fallback ✓');
     return state.menu;
   } catch (err) {

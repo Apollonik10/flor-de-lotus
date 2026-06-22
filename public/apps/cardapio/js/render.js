@@ -161,7 +161,8 @@ function renderCard(item) {
 
   // Garante que o caminho da imagem seja relativo à raiz do app se necessário, 
   // mas mantém a flexibilidade para caminhos absolutos.
-  const imgPath = item.imagem && item.imagem.startsWith('/') ? item.imagem : `/${item.imagem}`;
+  const basePath = window.location.pathname.startsWith('/flor-de-lotus') ? '/flor-de-lotus' : '';
+  const imgPath = item.imagem ? (item.imagem.startsWith(basePath) ? item.imagem : basePath + (item.imagem.startsWith('/') ? item.imagem : '/' + item.imagem)) : '';
 
   return `
     <li class="item-card" role="listitem"
@@ -171,7 +172,7 @@ function renderCard(item) {
 
       <div class="item-card-img">
         <img src="${imgPath}" alt="${item.nome}" loading="lazy"
-             onerror="console.warn('[render] falha ao carregar imagem:', this.src); this.onerror=null; this.src='/assets/images/placeholder.jpg'">
+             onerror="console.warn('[render] falha ao carregar imagem:', this.src); this.onerror=null; this.src='${basePath}/assets/images/placeholder.jpg'">
       </div>
 ...
       <div class="item-card-body">
