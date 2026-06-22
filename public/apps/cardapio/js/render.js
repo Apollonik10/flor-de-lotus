@@ -16,7 +16,7 @@ export function renderFilterBar() {
   if (!bar) return;
 
   const pills = [
-    { id: 'todos',     nome: 'Todos',     icone: 'fa-spa'   },
+    { id: 'todos', nome: 'Todos', icone: 'fa-spa' },
     { id: 'favoritos', nome: 'Favoritos', icone: 'fa-heart' },
     ...state.menu.map(c => ({ id: c.id, nome: c.nome, icone: c.icone })),
   ];
@@ -80,35 +80,28 @@ export function renderContent() {
     if (emptyState) emptyState.classList.add('visible');
     return;
   }
+
   if (emptyState) emptyState.classList.remove('visible');
 
   container.innerHTML = categorias.map(cat => renderCategory(cat)).join('');
 
-  /* ── FIX: forçar visibilidade após substituição do DOM ──
-     O IntersectionObserver do pwa-patch.js observa elementos na
-     carga inicial. Quando renderContent() troca o innerHTML, os
-     novos elementos nunca são re-observados e ficam com opacity:0.
-     Aqui removemos qualquer estado de ocultação e re-disparamos
-     o observer global, se existir. ── */
   requestAnimationFrame(() => {
     container.querySelectorAll(
       '.item-card, .category-section, .items-grid'
     ).forEach(el => {
-      el.style.opacity    = '1';
+      el.style.opacity = '1';
       el.style.visibility = 'visible';
-      el.style.transform  = 'translateY(0)';
-      el.style.animation  = 'none'; // cancela animação pendente
+      el.style.transform = 'translateY(0)';
+      el.style.animation = 'none';
     });
 
-    // Chama re-observer do pwa-patch.js, se disponível
     if (typeof window.reObserveCards === 'function') {
       window.reObserveCards(container);
     }
   });
 
-  // Bind de eventos nos cards
   container.querySelectorAll('.item-card').forEach(card => {
-    const id   = card.dataset.id;
+    const id = card.dataset.id;
     const item = findItem(id);
     if (!item) return;
 
@@ -148,6 +141,7 @@ function renderCategory(cat) {
           ${cat.itens.length} ite${cat.itens.length > 1 ? 'ns' : 'm'}
         </span>
       </header>
+
       <ul class="items-grid" role="list">
         ${cat.itens.map(it => renderCard(it)).join('')}
       </ul>
@@ -155,33 +149,43 @@ function renderCategory(cat) {
   `;
 }
 
+/* ── CORREÇÃO DEFINITIVA DE IMAGEM ── */
 function renderCard(item) {
   const isFav = state.favorites.has(item.id);
   const preco = formatPrice(item.preco);
 
-  // Garante que o caminho da imagem seja relativo à raiz do app se necessário, 
-  // mas mantém a flexibilidade para caminhos absolutos.
-  const basePath = window.location.pathname.startsWith('/flor-de-lotus') ? '/flor-de-lotus' : '';
-  const imgPath = item.imagem ? (item.imagem.startsWith(basePath) ? item.imagem : basePath + (item.imagem.startsWith('/') ? item.imagem : '/' + item.imagem)) : '';
+  const imgPath = normalizeImagePath(item.imagem);
 
   return `
-    <li class="item-card" role="listitem"
+    <li class="item-card"
+        role="listitem"
         data-id="${item.id}"
-        data-destaque="${item.destaque}"
+        data-destaque="${item.destaque || ''}"
         aria-label="${item.nome} — R$ ${preco}">
 
       <div class="item-card-img">
-        <img src="${imgPath}" alt="${item.nome}" loading="lazy"
-             onerror="console.warn('[render] falha ao carregar imagem:', this.src); this.onerror=null; this.src='${basePath}/assets/images/placeholder.jpg'">
+        <img
+          src="${imgPath}"
+          alt="${item.nome}"
+          loading="lazy"
+          onerror="
+            console.error('Imagem não encontrada:', this.src);
+            this.onerror=null;
+            this.src='/assets/images/placeholder.jpg';
+          "
+        >
       </div>
-...
+
       <div class="item-card-body">
         <h3 class="item-card-name">${item.nome}</h3>
-        ${item.porcao
-          ? `<span class="item-card-porcao">
-               <i class="fas fa-utensils" aria-hidden="true"></i> ${item.porcao}
-             </span>`
-          : ''}
+
+        ${item.porcao ? `
+          <span class="item-card-porcao">
+            <i class="fas fa-utensils" aria-hidden="true"></i>
+            ${item.porcao}
+          </span>
+        ` : ''}
+
         <p class="item-card-desc">${item.descricao}</p>
       </div>
 
@@ -189,12 +193,14 @@ function renderCard(item) {
         <span class="item-price" aria-label="Preço: R$ ${preco}">
           <sup>R$</sup>${preco}
         </span>
+
         <div class="item-card-actions">
           <button class="btn-fav ${isFav ? 'is-fav' : ''}"
                   aria-label="${isFav ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}"
                   aria-pressed="${isFav}">
             <i class="fa${isFav ? 's' : 'r'} fa-heart" aria-hidden="true"></i>
           </button>
+
           <button class="btn-add"
                   aria-label="Adicionar ${item.nome} ao carrinho">
             <i class="fas fa-plus" aria-hidden="true"></i>
@@ -204,4 +210,19 @@ function renderCard(item) {
       </div>
     </li>
   `;
+}
+
+/* ── Normalização segura de caminho de imagem ── */
+function normalizeImagePath(path) {
+  if (!path) return '/assets/images/placeholder.jpg';
+
+  // já é URL externa
+  if (path.startsWith('http://') || path.startsWith('https://')) {
+    return path;
+  }
+
+  // garante raiz única do app
+  const clean = path.replace(/^\.?\//, '');
+
+  return '/' + clean;
 }
