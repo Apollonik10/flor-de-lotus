@@ -27,12 +27,36 @@ O site usa a estrutura `/apps/cardapio/` com imports relativos. No GitHub Pages,
 
 ---
 
+## ✅ Sessão 2 — 23/06/2026 (Correções de Renderização na Vercel)
+
+### Problemas identificados e corrigidos
+
+| Arquivo | Problema | Correção |
+|---------|----------|----------|
+| `vercel.json` | `outputDirectory` e `framework` ausentes — Vercel não sabia servir a pasta `public/` | Adicionado `"outputDirectory": "public"` e `"framework": null` |
+| `public/apps/cardapio/js/render.js` | `...` literal no template HTML da função `renderCard` (linha 177) — aparecia como texto no DOM e quebrava todos os cards | Removido o `...` indevido |
+| `public/apps/cardapio/js/services/menuService.js` | Re-exportava `fetchMenuFallback` que é uma função **privada** em `api.js` — causava erro de módulo ES e bloqueava toda a inicialização do app | Removida a re-exportação inválida |
+
+### Causa raiz da tela em branco
+O app foi hospedado como **"Other"** na Vercel **sem** definir `outputDirectory`, portanto a Vercel tentava servir a raiz do repo (onde só existem `backend/`, `supabase/`, `vercel.json` etc.) em vez de `public/`. Combinado com o erro de módulo ES em `menuService.js`, o JavaScript nem chegava a inicializar.
+
+### Segurança
+- `.env` confirmado como **não rastreado** pelo git (já estava no `.gitignore`)
+- Tokens de Vercel, GitHub, OpenAI, Gemini, Grok, DeepSeek e Supabase nunca foram commitados ✓
+
+### Infraestrutura
+- Commit `06694cc` criado via `git pull --rebase` + `git push origin main`
+
+---
+
 ## 🔜 Próximos passos sugeridos
 
-- [ ] Verificar deploy no GitHub Pages e Vercel após push
-- [ ] Limpar cache do navegador e testar cardápio completo (imagens, menus, carrinho)
+- [ ] Verificar deploy na Vercel após push (deve renderizar cardápio completo agora)
+- [ ] Limpar cache do Service Worker no navegador para forçar o novo SW
 - [ ] Adicionar animações e melhorias visuais no cardápio
 - [ ] Implementar sistema de pedidos / WhatsApp integration
 - [ ] Adicionar painel admin para editar o `menu.json` via interface
 - [ ] PWA: melhorar offline experience com SW atualizado
 - [ ] Testes em dispositivos móveis (Android/iOS)
+- [ ] **Fase 5:** Pagamentos PIX (Efí Bank)
+- [ ] **Fase 6:** Notificações Push & Cupons de Desconto
