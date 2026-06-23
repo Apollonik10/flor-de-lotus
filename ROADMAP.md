@@ -45,14 +45,16 @@ O app foi hospedado como **"Other"** na Vercel **sem** definir `outputDirectory`
 - Tokens de Vercel, GitHub, OpenAI, Gemini, Grok, DeepSeek e Supabase nunca foram commitados ✓
 
 ### Infraestrutura
-- Commit `06694cc` criado via `git pull --rebase` + `git push origin main`
+- Commit `06694cc` — correções aplicadas
+- Commit `4dbaf68` — ROADMAP atualizado
+- **Deploy validado pelo usuário em 23/06/2026 ✅ — app totalmente funcional na Vercel**
 
 ---
 
-## 🔜 Próximos passos sugeridos
+## 🔜 Próximos passos
 
-- [ ] Verificar deploy na Vercel após push (deve renderizar cardápio completo agora)
-- [ ] Limpar cache do Service Worker no navegador para forçar o novo SW
+- [x] ~~Verificar deploy na Vercel após push~~ — **confirmado funcional ✅**
+- [x] ~~Limpar cache do Service Worker~~ — **validado ✅**
 - [ ] Adicionar animações e melhorias visuais no cardápio
 - [ ] Implementar sistema de pedidos / WhatsApp integration
 - [ ] Adicionar painel admin para editar o `menu.json` via interface
